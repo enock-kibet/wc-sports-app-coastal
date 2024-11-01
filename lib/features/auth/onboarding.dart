@@ -15,7 +15,7 @@ class Onboarding extends StatefulWidget {
 }
 
 class _OnboardingState extends State<Onboarding> {
-  bool showNext = true;
+  bool showNext =true;
 
   @override
   Widget build(BuildContext context) {
