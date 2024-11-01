@@ -75,7 +75,7 @@ class ProfilePage extends StatelessWidget {
               InforCard(
                 image: LucideIcons.helpCircle,
                 title: "Help",
-                press: () {},
+                press: () {context.go('/onboarding');},
               ),
             ],
           ),
