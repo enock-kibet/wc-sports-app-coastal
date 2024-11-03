@@ -15,7 +15,7 @@ class Onboarding extends StatefulWidget {
 }
 
 class _OnboardingState extends State<Onboarding> {
-  bool showNext =true;
+  bool showNext = true;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class _OnboardingState extends State<Onboarding> {
       body:Padding(
         padding: EdgeInsets.only(top:viewPadding),
         child: SingleChildScrollView(
-          child: Padding(
+          child:Padding(
         padding:  EdgeInsets.symmetric(vertical:0,horizontal: kSmall),
             child: GestureDetector(
               onTap: (){
