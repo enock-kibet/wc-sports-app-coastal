@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         children: [
                           const SizedBox(height: kMedium),
-                          headerSection(),
+                          headerSection(context),
                           const SizedBox(height: kMedium),
                           searchField(),
                           const SizedBox(height: kMedium),
@@ -354,13 +354,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Row headerSection() {
+  Row headerSection(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         GestureDetector(
           onTap: () {
-            context.read<SideMenuCubit>().state.currentState!.openDrawer();
+            context.go('/onboarding');
+            //context.read<SideMenuCubit>().state.currentState!.openDrawer();
           },
           child: Container(
             padding: const EdgeInsets.all(kSmall),

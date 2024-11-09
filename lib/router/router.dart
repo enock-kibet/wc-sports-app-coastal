@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/features/auth/login_page2.dart';
+import 'package:sports_app/features/auth/onboarding.dart';
+import 'package:sports_app/features/auth/otp_page.dart';
+import 'package:sports_app/features/auth/sign_up_page.dart';
 import 'package:sports_app/features/dashboard/pages/home/match_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/media/team_media_page.dart';
 import 'package:sports_app/features/dashboard/pages/notifications/notification_page.dart';
@@ -27,8 +31,12 @@ enum AppRoute {
   standings,
   notifications,
   teamMedia,
-   profileDetails,
+  profileDetails,
   editProfile,
+  onboarding,
+  signUp,
+  signIn,
+  otp
 }
 
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -63,6 +71,54 @@ final router = GoRouter(
       pageBuilder: (context, state) {
         return MaterialPage(
           child: StandingPage(
+            key: state.pageKey,
+          ),
+        );
+      },
+    ),
+    GoRoute(
+      path: "/onboarding",
+      name: AppRoute.onboarding.name,
+      parentNavigatorKey: rootNavigatorKey,
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          child: Onboarding(
+            key: state.pageKey,
+          ),
+        );
+      },
+    ),
+    GoRoute(
+      path: "/signUp",
+      name: AppRoute.signUp.name,
+      parentNavigatorKey: rootNavigatorKey,
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          child: SignUpPage(
+            key: state.pageKey,
+          ),
+        );
+      },
+    ),
+    GoRoute(
+      path: "/signIn",
+      name: AppRoute.signIn.name,
+      parentNavigatorKey: rootNavigatorKey,
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          child: LoginPage(
+            key: state.pageKey,
+          ),
+        );
+      },
+    ),
+    GoRoute(
+      path: "/otp",
+      name: AppRoute.otp.name,
+      parentNavigatorKey: rootNavigatorKey,
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          child: OtpPage(
             key: state.pageKey,
           ),
         );

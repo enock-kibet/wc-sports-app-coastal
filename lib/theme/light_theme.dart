@@ -8,7 +8,7 @@ import 'app_colors.dart';
 ThemeData lightMode = ThemeData(
   brightness: Brightness.light,
   useMaterial3: true,
-  textTheme: GoogleFonts.jetBrainsMonoTextTheme(),
+  textTheme: GoogleFonts.interTextTheme(),//.jetBrainsMonoTextTheme(),
   //fontFamily: 'Inter',
   buttonTheme: ButtonThemeData(
     buttonColor: AppColors.primaryColor,
