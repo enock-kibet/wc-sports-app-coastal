@@ -4,6 +4,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/data/models/stripe_checkout/stripe_checkout.dart';
 import 'package:sports_app/features/app/blocs/stripe/stripe_bloc.dart';
@@ -89,15 +90,8 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
               ),
             ),
           ),
-          body: Container(
-              height: double.infinity,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("assets/background.png"),
-                    fit: BoxFit.cover),
-              ),
-              child: SafeArea(
+          body: AppBackground(
+              childWidget:SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: kMedium),
                   child: SingleChildScrollView(
@@ -123,7 +117,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                                   padding: const EdgeInsets.all(kSmall),
                                   decoration: BoxDecoration(
                                       color:
-                                          AppColors.darkColor.withOpacity(0.3),
+                                      AppColors.darkColor.withOpacity(0.3),
                                       shape: BoxShape.circle),
                                   child: Icon(
                                     LucideIcons.arrowLeft,
@@ -152,7 +146,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                           width: double.infinity,
                           color: AppColors.whiteColor,
                           padding:
-                              const EdgeInsets.symmetric(horizontal: kMedium),
+                          const EdgeInsets.symmetric(horizontal: kMedium),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -201,7 +195,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                                     fontSize: kSMedium,
                                     fontWeight: FontWeight.w400,
                                     color:
-                                        AppColors.darkColor.withOpacity(0.7)),
+                                    AppColors.darkColor.withOpacity(0.7)),
                               ),
                               const SizedBox(
                                 height: kMedium,
@@ -226,7 +220,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                                 decoration: BoxDecoration(
                                     color: AppColors.greyColor,
                                     borderRadius:
-                                        BorderRadius.circular(kMedium)),
+                                    BorderRadius.circular(kMedium)),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(kMedium),
                                   child: GoogleMap(
@@ -247,7 +241,168 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                     ),
                   ),
                 ),
-              )),
+              )
+          )
+
+          // Container(
+          //     height: double.infinity,
+          //     width: double.infinity,
+          //     decoration: const BoxDecoration(
+          //       image: DecorationImage(
+          //           image: AssetImage("assets/background.png"),
+          //           fit: BoxFit.cover),
+          //     ),
+          //     child: SafeArea(
+          //       child: Padding(
+          //         padding: const EdgeInsets.symmetric(horizontal: kMedium),
+          //         child: SingleChildScrollView(
+          //           child: Column(
+          //             children: [
+          //               const SizedBox(
+          //                 height: kLarge,
+          //               ),
+          //               Stack(
+          //                 children: [
+          //                   Image.asset(
+          //                     "assets/images/Frame9.png",
+          //                     width: double.infinity,
+          //                   ),
+          //                   Positioned(
+          //                     left: 20,
+          //                     top: 20,
+          //                     child: GestureDetector(
+          //                       onTap: () {
+          //                         context.pop();
+          //                       },
+          //                       child: Container(
+          //                         padding: const EdgeInsets.all(kSmall),
+          //                         decoration: BoxDecoration(
+          //                             color:
+          //                                 AppColors.darkColor.withOpacity(0.3),
+          //                             shape: BoxShape.circle),
+          //                         child: Icon(
+          //                           LucideIcons.arrowLeft,
+          //                           color: AppColors.whiteColor,
+          //                         ),
+          //                       ),
+          //                     ),
+          //                   ),
+          //                   Positioned(
+          //                     right: 20,
+          //                     top: 20,
+          //                     child: Container(
+          //                       padding: const EdgeInsets.all(kSmall),
+          //                       decoration: BoxDecoration(
+          //                           color: AppColors.darkColor.withOpacity(0.3),
+          //                           shape: BoxShape.circle),
+          //                       child: Icon(
+          //                         LucideIcons.moreHorizontal,
+          //                         color: AppColors.whiteColor,
+          //                       ),
+          //                     ),
+          //                   )
+          //                 ],
+          //               ),
+          //               Container(
+          //                 width: double.infinity,
+          //                 color: AppColors.whiteColor,
+          //                 padding:
+          //                     const EdgeInsets.symmetric(horizontal: kMedium),
+          //                 child: Column(
+          //                   crossAxisAlignment: CrossAxisAlignment.start,
+          //                   children: [
+          //                     const SizedBox(
+          //                       height: kMedium,
+          //                     ),
+          //                     Center(
+          //                       child: Text(
+          //                         "Friday,27 Oct 2024 . 05:00PM",
+          //                         maxLines: 2,
+          //                         overflow: TextOverflow.ellipsis,
+          //                         style: TextStyle(
+          //                             fontWeight: FontWeight.bold,
+          //                             fontSize: kSMedium,
+          //                             color: AppColors.darkColor),
+          //                       ),
+          //                     ),
+          //                     const SizedBox(
+          //                       height: kXSmall,
+          //                     ),
+          //                     Text(
+          //                       widget.match['name'],
+          //                       textAlign: TextAlign.start,
+          //                       style: TextStyle(
+          //                           fontSize: kLarge,
+          //                           fontWeight: FontWeight.bold),
+          //                     ),
+          //                     const SizedBox(
+          //                       height: kMedium,
+          //                     ),
+          //                     Text(
+          //                       "Description",
+          //                       textAlign: TextAlign.start,
+          //                       style: TextStyle(
+          //                           fontSize: kMedium,
+          //                           fontWeight: FontWeight.w700,
+          //                           color: AppColors.darkColor),
+          //                     ),
+          //                     const SizedBox(
+          //                       height: kXSmall,
+          //                     ),
+          //                     Text(
+          //                       widget.match["description"],
+          //                       textAlign: TextAlign.start,
+          //                       style: TextStyle(
+          //                           fontSize: kSMedium,
+          //                           fontWeight: FontWeight.w400,
+          //                           color:
+          //                               AppColors.darkColor.withOpacity(0.7)),
+          //                     ),
+          //                     const SizedBox(
+          //                       height: kMedium,
+          //                     ),
+          //                     const SizedBox(
+          //                       height: kMedium,
+          //                     ),
+          //                     Text(
+          //                       "Maps",
+          //                       textAlign: TextAlign.start,
+          //                       style: TextStyle(
+          //                           fontSize: kMedium,
+          //                           fontWeight: FontWeight.w700,
+          //                           color: AppColors.darkColor),
+          //                     ),
+          //                     const SizedBox(
+          //                       height: kSmall,
+          //                     ),
+          //                     Container(
+          //                       height: 300,
+          //                       width: double.infinity,
+          //                       decoration: BoxDecoration(
+          //                           color: AppColors.greyColor,
+          //                           borderRadius:
+          //                               BorderRadius.circular(kMedium)),
+          //                       child: ClipRRect(
+          //                         borderRadius: BorderRadius.circular(kMedium),
+          //                         child: GoogleMap(
+          //                           mapType: MapType.normal,
+          //                           trafficEnabled: true,
+          //                           initialCameraPosition: _cameraPosition,
+          //                           onMapCreated: (controller) {},
+          //                         ),
+          //                       ),
+          //                     ),
+          //                     const SizedBox(
+          //                       height: kLarge,
+          //                     ),
+          //                   ],
+          //                 ),
+          //               )
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //     )),
         );
       },
     );

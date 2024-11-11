@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/data/models/stripe_checkout/stripe_checkout.dart';
@@ -42,100 +43,95 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-          height: double.infinity,
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage("assets/background.png"), fit: BoxFit.cover),
-          ),
-          child: SafeArea(child: BlocBuilder<MatchBloc, MatchState>(
-            builder: (context, state) {
-              switch (state.status) {
-                case MatchStatus.loading:
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                case MatchStatus.failure:
-                  return Center(
-                    child: Text(state.failure!.error),
-                  );
-                case MatchStatus.success:
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: kMedium),
-                    child: SingleChildScrollView(
-                      child: Column(
+      body: AppBackground(
+        childWidget:SafeArea(child: BlocBuilder<MatchBloc, MatchState>(
+        builder: (context, state) {
+          switch (state.status) {
+            case MatchStatus.loading:
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            case MatchStatus.failure:
+              return Center(
+                child: Text(state.failure!.error),
+              );
+            case MatchStatus.success:
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: kMedium),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: kMedium),
+                      headerSection(context),
+                      const SizedBox(height: kMedium),
+                      searchField(),
+                      const SizedBox(height: kMedium),
+                      banner(),
+                      const SizedBox(height: kMedium),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const SizedBox(height: kMedium),
-                          headerSection(context),
-                          const SizedBox(height: kMedium),
-                          searchField(),
-                          const SizedBox(height: kMedium),
-                          banner(),
-                          const SizedBox(height: kMedium),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Schedule",
-                                style: TextStyle(
-                                    fontSize: kMedium,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.whiteColor),
-                              ),
-                              TextButton(
-                                  onPressed: () {},
-                                  child: Text("See All",
-                                      style: TextStyle(
-                                          color: AppColors.whiteColor)))
-                            ],
+                          Text(
+                            "Schedule",
+                            style: TextStyle(
+                                fontSize: kMedium,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.whiteColor),
                           ),
-                          const SizedBox(height: kSMedium),
-                          //TODO! Add schedules
-                          schedules(matches: state.matches),
-                          const SizedBox(height: kMedium),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Upcoming Matches",
-                                style: TextStyle(
-                                    fontSize: kMedium,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.whiteColor),
-                              ),
-                              TextButton(
-                                  onPressed: () {},
-                                  child: Text("See All",
-                                      style: TextStyle(
-                                          color: AppColors.whiteColor)))
-                            ],
-                          ),
-                          const SizedBox(height: kMedium),
-                          //TODO! Add upcoming matches
-                          AutoHeightGridView(
-                            itemCount: state.matches.length,
-                            crossAxisCount: context.isTablet ? 3 : 2,
-                            mainAxisSpacing: kSmall,
-                            crossAxisSpacing: kSmall,
-                            physics: const BouncingScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            builder: (context, index) {
-                              final match = state.matches[index];
-                              return ProductCard(match: match);
-                            },
-                          ),
+                          TextButton(
+                              onPressed: () {},
+                              child: Text("See All",
+                                  style: TextStyle(
+                                      color: AppColors.whiteColor)))
                         ],
                       ),
-                    ),
-                  );
+                      const SizedBox(height: kSMedium),
+                      //TODO! Add schedules
+                      schedules(matches: state.matches),
+                      const SizedBox(height: kMedium),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Upcoming Matches",
+                            style: TextStyle(
+                                fontSize: kMedium,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.whiteColor),
+                          ),
+                          TextButton(
+                              onPressed: () {},
+                              child: Text("See All",
+                                  style: TextStyle(
+                                      color: AppColors.whiteColor)))
+                        ],
+                      ),
+                      const SizedBox(height: kMedium),
+                      //TODO! Add upcoming matches
+                      AutoHeightGridView(
+                        itemCount: state.matches.length,
+                        crossAxisCount: context.isTablet ? 3 : 2,
+                        mainAxisSpacing: kSmall,
+                        crossAxisSpacing: kSmall,
+                        physics: const BouncingScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        builder: (context, index) {
+                          final match = state.matches[index];
+                          return ProductCard(match: match);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
 
-                default:
-                  return const SizedBox.shrink();
-              }
-            },
-          ))),
+            default:
+              return const SizedBox.shrink();
+          }
+        },
+      )) ,
+      )
     );
   }
 

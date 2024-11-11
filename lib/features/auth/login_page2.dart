@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/mixin/input_validation_mixin.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
@@ -87,19 +88,7 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
           }
         },
         builder: (context, state) {
-          return Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                AppColors.defaultAppRed,
-                AppColors.defaultAppPurple,
-              ],
-            )),
-          );
+          return const AppBackground();
         },
       ),
       bottomSheet: SingleChildScrollView(

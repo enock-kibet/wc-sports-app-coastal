@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sports_app/common/app_background.dart';
 
 import '../../common/dimens.dart';
 import '../../theme/app_colors.dart';
@@ -17,17 +18,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [AppColors.defaultAppRed,AppColors.defaultAppPurple,],
-            )
-        ),
-      ),
+      body: const AppBackground(),
       bottomSheet: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all( kMedium),
