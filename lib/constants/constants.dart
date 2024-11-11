@@ -1,4 +1,5 @@
-const BASE_URL = "https://sports.johnmbugua.xyz/api/";
+const BASE_URL = "https://sportsadmin-production.up.railway.app/api/";
+//"https://sports.johnmbugua.xyz/api/";
 
 const TIMEOUT = 45000;
 

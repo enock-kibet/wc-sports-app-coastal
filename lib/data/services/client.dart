@@ -18,6 +18,32 @@ class MatchService {
   }
 }
 
+class AuthService {
+  HttpResult<String> login(Map<String,dynamic> data) async {
+    return Http.post(
+      "auth/login",
+      data,
+      deserializer: (data) => data["session"],
+    );
+  }
+
+  HttpResult<String> signup(Map<String,dynamic> data) async {
+    return Http.post(
+      "auth/sign-up",
+      data,
+      deserializer: (data) => data["session"],
+    );
+  }
+
+  HttpResult<String> logout() async {
+    return Http.post(
+      "auth/sign-out",
+      {},
+      deserializer: (data) => data["msg"],
+    );
+  }
+}
+
 class StripeService {
   HttpResult<dynamic> getStripe({
     required String email,

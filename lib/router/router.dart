@@ -61,7 +61,7 @@ final GlobalKey<NavigatorState> _shellNavigatorDKey =
 
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: "/home",
+  initialLocation: "/onboarding",
   observers: [TalkerRouteObserver(service<Talker>())],
   routes: [
     GoRoute(

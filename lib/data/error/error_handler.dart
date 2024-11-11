@@ -10,13 +10,7 @@ class ErrorHandler {
   Failure handle() {
     if (error.response?.statusCode == 302) {
       return Failure(error: "Check your internet connection/bundle balance");
-    } else if (error.response?.data['message'] != null) {
-      return Failure(
-          error: error.response!.data['message'],
-          precondition: error.response!.data["precondition"],
-          description: error.response!.data["description"],
-          value: error.response!.data["value"]);
-    } else {
+    }else {
       switch (error.type) {
         case DioExceptionType.connectionTimeout:
           return Failure(error: "Connection timeout!");

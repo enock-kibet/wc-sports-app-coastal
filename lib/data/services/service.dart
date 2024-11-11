@@ -36,6 +36,7 @@ setUpService() {
   service.registerLazySingleton<AppPreferences>(() => AppPreferences());
   service.registerLazySingleton<ProductService>(() => ProductService());
   service.registerLazySingleton<MatchService>(() => MatchService());
+  service.registerLazySingleton<AuthService>(() => AuthService());
   service.registerLazySingleton<StripeService>(() => StripeService());
   service.registerLazySingleton<GeolocationRepository>(
       () => GeolocationRepository());
