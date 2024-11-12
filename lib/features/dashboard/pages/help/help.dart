@@ -92,7 +92,7 @@ Accordion({required bool state, required VoidCallback onTap, double? height,Stri
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title??'Help with setting up my Account',style: TextStyle(fontSize: 13,fontWeight: FontWeight.bold,color:Color(0XFF585C60)),),
+            Text(title??'Help with setting up my Account',style: TextStyle(fontSize: 14,fontWeight: FontWeight.normal,color:Color(0XFF000000)),),
             Icon(state?Icons.keyboard_arrow_down:Icons.chevron_right)
           ],
         ),
