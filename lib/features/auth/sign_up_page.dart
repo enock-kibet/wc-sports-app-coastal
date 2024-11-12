@@ -23,8 +23,8 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Container(
           padding: EdgeInsets.all( kMedium),
           width: double.infinity,
-          height: 634,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               LoginSignUpSwitch(context, false),
               SizedBox(height: kLarge,),

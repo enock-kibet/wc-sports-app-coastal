@@ -19,6 +19,7 @@ import 'package:sports_app/features/dashboard/pages/standings/standinds_page.dar
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../features/dashboard/base_screen.dart';
+import '../features/dashboard/pages/help/help.dart';
 import '../features/dashboard/pages/pages.dart';
 
 enum AppRoute {
@@ -36,7 +37,8 @@ enum AppRoute {
   onboarding,
   signUp,
   signIn,
-  otp
+  otp,
+  help
 }
 
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -245,6 +247,14 @@ final router = GoRouter(
                   builder: (context, state) {
                     return const EditProfileMain();
                   },
+                ),
+                GoRoute(
+                  path: "help",
+                  parentNavigatorKey: rootNavigatorKey,
+                  name: AppRoute.help.name,
+                  builder: (context,state){
+                    return const Help();
+                  }
                 ),
                 GoRoute(
                   path: "details",

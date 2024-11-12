@@ -98,33 +98,33 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
             return Container(
                   padding: EdgeInsets.all(kMedium),
                   width: double.infinity,
-                  height: 536,
                   child: Form(
                     key: _loginFormKey,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         LoginSignUpSwitch(context, true),
-                        SizedBox(
+                        const SizedBox(
                           height: kLarge,
                         ),
-                        Text(
+                        const Text(
                           "Welcome Back!",
                           style: TextStyle(
                               fontSize: kMedium,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF696565)),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: kLarge,
                         ),
-                        Align(
+                        const Align(
                             alignment: Alignment.centerLeft,
                             child: Text("Email",
                                 style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF696565)))),
-                        SizedBox(
+                        const SizedBox(
                           height: 9,
                         ),
                         CustomTextField(true, "jina@email.com",controller: _emailController,
@@ -132,17 +132,17 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
                                         withMessage('Email is empty', isTextEmpty),
                                         withMessage('Email is invalid', isInvalidEmail)
                                       ]),),
-                        SizedBox(
+                        const SizedBox(
                           height: 13,
                         ),
-                        Align(
+                        const Align(
                             alignment: Alignment.centerLeft,
                             child: Text("Password",
                                 style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF696565)))),
-                        SizedBox(
+                        const SizedBox(
                           height: 9,
                         ),
                         CustomTextField(false, "**********",controller: _passwordController,
@@ -160,7 +160,7 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
                             Row(
                               children: [
                                 Checkbox(value: false, onChanged: (onChanged) {}),
-                                Text(
+                                const Text(
                                   'Remember Me',
                                   style: TextStyle(fontSize: kSMedium),
                                 )
@@ -168,13 +168,13 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
                             ),
                             TextButton(
                                 onPressed: () {},
-                                child: Text(
+                                child: const Text(
                                   "Forgot Password",
                                   style: TextStyle(fontSize: kSMedium),
                                 ))
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: kLarge,
                         ),
                         GestureDetector(
@@ -193,7 +193,7 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
                             child: CustomFilledButton(state.status == AuthStatus.loading
                                             ? "Loading..."
                                             : 'Sign In')),
-                        SizedBox(
+                        const SizedBox(
                           height: kSMedium,
                         ),
                         OutlinedButton(
@@ -210,10 +210,10 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
                                   "assets/images/googlelogo2.png",
                                   height: kLarge,
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: kSMedium,
                                 ),
-                                Text(
+                                const Text(
                                   'Sign In with Google',
                                   style:
                                       TextStyle(color: Color(0xFF525252), fontSize: 13),
