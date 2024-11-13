@@ -7,6 +7,7 @@ import 'package:sports_app/features/auth/login_page2.dart';
 import 'package:sports_app/features/auth/onboarding.dart';
 import 'package:sports_app/features/auth/otp_page.dart';
 import 'package:sports_app/features/auth/sign_up_page.dart';
+import 'package:sports_app/features/dashboard/pages/about/about_us.dart';
 import 'package:sports_app/features/dashboard/pages/home/match_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/media/team_media_page.dart';
 import 'package:sports_app/features/dashboard/pages/notifications/notification_page.dart';
@@ -38,7 +39,8 @@ enum AppRoute {
   signUp,
   signIn,
   otp,
-  help
+  help,
+  aboutUs
 }
 
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -254,6 +256,14 @@ final router = GoRouter(
                   name: AppRoute.help.name,
                   builder: (context,state){
                     return const Help();
+                  }
+                ),
+                GoRoute(
+                  path: "aboutUs",
+                  parentNavigatorKey:rootNavigatorKey,
+                  name:AppRoute.aboutUs.name,
+                  builder:(context,state){
+                    return const AboutUs();
                   }
                 ),
                 GoRoute(
