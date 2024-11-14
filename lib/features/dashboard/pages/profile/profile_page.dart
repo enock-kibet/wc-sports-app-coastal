@@ -130,12 +130,14 @@ class _ProfilePageState extends State<ProfilePage> {
               InforCard(
                 image: LucideIcons.badgeInfo,
                 title: "About Us",
-                press: () {},
+                press: () {
+                  context.pushNamed(AppRoute.aboutUs.name);
+                },
               ),
               InforCard(
                 image: LucideIcons.helpCircle,
                 title: "Help",
-                press: () {context.go('/onboarding');},
+                press: () {context.pushNamed(AppRoute.help.name);},
               ),
               InforCard(
                 image: LucideIcons.logOut,

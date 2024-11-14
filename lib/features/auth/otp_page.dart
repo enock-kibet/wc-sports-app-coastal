@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/features/auth/login_page2.dart';
 
 import '../../common/dimens.dart';
@@ -12,17 +13,7 @@ class OtpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [AppColors.defaultAppRed,AppColors.defaultAppPurple,],
-            )
-        ),
-      ),
+      body: const AppBackground(),
       bottomSheet: SingleChildScrollView(
         child: Padding(padding: EdgeInsets.symmetric(horizontal: kLarge,vertical: kMedium),
           child: Column(

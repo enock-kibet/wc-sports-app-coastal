@@ -6,6 +6,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/data/models/location/directions_details.dart';
 import 'package:sports_app/data/models/stripe_checkout/stripe_checkout.dart';
@@ -213,176 +214,170 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
               ),
             ),
           ),
-          body: Container(
-              height: double.infinity,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("assets/background.png"),
-                    fit: BoxFit.cover),
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: kMedium),
-                  child: SingleChildScrollView(
-                    child: Column(
+          body:
+          AppBackground(childWidget: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: kMedium),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: kLarge,
+                    ),
+                    Stack(
                       children: [
-                        const SizedBox(
-                          height: kLarge,
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(kSMedium),
+                              topRight: Radius.circular(kSMedium)),
+                          child: Image.network(
+                            widget.product["imageUrl"],
+                            width: double.infinity,
+                          ),
                         ),
-                        Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(kSMedium),
-                                  topRight: Radius.circular(kSMedium)),
-                              child: Image.network(
-                                widget.product["imageUrl"],
-                                width: double.infinity,
+                        Positioned(
+                          left: 20,
+                          top: 20,
+                          child: GestureDetector(
+                            onTap: () {
+                              context.pop();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(kSmall),
+                              decoration: BoxDecoration(
+                                  color:
+                                  AppColors.darkColor.withOpacity(0.3),
+                                  shape: BoxShape.circle),
+                              child: Icon(
+                                LucideIcons.arrowLeft,
+                                color: AppColors.whiteColor,
                               ),
                             ),
-                            Positioned(
-                              left: 20,
-                              top: 20,
-                              child: GestureDetector(
-                                onTap: () {
-                                  context.pop();
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(kSmall),
-                                  decoration: BoxDecoration(
-                                      color:
-                                          AppColors.darkColor.withOpacity(0.3),
-                                      shape: BoxShape.circle),
-                                  child: Icon(
-                                    LucideIcons.arrowLeft,
-                                    color: AppColors.whiteColor,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              right: 20,
-                              top: 20,
-                              child: Container(
-                                padding: const EdgeInsets.all(kSmall),
-                                decoration: BoxDecoration(
-                                    color: AppColors.darkColor.withOpacity(0.3),
-                                    shape: BoxShape.circle),
-                                child: Icon(
-                                  LucideIcons.moreHorizontal,
-                                  color: AppColors.whiteColor,
-                                ),
-                              ),
-                            )
-                          ],
+                          ),
                         ),
-                        Container(
-                          width: double.infinity,
-                          color: AppColors.whiteColor,
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: kMedium),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                height: kMedium,
-                              ),
-                              Center(
-                                child: Text(
-                                  "Delivery . 2-3 Business Days",
-                                  maxLines: 4,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: kSMedium,
-                                      color: AppColors.darkColor),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: kXSmall,
-                              ),
-                              Text(
-                                widget.product["name"],
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    fontSize: kLarge,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(
-                                height: kMedium,
-                              ),
-                              Text(
-                                "Description",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    fontSize: kMedium,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.darkColor),
-                              ),
-                              const SizedBox(
-                                height: kXSmall,
-                              ),
-                              Text(
-                                widget.product["description"],
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    fontSize: kSMedium,
-                                    fontWeight: FontWeight.w400,
-                                    color:
-                                        AppColors.darkColor.withOpacity(0.7)),
-                              ),
-                              const SizedBox(
-                                height: kMedium,
-                              ),
-                              const SizedBox(
-                                height: kMedium,
-                              ),
-                              Text(
-                                "Maps Guide",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    fontSize: kMedium,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.darkColor),
-                              ),
-                              const SizedBox(
-                                height: kSmall,
-                              ),
-                              Container(
-                                height: 300,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                    color: AppColors.greyColor,
-                                    borderRadius:
-                                        BorderRadius.circular(kMedium)),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(kMedium),
-                                  child: GoogleMap(
-                                    padding:
-                                        EdgeInsets.only(bottom: mapPadding),
-                                    mapType: MapType.normal,
-                                    trafficEnabled: true,
-                                    initialCameraPosition: _cameraPosition,
-                                    onMapCreated: (controller) {
-                                      _controller.complete(controller);
-                                    },
-                                    markers: _markers.values.toSet(),
-                                    polylines: setOfPolyline,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: kLarge,
-                              ),
-                            ],
+                        Positioned(
+                          right: 20,
+                          top: 20,
+                          child: Container(
+                            padding: const EdgeInsets.all(kSmall),
+                            decoration: BoxDecoration(
+                                color: AppColors.darkColor.withOpacity(0.3),
+                                shape: BoxShape.circle),
+                            child: Icon(
+                              LucideIcons.moreHorizontal,
+                              color: AppColors.whiteColor,
+                            ),
                           ),
                         )
                       ],
                     ),
-                  ),
+                    Container(
+                      width: double.infinity,
+                      color: AppColors.whiteColor,
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: kMedium),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: kMedium,
+                          ),
+                          Center(
+                            child: Text(
+                              "Delivery . 2-3 Business Days",
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: kSMedium,
+                                  color: AppColors.darkColor),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: kXSmall,
+                          ),
+                          Text(
+                            widget.product["name"],
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                fontSize: kLarge,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(
+                            height: kMedium,
+                          ),
+                          Text(
+                            "Description",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                fontSize: kMedium,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.darkColor),
+                          ),
+                          const SizedBox(
+                            height: kXSmall,
+                          ),
+                          Text(
+                            widget.product["description"],
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                fontSize: kSMedium,
+                                fontWeight: FontWeight.w400,
+                                color:
+                                AppColors.darkColor.withOpacity(0.7)),
+                          ),
+                          const SizedBox(
+                            height: kMedium,
+                          ),
+                          const SizedBox(
+                            height: kMedium,
+                          ),
+                          Text(
+                            "Maps Guide",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                fontSize: kMedium,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.darkColor),
+                          ),
+                          const SizedBox(
+                            height: kSmall,
+                          ),
+                          Container(
+                            height: 300,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                                color: AppColors.greyColor,
+                                borderRadius:
+                                BorderRadius.circular(kMedium)),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(kMedium),
+                              child: GoogleMap(
+                                padding:
+                                EdgeInsets.only(bottom: mapPadding),
+                                mapType: MapType.normal,
+                                trafficEnabled: true,
+                                initialCameraPosition: _cameraPosition,
+                                onMapCreated: (controller) {
+                                  _controller.complete(controller);
+                                },
+                                markers: _markers.values.toSet(),
+                                polylines: setOfPolyline,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: kLarge,
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
-              )),
+              ),
+            ),
+          ),)
+
         );
       },
     );

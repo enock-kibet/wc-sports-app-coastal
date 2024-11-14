@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/features/app/blocs/matches/product_bloc.dart';
@@ -22,19 +23,12 @@ class _ShopPageState extends State<ShopPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-          height: double.infinity,
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage("assets/background.png"), fit: BoxFit.cover),
-          ),
-          child: BlocBuilder<ProductBloc, ProductState>(
-            builder: (context, state) {
-              switch (state.status) {
-                case ProductStatus.success:
-                  return SafeArea(
-                      child: Padding(
+      body: AppBackground(childWidget:  BlocBuilder<ProductBloc, ProductState>(
+        builder: (context, state) {
+          switch (state.status) {
+            case ProductStatus.success:
+              return SafeArea(
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: kMedium),
                     child: SingleChildScrollView(
                       child: Column(
@@ -80,19 +74,20 @@ class _ShopPageState extends State<ShopPage> {
                       ),
                     ),
                   ));
-                case ProductStatus.failure:
-                  return Center(
-                    child: Text(state.failure!.error),
-                  );
-                case ProductStatus.loading:
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                default:
-                  return SizedBox.shrink();
-              }
-            },
-          )),
+            case ProductStatus.failure:
+              return Center(
+                child: Text(state.failure!.error),
+              );
+            case ProductStatus.loading:
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            default:
+              return SizedBox.shrink();
+          }
+        },
+      ),)
+
     );
   }
 
