@@ -13,6 +13,7 @@ import 'package:sports_app/constants/constants.dart';
 import 'package:sports_app/data/error/error_handler.dart';
 import 'package:sports_app/data/error/failure.dart';
 import 'package:sports_app/data/models/multiple_results/multiple_result.dart';
+import 'package:sports_app/data/repository/auth_repository.dart';
 import 'package:sports_app/data/repository/authentication.dart';
 import 'package:sports_app/data/repository/geolocation_repository.dart';
 import 'package:sports_app/localization/app_prefs.dart';
@@ -36,6 +37,7 @@ setUpService() {
   service.registerLazySingleton<AppPreferences>(() => AppPreferences());
   service.registerLazySingleton<ProductService>(() => ProductService());
   service.registerLazySingleton<MatchService>(() => MatchService());
+  service.registerLazySingleton<ProfileService>(() => ProfileService());
   service.registerLazySingleton<AuthService>(() => AuthService());
   service.registerLazySingleton<StripeService>(() => StripeService());
   service.registerLazySingleton<GeolocationRepository>(

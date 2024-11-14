@@ -1,22 +1,20 @@
-import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sports_app/data/models/user/user.dart';
 
 class AppPreferences {
   /// Store Auth data in shared preferences
-  Future<void> storeAuthData(User data) async {
+  Future<void> storeAuthData(String data) async {
     await SharedPreferences.getInstance().then(
-      (value) => value.setString("USER", jsonEncode(data.toJson())),
+      (value) => value.setString("USER", data),
     );
   }
 
   /// Get Auth data from shared preferences
-  Future<User?> getAuthData() async {
+  Future<String?> getAuthData() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString("USER");
     if (data != null) {
-      return User.fromJson(jsonDecode(data));
+      return data;
     }
     return null;
   }

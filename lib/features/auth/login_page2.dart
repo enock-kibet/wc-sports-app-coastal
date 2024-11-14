@@ -64,6 +64,7 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
                 ),
               ),
             );
+            context.go("/otp");
           }
           if (state.status == AuthStatus.failure) {
             service<Talker>().error('Login Failed');

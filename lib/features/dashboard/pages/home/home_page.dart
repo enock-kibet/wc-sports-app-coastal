@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/data/models/stripe_checkout/stripe_checkout.dart';
+import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/product/match_bloc.dart';
 import 'package:sports_app/features/app/blocs/stripe/stripe_bloc.dart';
 import 'package:sports_app/features/app/side_menu_cubit.dart';
@@ -27,9 +28,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late StripeBloc _stripeBloc;
+  Map<String,dynamic>? user;
+  bool loading=false;
+  getUserInfo()async{
+    loading=true;
+    final response =await service<ProfileService>().getMe();
+    response.when(onError: (error){}, onSuccess: (data){
+      setState(() {
+        user=data;
+        loading=false;
+      });
+    });
+  }
   @override
   void initState() {
     _stripeBloc = StripeBloc();
+    getUserInfo();
     super.initState();
   }
 
@@ -360,8 +374,8 @@ class _HomePageState extends State<HomePage> {
       children: [
         GestureDetector(
           onTap: () {
-            context.go('/onboarding');
-            //context.read<SideMenuCubit>().state.currentState!.openDrawer();
+           // context.go('/onboarding');
+          context.read<SideMenuCubit>().state.currentState!.openDrawer();
           },
           child: Container(
             padding: const EdgeInsets.all(kSmall),
@@ -377,7 +391,7 @@ class _HomePageState extends State<HomePage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Hi Ogwambo!",
+            Text("Hi ${user?["name"]}!",
                 style: TextStyle(
                     color: AppColors.whiteColor,
                     fontSize: kLarge,

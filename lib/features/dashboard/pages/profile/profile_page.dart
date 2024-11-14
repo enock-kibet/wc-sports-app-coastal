@@ -6,12 +6,72 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
+import 'package:sports_app/data/repository/auth_repository.dart';
+import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/app_colors.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  Map<String,dynamic>? user;
+  bool loading=false;
+  getUserInfo()async{
+    loading=true;
+    final response =await service<ProfileService>().getMe();
+    response.when(onError: (error){}, onSuccess: (data){
+      setState(() {
+        user=data;
+        loading=false;
+      });
+    });
+  }
+  Future<void> _logoutDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext dialogcontext) {
+        return AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('You are about to logout!!'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text('Yes, logout'),
+              onPressed: () {
+                AuthRepository.instance.logout();
+                context.goNamed(AppRoute.signIn.name);
+              },
+            ),
+            TextButton(
+              child: const Text('No, stay loggedIn'),
+              onPressed: () {
+                Navigator.of(dialogcontext).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  @override
+  void initState() {
+    getUserInfo();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,19 +83,19 @@ class ProfilePage extends StatelessWidget {
               Stack(
                 children: [
                   imageStack(context),
-                  const Positioned(
+                   Positioned(
                     bottom: 0,
                     right: 0,
                     left: 0,
                     child: Column(
                       children: [
-                        CircleAvatar(
+                       const CircleAvatar(
                           radius: 40,
                           backgroundImage:
                               AssetImage('assets/images/shirt.png'),
                         ),
-                        Text("John Mbugua",
-                            style: TextStyle(
+                        Text(user?["name"]??"",
+                            style: const TextStyle(
                                 fontSize: kLarge, fontWeight: FontWeight.bold)),
                         Text("0 Points")
                       ],
@@ -76,6 +136,13 @@ class ProfilePage extends StatelessWidget {
                 image: LucideIcons.helpCircle,
                 title: "Help",
                 press: () {context.go('/onboarding');},
+              ),
+              InforCard(
+                image: LucideIcons.logOut,
+                title: "Logout",
+                press: () {
+                   _logoutDialog();
+                }
               ),
             ],
           ),

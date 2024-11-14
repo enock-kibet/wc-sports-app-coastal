@@ -60,3 +60,12 @@ class StripeService {
     );
   }
 }
+
+class ProfileService {
+  HttpResult<dynamic> getMe() async {
+    return Http.get(
+      "auth/me",
+      deserializer: (data) => data["user"],
+    );
+  }
+}

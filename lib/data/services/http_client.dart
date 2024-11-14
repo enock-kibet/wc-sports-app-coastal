@@ -4,14 +4,15 @@ class RequestInterceptor extends Interceptor {
   @override
   FutureOr<dynamic> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) {
-    final authToken = AuthenticationRepository.instance.authToken;
+    final authToken = AuthRepository.instance.authUser;
     if (authToken != null && authToken.isNotEmpty) {
       options.headers["Authorization"] = "Bearer $authToken";
+      options.headers["cookie"] =
+        "jwt=$authToken";
     }
 
     options.headers['Accept'] = 'application/json';
-    // options.headers["cookie"] =
-    //     "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzNzgwMDdlZjk3Mjk4NzAwMjk1ZDgyNiIsImlhdCI6MTcyNDkzODQ0OH0.AeZMerACjYu3rI0ixPPIBXAdwyivCTcIE5TxwSLYxD4";
+    
     super.onRequest(options, handler);
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:sports_app/data/error/failure.dart';
+import 'package:sports_app/data/repository/auth_repository.dart';
 import 'package:sports_app/data/repository/authentication.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/localization/app_prefs.dart';
@@ -37,8 +38,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           status: AuthStatus.success,
           failure: null,
         ));
-        // await appPreferences.storeAuthData(loginRes);
-        // await authRepository.login(loginRes);
+        await appPreferences.storeAuthData(loginRes);
+        await authRepository.login();
+        await AuthRepository.instance.login(loginRes);
       });
     });
 
@@ -51,12 +53,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           status: AuthStatus.failure,
           failure: error,
         ));
-      }, onSuccess: (registerRes) {
+      }, onSuccess: (registerRes) async{
         emit(state.copyWith(
           status: AuthStatus.success,
           failure: null,
         ));
         service<Talker>().info(registerRes);
+         await appPreferences.storeAuthData(registerRes);
+         await authRepository.login();
+        await AuthRepository.instance.login(registerRes);
       });
     });
     // on<_SendOtp>((event, emit) async {

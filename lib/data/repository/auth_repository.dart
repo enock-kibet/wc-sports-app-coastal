@@ -1,8 +1,6 @@
 
 
 
-
-import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/router/router.dart';
 
 import '../../localization/app_prefs.dart';
@@ -10,10 +8,10 @@ import '../services/service.dart';
 
 class AuthRepository {
   static AuthRepository instance = AuthRepository();
-  User? authUser;
+  String? authUser;
   final _prefs = service<AppPreferences>();
 
-  Future<void> login(User user) async {
+  Future<void> login(String user) async {
     authUser = user;
     await _prefs.storeAuthData(user);
   }

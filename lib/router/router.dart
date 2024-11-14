@@ -16,12 +16,14 @@ import 'package:sports_app/features/dashboard/pages/profile/profile_page.dart';
 import 'package:sports_app/features/dashboard/pages/schedule/schedule_page.dart';
 import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/standings/standinds_page.dart';
+import 'package:sports_app/splash_screen.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../features/dashboard/base_screen.dart';
 import '../features/dashboard/pages/pages.dart';
 
 enum AppRoute {
+  splash,
   home,
   schedule,
   shop,
@@ -61,9 +63,16 @@ final GlobalKey<NavigatorState> _shellNavigatorDKey =
 
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: "/onboarding",
+  initialLocation: "/splash",
   observers: [TalkerRouteObserver(service<Talker>())],
   routes: [
+    GoRoute(
+      path: "/splash",
+      name: AppRoute.splash.name,
+      builder: (context, state) {
+        return const SplashScreen();
+      },
+    ),
     GoRoute(
       path: "/standing",
       name: AppRoute.standings.name,

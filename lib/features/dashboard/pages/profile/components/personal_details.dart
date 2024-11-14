@@ -12,6 +12,7 @@ import 'package:mime/mime.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/common/huge_icon_button.dart';
+import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/dashboard/pages/profile/widgets/profile_picture.dart';
 
 
@@ -32,7 +33,18 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   num? roleId;
   String? profilePicture;
   String? picture;
-
+dynamic user;
+  bool loading=false;
+  getUserInfo()async{
+    loading=true;
+    final response =await service<ProfileService>().getMe();
+    response.when(onError: (error){}, onSuccess: (data){
+      setState(() {
+        user=data;
+        loading=false;
+      });
+    });
+  }
   Future<void> selectProfilePicture() async {
     final FilePickerResult? result =
         await FilePicker.platform.pickFiles(type: FileType.image);
@@ -82,12 +94,16 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   @override
   void initState() {
     super.didChangeDependencies();
-    const user = null;
-    _firstNameController = TextEditingController(text: user?.firstname ?? '');
+    getUserInfo().then((value) {
+      _firstNameController = TextEditingController(text: user?["name"] ?? '');
+      _emailController = TextEditingController(text: user?["email"] ?? '');
+    });
+    _firstNameController = TextEditingController();
+      _emailController = TextEditingController();
     _usernameController = TextEditingController(text: user?.username ?? '');
     _lastNameController = TextEditingController(text: user?.lastname ?? '');
     _dobController = TextEditingController(text: '');
-    _emailController = TextEditingController(text: user?.email ?? '');
+    
     _phoneNumberController = TextEditingController(text: user?.phone ?? '');
 
     picture = user?.picture ?? '';
