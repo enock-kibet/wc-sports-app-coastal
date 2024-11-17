@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/mixin/input_validation_mixin.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
@@ -91,19 +92,7 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
           }
         },
         builder: (context, state) {
-          return Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                AppColors.defaultAppRed,
-                AppColors.defaultAppPurple,
-              ],
-            )),
-          );
+          return AppBackground();
         },
       ),
       bottomSheet: SingleChildScrollView(
@@ -113,40 +102,34 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
             return Container(
               padding: EdgeInsets.all(kMedium),
               width: double.infinity,
-              height: 634,
               child: Form(
                 key: _registerFormKey,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     LoginSignUpSwitch(context, false),
-                    SizedBox(
-                      height: kLarge,
-                    ),
-                    Text(
+                    const SizedBox(height: kLarge),
+                    const Text(
                       "Welcome!",
                       style: TextStyle(
                           fontSize: kMedium,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF696565)),
                     ),
-                    SizedBox(
-                      height: kLarge,
-                    ),
+                    const SizedBox(height: kLarge),
                     Row(
                       children: [
                         Expanded(
                             child: Column(
                           children: [
-                            Align(
+                            const Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text("First Name",
                                     style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: Color(0xFF696565)))),
-                            SizedBox(
-                              height: 9,
-                            ),
+                            const SizedBox(height: 9),
                             CustomTextField(true, "Jina Langu",controller: _firstNameController,
                                       validator: combine([
                                         withMessage('Name is empty', isTextEmpty),
@@ -160,14 +143,14 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                         Expanded(
                             child: Column(
                           children: [
-                            Align(
+                            const Align(
                                 alignment: Alignment.centerRight,
                                 child: Text("Other Name",
                                     style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: Color(0xFF696565)))),
-                            SizedBox(
+                            const SizedBox(
                               height: 9,
                             ),
                             CustomTextField(true, "",controller: _lastNameController,
@@ -179,17 +162,17 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                         ))
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 9,
                     ),
-                    Align(
+                    const Align(
                         alignment: Alignment.centerLeft,
                         child: Text("Email",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF696565)))),
-                    SizedBox(
+                    const SizedBox(
                       height: 9,
                     ),
                     CustomTextField(true, "jina@email.com",controller: _emailController,
@@ -197,17 +180,17 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                                         withMessage('Email is empty', isTextEmpty),
                                         withMessage('Email is invalid', isInvalidEmail)
                                       ]),),
-                    SizedBox(
+                    const SizedBox(
                       height: 13,
                     ),
-                    Align(
+                    const Align(
                         alignment: Alignment.centerLeft,
                         child: Text("Password",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF696565)))),
-                    SizedBox(
+                    const SizedBox(
                       height: 9,
                     ),
                     CustomTextField(false, "**********",controller: _passwordController,
@@ -221,13 +204,13 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                     Row(
                       children: [
                         Checkbox(value: false, onChanged: (onChanged) {}),
-                        Text(
+                        const Text(
                           'Agree to Terms & Conditions',
                           style: TextStyle(fontSize: 12),
                         )
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: kLarge,
                     ),
                     GestureDetector(

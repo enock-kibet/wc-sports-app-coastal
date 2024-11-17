@@ -264,13 +264,13 @@ CustomTextField(bool isEmail, String hintText,{final TextEditingController? cont
                                         : Icons.visibility_off,
                                     color: AppColors.primaryColor,
                                   ),
-                                ):SizedBox(),
+                                ):const SizedBox(),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(kMedium),
-            borderSide: BorderSide(color: Color(0xFFC6C6C6))),
+            borderSide: const BorderSide(color: Color(0xFFC6C6C6))),
         filled: false,
         hintText: hintText,
-        hintStyle: TextStyle(fontSize: 13, color: Color(0xFFC6C6C6)),
+        hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFC6C6C6)),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(kMedium),
             borderSide: BorderSide(color: AppColors.primaryColor))),

@@ -17,6 +17,7 @@ class OtpPage extends StatelessWidget {
       bottomSheet: SingleChildScrollView(
         child: Padding(padding: EdgeInsets.symmetric(horizontal: kLarge,vertical: kMedium),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text('One Time Password Verification',style: TextStyle(fontSize: kMedium,fontWeight: FontWeight.bold),),
               SizedBox(height: 20,),
