@@ -11,6 +11,7 @@ import 'router/router.dart';
 import 'theme/light_theme.dart';
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   setUpService();
   Stripe.publishableKey = "pk_test_51O9SmpIPfdPAIvZjlRwm4hFZ6VFixUHEdBHSl8OfNDnY8UrPfDHHjfgAl7eCQSxZkHBp4WDuRpF46Ct184dH6fPm00sTQAWXJH";

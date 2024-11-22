@@ -12,6 +12,7 @@ import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/product/match_bloc.dart';
 import 'package:sports_app/features/app/blocs/stripe/stripe_bloc.dart';
 import 'package:sports_app/features/app/side_menu_cubit.dart';
+import 'package:sports_app/main.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/app_colors.dart';
 import 'package:sports_app/theme/theme.dart';
@@ -19,6 +20,7 @@ import 'package:auto_height_grid_view/auto_height_grid_view.dart';
 import 'package:sports_app/utils/utils.dart';
 
 import 'widget/match.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -145,7 +147,7 @@ class _HomePageState extends State<HomePage> {
           }
         },
       )) ,
-      )
+      ),
     );
   }
 
@@ -370,8 +372,8 @@ class _HomePageState extends State<HomePage> {
       children: [
         GestureDetector(
           onTap: () {
-           // context.go('/onboarding');
-          context.read<SideMenuCubit>().state.currentState!.openDrawer();
+
+          context.read<SideMenuCubit>().openDrawer();
           },
           child: Container(
             padding: const EdgeInsets.all(kSmall),
@@ -541,4 +543,14 @@ class _HomePageState extends State<HomePage> {
       }
     }
   }
+}
+RowIconButton(IconData icon,String text){
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon),
+      SizedBox(width: kSMedium,),
+      Text(text,style: TextStyle(fontSize: 14),)
+    ],
+  );
 }
