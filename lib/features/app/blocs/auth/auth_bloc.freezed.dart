@@ -19,7 +19,9 @@ mixin _$AuthEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(dynamic request) login,
-    required TResult Function(String phone) sendOtp,
+    required TResult Function(dynamic request) verifyOtp,
+    required TResult Function(dynamic request) googlelogin,
+    required TResult Function(dynamic request) resendOtp,
     required TResult Function(Map<String, dynamic> data) verifyandResetPassword,
     required TResult Function(dynamic request) registering,
     required TResult Function(dynamic request) editProfile,
@@ -29,7 +31,9 @@ mixin _$AuthEvent {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(dynamic request)? login,
-    TResult? Function(String phone)? sendOtp,
+    TResult? Function(dynamic request)? verifyOtp,
+    TResult? Function(dynamic request)? googlelogin,
+    TResult? Function(dynamic request)? resendOtp,
     TResult? Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult? Function(dynamic request)? registering,
     TResult? Function(dynamic request)? editProfile,
@@ -39,7 +43,9 @@ mixin _$AuthEvent {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(dynamic request)? login,
-    TResult Function(String phone)? sendOtp,
+    TResult Function(dynamic request)? verifyOtp,
+    TResult Function(dynamic request)? googlelogin,
+    TResult Function(dynamic request)? resendOtp,
     TResult Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult Function(dynamic request)? registering,
     TResult Function(dynamic request)? editProfile,
@@ -50,7 +56,9 @@ mixin _$AuthEvent {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Login value) login,
-    required TResult Function(_SendOtp value) sendOtp,
+    required TResult Function(_VerifyOtp value) verifyOtp,
+    required TResult Function(_GoogleLogin value) googlelogin,
+    required TResult Function(_ResendOtp value) resendOtp,
     required TResult Function(_VerifyAndResetPassword value)
         verifyandResetPassword,
     required TResult Function(_Registered value) registering,
@@ -61,7 +69,9 @@ mixin _$AuthEvent {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Login value)? login,
-    TResult? Function(_SendOtp value)? sendOtp,
+    TResult? Function(_VerifyOtp value)? verifyOtp,
+    TResult? Function(_GoogleLogin value)? googlelogin,
+    TResult? Function(_ResendOtp value)? resendOtp,
     TResult? Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult? Function(_Registered value)? registering,
     TResult? Function(_EditProfile value)? editProfile,
@@ -71,7 +81,9 @@ mixin _$AuthEvent {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Login value)? login,
-    TResult Function(_SendOtp value)? sendOtp,
+    TResult Function(_VerifyOtp value)? verifyOtp,
+    TResult Function(_GoogleLogin value)? googlelogin,
+    TResult Function(_ResendOtp value)? resendOtp,
     TResult Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult Function(_Registered value)? registering,
     TResult Function(_EditProfile value)? editProfile,
@@ -164,7 +176,9 @@ class _$LoginImpl implements _Login {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(dynamic request) login,
-    required TResult Function(String phone) sendOtp,
+    required TResult Function(dynamic request) verifyOtp,
+    required TResult Function(dynamic request) googlelogin,
+    required TResult Function(dynamic request) resendOtp,
     required TResult Function(Map<String, dynamic> data) verifyandResetPassword,
     required TResult Function(dynamic request) registering,
     required TResult Function(dynamic request) editProfile,
@@ -177,7 +191,9 @@ class _$LoginImpl implements _Login {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(dynamic request)? login,
-    TResult? Function(String phone)? sendOtp,
+    TResult? Function(dynamic request)? verifyOtp,
+    TResult? Function(dynamic request)? googlelogin,
+    TResult? Function(dynamic request)? resendOtp,
     TResult? Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult? Function(dynamic request)? registering,
     TResult? Function(dynamic request)? editProfile,
@@ -190,7 +206,9 @@ class _$LoginImpl implements _Login {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(dynamic request)? login,
-    TResult Function(String phone)? sendOtp,
+    TResult Function(dynamic request)? verifyOtp,
+    TResult Function(dynamic request)? googlelogin,
+    TResult Function(dynamic request)? resendOtp,
     TResult Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult Function(dynamic request)? registering,
     TResult Function(dynamic request)? editProfile,
@@ -207,7 +225,9 @@ class _$LoginImpl implements _Login {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Login value) login,
-    required TResult Function(_SendOtp value) sendOtp,
+    required TResult Function(_VerifyOtp value) verifyOtp,
+    required TResult Function(_GoogleLogin value) googlelogin,
+    required TResult Function(_ResendOtp value) resendOtp,
     required TResult Function(_VerifyAndResetPassword value)
         verifyandResetPassword,
     required TResult Function(_Registered value) registering,
@@ -221,7 +241,9 @@ class _$LoginImpl implements _Login {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Login value)? login,
-    TResult? Function(_SendOtp value)? sendOtp,
+    TResult? Function(_VerifyOtp value)? verifyOtp,
+    TResult? Function(_GoogleLogin value)? googlelogin,
+    TResult? Function(_ResendOtp value)? resendOtp,
     TResult? Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult? Function(_Registered value)? registering,
     TResult? Function(_EditProfile value)? editProfile,
@@ -234,7 +256,9 @@ class _$LoginImpl implements _Login {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Login value)? login,
-    TResult Function(_SendOtp value)? sendOtp,
+    TResult Function(_VerifyOtp value)? verifyOtp,
+    TResult Function(_GoogleLogin value)? googlelogin,
+    TResult Function(_ResendOtp value)? resendOtp,
     TResult Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult Function(_Registered value)? registering,
     TResult Function(_EditProfile value)? editProfile,
@@ -258,105 +282,112 @@ abstract class _Login implements AuthEvent {
 }
 
 /// @nodoc
-abstract class _$$SendOtpImplCopyWith<$Res> {
-  factory _$$SendOtpImplCopyWith(
-          _$SendOtpImpl value, $Res Function(_$SendOtpImpl) then) =
-      __$$SendOtpImplCopyWithImpl<$Res>;
+abstract class _$$VerifyOtpImplCopyWith<$Res> {
+  factory _$$VerifyOtpImplCopyWith(
+          _$VerifyOtpImpl value, $Res Function(_$VerifyOtpImpl) then) =
+      __$$VerifyOtpImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String phone});
+  $Res call({dynamic request});
 }
 
 /// @nodoc
-class __$$SendOtpImplCopyWithImpl<$Res>
-    extends _$AuthEventCopyWithImpl<$Res, _$SendOtpImpl>
-    implements _$$SendOtpImplCopyWith<$Res> {
-  __$$SendOtpImplCopyWithImpl(
-      _$SendOtpImpl _value, $Res Function(_$SendOtpImpl) _then)
+class __$$VerifyOtpImplCopyWithImpl<$Res>
+    extends _$AuthEventCopyWithImpl<$Res, _$VerifyOtpImpl>
+    implements _$$VerifyOtpImplCopyWith<$Res> {
+  __$$VerifyOtpImplCopyWithImpl(
+      _$VerifyOtpImpl _value, $Res Function(_$VerifyOtpImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? phone = null,
+    Object? request = freezed,
   }) {
-    return _then(_$SendOtpImpl(
-      phone: null == phone
-          ? _value.phone
-          : phone // ignore: cast_nullable_to_non_nullable
-              as String,
+    return _then(_$VerifyOtpImpl(
+      request: freezed == request
+          ? _value.request
+          : request // ignore: cast_nullable_to_non_nullable
+              as dynamic,
     ));
   }
 }
 
 /// @nodoc
 
-class _$SendOtpImpl implements _SendOtp {
-  const _$SendOtpImpl({required this.phone});
+class _$VerifyOtpImpl implements _VerifyOtp {
+  const _$VerifyOtpImpl({required this.request});
 
   @override
-  final String phone;
+  final dynamic request;
 
   @override
   String toString() {
-    return 'AuthEvent.sendOtp(phone: $phone)';
+    return 'AuthEvent.verifyOtp(request: $request)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SendOtpImpl &&
-            (identical(other.phone, phone) || other.phone == phone));
+            other is _$VerifyOtpImpl &&
+            const DeepCollectionEquality().equals(other.request, request));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, phone);
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(request));
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$SendOtpImplCopyWith<_$SendOtpImpl> get copyWith =>
-      __$$SendOtpImplCopyWithImpl<_$SendOtpImpl>(this, _$identity);
+  _$$VerifyOtpImplCopyWith<_$VerifyOtpImpl> get copyWith =>
+      __$$VerifyOtpImplCopyWithImpl<_$VerifyOtpImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(dynamic request) login,
-    required TResult Function(String phone) sendOtp,
+    required TResult Function(dynamic request) verifyOtp,
+    required TResult Function(dynamic request) googlelogin,
+    required TResult Function(dynamic request) resendOtp,
     required TResult Function(Map<String, dynamic> data) verifyandResetPassword,
     required TResult Function(dynamic request) registering,
     required TResult Function(dynamic request) editProfile,
     required TResult Function(int id) myProfile,
   }) {
-    return sendOtp(phone);
+    return verifyOtp(request);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(dynamic request)? login,
-    TResult? Function(String phone)? sendOtp,
+    TResult? Function(dynamic request)? verifyOtp,
+    TResult? Function(dynamic request)? googlelogin,
+    TResult? Function(dynamic request)? resendOtp,
     TResult? Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult? Function(dynamic request)? registering,
     TResult? Function(dynamic request)? editProfile,
     TResult? Function(int id)? myProfile,
   }) {
-    return sendOtp?.call(phone);
+    return verifyOtp?.call(request);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(dynamic request)? login,
-    TResult Function(String phone)? sendOtp,
+    TResult Function(dynamic request)? verifyOtp,
+    TResult Function(dynamic request)? googlelogin,
+    TResult Function(dynamic request)? resendOtp,
     TResult Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult Function(dynamic request)? registering,
     TResult Function(dynamic request)? editProfile,
     TResult Function(int id)? myProfile,
     required TResult orElse(),
   }) {
-    if (sendOtp != null) {
-      return sendOtp(phone);
+    if (verifyOtp != null) {
+      return verifyOtp(request);
     }
     return orElse();
   }
@@ -365,53 +396,402 @@ class _$SendOtpImpl implements _SendOtp {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Login value) login,
-    required TResult Function(_SendOtp value) sendOtp,
+    required TResult Function(_VerifyOtp value) verifyOtp,
+    required TResult Function(_GoogleLogin value) googlelogin,
+    required TResult Function(_ResendOtp value) resendOtp,
     required TResult Function(_VerifyAndResetPassword value)
         verifyandResetPassword,
     required TResult Function(_Registered value) registering,
     required TResult Function(_EditProfile value) editProfile,
     required TResult Function(_MyProfile value) myProfile,
   }) {
-    return sendOtp(this);
+    return verifyOtp(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Login value)? login,
-    TResult? Function(_SendOtp value)? sendOtp,
+    TResult? Function(_VerifyOtp value)? verifyOtp,
+    TResult? Function(_GoogleLogin value)? googlelogin,
+    TResult? Function(_ResendOtp value)? resendOtp,
     TResult? Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult? Function(_Registered value)? registering,
     TResult? Function(_EditProfile value)? editProfile,
     TResult? Function(_MyProfile value)? myProfile,
   }) {
-    return sendOtp?.call(this);
+    return verifyOtp?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Login value)? login,
-    TResult Function(_SendOtp value)? sendOtp,
+    TResult Function(_VerifyOtp value)? verifyOtp,
+    TResult Function(_GoogleLogin value)? googlelogin,
+    TResult Function(_ResendOtp value)? resendOtp,
     TResult Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult Function(_Registered value)? registering,
     TResult Function(_EditProfile value)? editProfile,
     TResult Function(_MyProfile value)? myProfile,
     required TResult orElse(),
   }) {
-    if (sendOtp != null) {
-      return sendOtp(this);
+    if (verifyOtp != null) {
+      return verifyOtp(this);
     }
     return orElse();
   }
 }
 
-abstract class _SendOtp implements AuthEvent {
-  const factory _SendOtp({required final String phone}) = _$SendOtpImpl;
+abstract class _VerifyOtp implements AuthEvent {
+  const factory _VerifyOtp({required final dynamic request}) = _$VerifyOtpImpl;
 
-  String get phone;
+  dynamic get request;
   @JsonKey(ignore: true)
-  _$$SendOtpImplCopyWith<_$SendOtpImpl> get copyWith =>
+  _$$VerifyOtpImplCopyWith<_$VerifyOtpImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$GoogleLoginImplCopyWith<$Res> {
+  factory _$$GoogleLoginImplCopyWith(
+          _$GoogleLoginImpl value, $Res Function(_$GoogleLoginImpl) then) =
+      __$$GoogleLoginImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({dynamic request});
+}
+
+/// @nodoc
+class __$$GoogleLoginImplCopyWithImpl<$Res>
+    extends _$AuthEventCopyWithImpl<$Res, _$GoogleLoginImpl>
+    implements _$$GoogleLoginImplCopyWith<$Res> {
+  __$$GoogleLoginImplCopyWithImpl(
+      _$GoogleLoginImpl _value, $Res Function(_$GoogleLoginImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? request = freezed,
+  }) {
+    return _then(_$GoogleLoginImpl(
+      request: freezed == request
+          ? _value.request
+          : request // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$GoogleLoginImpl implements _GoogleLogin {
+  const _$GoogleLoginImpl({required this.request});
+
+  @override
+  final dynamic request;
+
+  @override
+  String toString() {
+    return 'AuthEvent.googlelogin(request: $request)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$GoogleLoginImpl &&
+            const DeepCollectionEquality().equals(other.request, request));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(request));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$GoogleLoginImplCopyWith<_$GoogleLoginImpl> get copyWith =>
+      __$$GoogleLoginImplCopyWithImpl<_$GoogleLoginImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(dynamic request) login,
+    required TResult Function(dynamic request) verifyOtp,
+    required TResult Function(dynamic request) googlelogin,
+    required TResult Function(dynamic request) resendOtp,
+    required TResult Function(Map<String, dynamic> data) verifyandResetPassword,
+    required TResult Function(dynamic request) registering,
+    required TResult Function(dynamic request) editProfile,
+    required TResult Function(int id) myProfile,
+  }) {
+    return googlelogin(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(dynamic request)? login,
+    TResult? Function(dynamic request)? verifyOtp,
+    TResult? Function(dynamic request)? googlelogin,
+    TResult? Function(dynamic request)? resendOtp,
+    TResult? Function(Map<String, dynamic> data)? verifyandResetPassword,
+    TResult? Function(dynamic request)? registering,
+    TResult? Function(dynamic request)? editProfile,
+    TResult? Function(int id)? myProfile,
+  }) {
+    return googlelogin?.call(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(dynamic request)? login,
+    TResult Function(dynamic request)? verifyOtp,
+    TResult Function(dynamic request)? googlelogin,
+    TResult Function(dynamic request)? resendOtp,
+    TResult Function(Map<String, dynamic> data)? verifyandResetPassword,
+    TResult Function(dynamic request)? registering,
+    TResult Function(dynamic request)? editProfile,
+    TResult Function(int id)? myProfile,
+    required TResult orElse(),
+  }) {
+    if (googlelogin != null) {
+      return googlelogin(request);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Login value) login,
+    required TResult Function(_VerifyOtp value) verifyOtp,
+    required TResult Function(_GoogleLogin value) googlelogin,
+    required TResult Function(_ResendOtp value) resendOtp,
+    required TResult Function(_VerifyAndResetPassword value)
+        verifyandResetPassword,
+    required TResult Function(_Registered value) registering,
+    required TResult Function(_EditProfile value) editProfile,
+    required TResult Function(_MyProfile value) myProfile,
+  }) {
+    return googlelogin(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Login value)? login,
+    TResult? Function(_VerifyOtp value)? verifyOtp,
+    TResult? Function(_GoogleLogin value)? googlelogin,
+    TResult? Function(_ResendOtp value)? resendOtp,
+    TResult? Function(_VerifyAndResetPassword value)? verifyandResetPassword,
+    TResult? Function(_Registered value)? registering,
+    TResult? Function(_EditProfile value)? editProfile,
+    TResult? Function(_MyProfile value)? myProfile,
+  }) {
+    return googlelogin?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Login value)? login,
+    TResult Function(_VerifyOtp value)? verifyOtp,
+    TResult Function(_GoogleLogin value)? googlelogin,
+    TResult Function(_ResendOtp value)? resendOtp,
+    TResult Function(_VerifyAndResetPassword value)? verifyandResetPassword,
+    TResult Function(_Registered value)? registering,
+    TResult Function(_EditProfile value)? editProfile,
+    TResult Function(_MyProfile value)? myProfile,
+    required TResult orElse(),
+  }) {
+    if (googlelogin != null) {
+      return googlelogin(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _GoogleLogin implements AuthEvent {
+  const factory _GoogleLogin({required final dynamic request}) =
+      _$GoogleLoginImpl;
+
+  dynamic get request;
+  @JsonKey(ignore: true)
+  _$$GoogleLoginImplCopyWith<_$GoogleLoginImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ResendOtpImplCopyWith<$Res> {
+  factory _$$ResendOtpImplCopyWith(
+          _$ResendOtpImpl value, $Res Function(_$ResendOtpImpl) then) =
+      __$$ResendOtpImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({dynamic request});
+}
+
+/// @nodoc
+class __$$ResendOtpImplCopyWithImpl<$Res>
+    extends _$AuthEventCopyWithImpl<$Res, _$ResendOtpImpl>
+    implements _$$ResendOtpImplCopyWith<$Res> {
+  __$$ResendOtpImplCopyWithImpl(
+      _$ResendOtpImpl _value, $Res Function(_$ResendOtpImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? request = freezed,
+  }) {
+    return _then(_$ResendOtpImpl(
+      request: freezed == request
+          ? _value.request
+          : request // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ResendOtpImpl implements _ResendOtp {
+  const _$ResendOtpImpl({required this.request});
+
+  @override
+  final dynamic request;
+
+  @override
+  String toString() {
+    return 'AuthEvent.resendOtp(request: $request)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ResendOtpImpl &&
+            const DeepCollectionEquality().equals(other.request, request));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(request));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ResendOtpImplCopyWith<_$ResendOtpImpl> get copyWith =>
+      __$$ResendOtpImplCopyWithImpl<_$ResendOtpImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(dynamic request) login,
+    required TResult Function(dynamic request) verifyOtp,
+    required TResult Function(dynamic request) googlelogin,
+    required TResult Function(dynamic request) resendOtp,
+    required TResult Function(Map<String, dynamic> data) verifyandResetPassword,
+    required TResult Function(dynamic request) registering,
+    required TResult Function(dynamic request) editProfile,
+    required TResult Function(int id) myProfile,
+  }) {
+    return resendOtp(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(dynamic request)? login,
+    TResult? Function(dynamic request)? verifyOtp,
+    TResult? Function(dynamic request)? googlelogin,
+    TResult? Function(dynamic request)? resendOtp,
+    TResult? Function(Map<String, dynamic> data)? verifyandResetPassword,
+    TResult? Function(dynamic request)? registering,
+    TResult? Function(dynamic request)? editProfile,
+    TResult? Function(int id)? myProfile,
+  }) {
+    return resendOtp?.call(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(dynamic request)? login,
+    TResult Function(dynamic request)? verifyOtp,
+    TResult Function(dynamic request)? googlelogin,
+    TResult Function(dynamic request)? resendOtp,
+    TResult Function(Map<String, dynamic> data)? verifyandResetPassword,
+    TResult Function(dynamic request)? registering,
+    TResult Function(dynamic request)? editProfile,
+    TResult Function(int id)? myProfile,
+    required TResult orElse(),
+  }) {
+    if (resendOtp != null) {
+      return resendOtp(request);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Login value) login,
+    required TResult Function(_VerifyOtp value) verifyOtp,
+    required TResult Function(_GoogleLogin value) googlelogin,
+    required TResult Function(_ResendOtp value) resendOtp,
+    required TResult Function(_VerifyAndResetPassword value)
+        verifyandResetPassword,
+    required TResult Function(_Registered value) registering,
+    required TResult Function(_EditProfile value) editProfile,
+    required TResult Function(_MyProfile value) myProfile,
+  }) {
+    return resendOtp(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Login value)? login,
+    TResult? Function(_VerifyOtp value)? verifyOtp,
+    TResult? Function(_GoogleLogin value)? googlelogin,
+    TResult? Function(_ResendOtp value)? resendOtp,
+    TResult? Function(_VerifyAndResetPassword value)? verifyandResetPassword,
+    TResult? Function(_Registered value)? registering,
+    TResult? Function(_EditProfile value)? editProfile,
+    TResult? Function(_MyProfile value)? myProfile,
+  }) {
+    return resendOtp?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Login value)? login,
+    TResult Function(_VerifyOtp value)? verifyOtp,
+    TResult Function(_GoogleLogin value)? googlelogin,
+    TResult Function(_ResendOtp value)? resendOtp,
+    TResult Function(_VerifyAndResetPassword value)? verifyandResetPassword,
+    TResult Function(_Registered value)? registering,
+    TResult Function(_EditProfile value)? editProfile,
+    TResult Function(_MyProfile value)? myProfile,
+    required TResult orElse(),
+  }) {
+    if (resendOtp != null) {
+      return resendOtp(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ResendOtp implements AuthEvent {
+  const factory _ResendOtp({required final dynamic request}) = _$ResendOtpImpl;
+
+  dynamic get request;
+  @JsonKey(ignore: true)
+  _$$ResendOtpImplCopyWith<_$ResendOtpImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -490,7 +870,9 @@ class _$VerifyAndResetPasswordImpl implements _VerifyAndResetPassword {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(dynamic request) login,
-    required TResult Function(String phone) sendOtp,
+    required TResult Function(dynamic request) verifyOtp,
+    required TResult Function(dynamic request) googlelogin,
+    required TResult Function(dynamic request) resendOtp,
     required TResult Function(Map<String, dynamic> data) verifyandResetPassword,
     required TResult Function(dynamic request) registering,
     required TResult Function(dynamic request) editProfile,
@@ -503,7 +885,9 @@ class _$VerifyAndResetPasswordImpl implements _VerifyAndResetPassword {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(dynamic request)? login,
-    TResult? Function(String phone)? sendOtp,
+    TResult? Function(dynamic request)? verifyOtp,
+    TResult? Function(dynamic request)? googlelogin,
+    TResult? Function(dynamic request)? resendOtp,
     TResult? Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult? Function(dynamic request)? registering,
     TResult? Function(dynamic request)? editProfile,
@@ -516,7 +900,9 @@ class _$VerifyAndResetPasswordImpl implements _VerifyAndResetPassword {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(dynamic request)? login,
-    TResult Function(String phone)? sendOtp,
+    TResult Function(dynamic request)? verifyOtp,
+    TResult Function(dynamic request)? googlelogin,
+    TResult Function(dynamic request)? resendOtp,
     TResult Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult Function(dynamic request)? registering,
     TResult Function(dynamic request)? editProfile,
@@ -533,7 +919,9 @@ class _$VerifyAndResetPasswordImpl implements _VerifyAndResetPassword {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Login value) login,
-    required TResult Function(_SendOtp value) sendOtp,
+    required TResult Function(_VerifyOtp value) verifyOtp,
+    required TResult Function(_GoogleLogin value) googlelogin,
+    required TResult Function(_ResendOtp value) resendOtp,
     required TResult Function(_VerifyAndResetPassword value)
         verifyandResetPassword,
     required TResult Function(_Registered value) registering,
@@ -547,7 +935,9 @@ class _$VerifyAndResetPasswordImpl implements _VerifyAndResetPassword {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Login value)? login,
-    TResult? Function(_SendOtp value)? sendOtp,
+    TResult? Function(_VerifyOtp value)? verifyOtp,
+    TResult? Function(_GoogleLogin value)? googlelogin,
+    TResult? Function(_ResendOtp value)? resendOtp,
     TResult? Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult? Function(_Registered value)? registering,
     TResult? Function(_EditProfile value)? editProfile,
@@ -560,7 +950,9 @@ class _$VerifyAndResetPasswordImpl implements _VerifyAndResetPassword {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Login value)? login,
-    TResult Function(_SendOtp value)? sendOtp,
+    TResult Function(_VerifyOtp value)? verifyOtp,
+    TResult Function(_GoogleLogin value)? googlelogin,
+    TResult Function(_ResendOtp value)? resendOtp,
     TResult Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult Function(_Registered value)? registering,
     TResult Function(_EditProfile value)? editProfile,
@@ -651,7 +1043,9 @@ class _$RegisteredImpl implements _Registered {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(dynamic request) login,
-    required TResult Function(String phone) sendOtp,
+    required TResult Function(dynamic request) verifyOtp,
+    required TResult Function(dynamic request) googlelogin,
+    required TResult Function(dynamic request) resendOtp,
     required TResult Function(Map<String, dynamic> data) verifyandResetPassword,
     required TResult Function(dynamic request) registering,
     required TResult Function(dynamic request) editProfile,
@@ -664,7 +1058,9 @@ class _$RegisteredImpl implements _Registered {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(dynamic request)? login,
-    TResult? Function(String phone)? sendOtp,
+    TResult? Function(dynamic request)? verifyOtp,
+    TResult? Function(dynamic request)? googlelogin,
+    TResult? Function(dynamic request)? resendOtp,
     TResult? Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult? Function(dynamic request)? registering,
     TResult? Function(dynamic request)? editProfile,
@@ -677,7 +1073,9 @@ class _$RegisteredImpl implements _Registered {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(dynamic request)? login,
-    TResult Function(String phone)? sendOtp,
+    TResult Function(dynamic request)? verifyOtp,
+    TResult Function(dynamic request)? googlelogin,
+    TResult Function(dynamic request)? resendOtp,
     TResult Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult Function(dynamic request)? registering,
     TResult Function(dynamic request)? editProfile,
@@ -694,7 +1092,9 @@ class _$RegisteredImpl implements _Registered {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Login value) login,
-    required TResult Function(_SendOtp value) sendOtp,
+    required TResult Function(_VerifyOtp value) verifyOtp,
+    required TResult Function(_GoogleLogin value) googlelogin,
+    required TResult Function(_ResendOtp value) resendOtp,
     required TResult Function(_VerifyAndResetPassword value)
         verifyandResetPassword,
     required TResult Function(_Registered value) registering,
@@ -708,7 +1108,9 @@ class _$RegisteredImpl implements _Registered {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Login value)? login,
-    TResult? Function(_SendOtp value)? sendOtp,
+    TResult? Function(_VerifyOtp value)? verifyOtp,
+    TResult? Function(_GoogleLogin value)? googlelogin,
+    TResult? Function(_ResendOtp value)? resendOtp,
     TResult? Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult? Function(_Registered value)? registering,
     TResult? Function(_EditProfile value)? editProfile,
@@ -721,7 +1123,9 @@ class _$RegisteredImpl implements _Registered {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Login value)? login,
-    TResult Function(_SendOtp value)? sendOtp,
+    TResult Function(_VerifyOtp value)? verifyOtp,
+    TResult Function(_GoogleLogin value)? googlelogin,
+    TResult Function(_ResendOtp value)? resendOtp,
     TResult Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult Function(_Registered value)? registering,
     TResult Function(_EditProfile value)? editProfile,
@@ -811,7 +1215,9 @@ class _$EditProfileImpl implements _EditProfile {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(dynamic request) login,
-    required TResult Function(String phone) sendOtp,
+    required TResult Function(dynamic request) verifyOtp,
+    required TResult Function(dynamic request) googlelogin,
+    required TResult Function(dynamic request) resendOtp,
     required TResult Function(Map<String, dynamic> data) verifyandResetPassword,
     required TResult Function(dynamic request) registering,
     required TResult Function(dynamic request) editProfile,
@@ -824,7 +1230,9 @@ class _$EditProfileImpl implements _EditProfile {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(dynamic request)? login,
-    TResult? Function(String phone)? sendOtp,
+    TResult? Function(dynamic request)? verifyOtp,
+    TResult? Function(dynamic request)? googlelogin,
+    TResult? Function(dynamic request)? resendOtp,
     TResult? Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult? Function(dynamic request)? registering,
     TResult? Function(dynamic request)? editProfile,
@@ -837,7 +1245,9 @@ class _$EditProfileImpl implements _EditProfile {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(dynamic request)? login,
-    TResult Function(String phone)? sendOtp,
+    TResult Function(dynamic request)? verifyOtp,
+    TResult Function(dynamic request)? googlelogin,
+    TResult Function(dynamic request)? resendOtp,
     TResult Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult Function(dynamic request)? registering,
     TResult Function(dynamic request)? editProfile,
@@ -854,7 +1264,9 @@ class _$EditProfileImpl implements _EditProfile {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Login value) login,
-    required TResult Function(_SendOtp value) sendOtp,
+    required TResult Function(_VerifyOtp value) verifyOtp,
+    required TResult Function(_GoogleLogin value) googlelogin,
+    required TResult Function(_ResendOtp value) resendOtp,
     required TResult Function(_VerifyAndResetPassword value)
         verifyandResetPassword,
     required TResult Function(_Registered value) registering,
@@ -868,7 +1280,9 @@ class _$EditProfileImpl implements _EditProfile {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Login value)? login,
-    TResult? Function(_SendOtp value)? sendOtp,
+    TResult? Function(_VerifyOtp value)? verifyOtp,
+    TResult? Function(_GoogleLogin value)? googlelogin,
+    TResult? Function(_ResendOtp value)? resendOtp,
     TResult? Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult? Function(_Registered value)? registering,
     TResult? Function(_EditProfile value)? editProfile,
@@ -881,7 +1295,9 @@ class _$EditProfileImpl implements _EditProfile {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Login value)? login,
-    TResult Function(_SendOtp value)? sendOtp,
+    TResult Function(_VerifyOtp value)? verifyOtp,
+    TResult Function(_GoogleLogin value)? googlelogin,
+    TResult Function(_ResendOtp value)? resendOtp,
     TResult Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult Function(_Registered value)? registering,
     TResult Function(_EditProfile value)? editProfile,
@@ -970,7 +1386,9 @@ class _$MyProfileImpl implements _MyProfile {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(dynamic request) login,
-    required TResult Function(String phone) sendOtp,
+    required TResult Function(dynamic request) verifyOtp,
+    required TResult Function(dynamic request) googlelogin,
+    required TResult Function(dynamic request) resendOtp,
     required TResult Function(Map<String, dynamic> data) verifyandResetPassword,
     required TResult Function(dynamic request) registering,
     required TResult Function(dynamic request) editProfile,
@@ -983,7 +1401,9 @@ class _$MyProfileImpl implements _MyProfile {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(dynamic request)? login,
-    TResult? Function(String phone)? sendOtp,
+    TResult? Function(dynamic request)? verifyOtp,
+    TResult? Function(dynamic request)? googlelogin,
+    TResult? Function(dynamic request)? resendOtp,
     TResult? Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult? Function(dynamic request)? registering,
     TResult? Function(dynamic request)? editProfile,
@@ -996,7 +1416,9 @@ class _$MyProfileImpl implements _MyProfile {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(dynamic request)? login,
-    TResult Function(String phone)? sendOtp,
+    TResult Function(dynamic request)? verifyOtp,
+    TResult Function(dynamic request)? googlelogin,
+    TResult Function(dynamic request)? resendOtp,
     TResult Function(Map<String, dynamic> data)? verifyandResetPassword,
     TResult Function(dynamic request)? registering,
     TResult Function(dynamic request)? editProfile,
@@ -1013,7 +1435,9 @@ class _$MyProfileImpl implements _MyProfile {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Login value) login,
-    required TResult Function(_SendOtp value) sendOtp,
+    required TResult Function(_VerifyOtp value) verifyOtp,
+    required TResult Function(_GoogleLogin value) googlelogin,
+    required TResult Function(_ResendOtp value) resendOtp,
     required TResult Function(_VerifyAndResetPassword value)
         verifyandResetPassword,
     required TResult Function(_Registered value) registering,
@@ -1027,7 +1451,9 @@ class _$MyProfileImpl implements _MyProfile {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Login value)? login,
-    TResult? Function(_SendOtp value)? sendOtp,
+    TResult? Function(_VerifyOtp value)? verifyOtp,
+    TResult? Function(_GoogleLogin value)? googlelogin,
+    TResult? Function(_ResendOtp value)? resendOtp,
     TResult? Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult? Function(_Registered value)? registering,
     TResult? Function(_EditProfile value)? editProfile,
@@ -1040,7 +1466,9 @@ class _$MyProfileImpl implements _MyProfile {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Login value)? login,
-    TResult Function(_SendOtp value)? sendOtp,
+    TResult Function(_VerifyOtp value)? verifyOtp,
+    TResult Function(_GoogleLogin value)? googlelogin,
+    TResult Function(_ResendOtp value)? resendOtp,
     TResult Function(_VerifyAndResetPassword value)? verifyandResetPassword,
     TResult Function(_Registered value)? registering,
     TResult Function(_EditProfile value)? editProfile,

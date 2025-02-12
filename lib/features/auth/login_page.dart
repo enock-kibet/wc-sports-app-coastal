@@ -1,437 +1,430 @@
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/gestures.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:go_router/go_router.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sports_app/common/app_background.dart';
+import 'package:sports_app/common/mixin/input_validation_mixin.dart';
+import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
+import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
-// import 'package:talker_flutter/talker_flutter.dart';
+import '../../common/dimens.dart';
+import '../../theme/app_colors.dart';
 
-// class LoginPage extends StatefulWidget {
-//   const LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
-//   @override
-//   State<LoginPage> createState() => _LoginPageState();
-// }
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
 
-// class _LoginPageState extends State<LoginPage> with InputValidationMixin {
-//   bool rememberMe = true;
-//   bool usePhone = true;
-//   late TextEditingController _emailController;
-//   late TextEditingController _phoneController;
-//   late TextEditingController _passwordController;
+class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
+  late AuthBloc authBloc;
+  final _loginFormKey = GlobalKey<FormState>();
+  final TextEditingController _emailController =
+      TextEditingController(text: kDebugMode ? 'codewithmbugua@gmail.com' : '');
+  final TextEditingController _passwordController =
+      TextEditingController(text: kDebugMode ? 'secretpassword123' : '');
+  bool hidePassword = true;
+  @override
+  void initState() {
+    authBloc = AuthBloc();
+    super.initState();
+  }
 
-//   String? completeNumber;
-//   bool showPassword=true;
+  @override
+  void dispose() {
+    authBloc.close();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
-//   final _formKey = GlobalKey<FormState>();
-//   @override
-//   void initState() {
-//     super.initState();
-  
-//     _emailController = TextEditingController();
-//     _phoneController = TextEditingController();
-//     _passwordController = TextEditingController();
-//   }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: BlocConsumer<AuthBloc, AuthState>(
+         bloc: authBloc,
+        listener: (context, state) {
+          if (state.status == AuthStatus.success) {
+            context.read<UserBloc>().add(UpdateUser(state.data));
+            //show success snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Login Successful'),
+                backgroundColor: AppColors.primaryColor,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 3),
+                action: SnackBarAction(
+                  label: 'Dismiss',
+                  textColor: AppColors.whiteColor,
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  },
+                ),
+              ),
+            );
+          }
+          if (state.status == AuthStatus.failure) {
+            service<Talker>().error('Login Failed');
+            service<Talker>().error(state.failure!.error);
+            //show snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.failure!.error),
+                backgroundColor: AppColors.dangerColor,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 3),
+                action: SnackBarAction(
+                  label: 'Dismiss',
+                  textColor: AppColors.whiteColor,
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  },
+                ),
+              ),
+            );
+          }
 
-//   @override
-//   void dispose() {
-//     _userBloc.close();
-//     _authBloc.close();
-//     _emailController.dispose();
-//     _phoneController.dispose();
-//     _passwordController.dispose();
-//     super.dispose();
-//   }
+        },
+        builder: (context, state) {
+          return const AppBackground();
+        },
+      ),
+      bottomSheet: SingleChildScrollView(
+        child: BlocBuilder<AuthBloc, AuthState>(
+          bloc: authBloc,
+          builder: (context, state) {
+            return Container(
+                  padding: EdgeInsets.all(kMedium),
+                  width: double.infinity,
+                  child: Form(
+                    key: _loginFormKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        LoginSignUpSwitch(context, true),
+                        const SizedBox(
+                          height: kLarge,
+                        ),
+                        const Text(
+                          "Welcome Back!",
+                          style: TextStyle(
+                              fontSize: kMedium,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF696565)),
+                        ),
+                        const SizedBox(
+                          height: kLarge,
+                        ),
+                        const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("Email",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF696565)))),
+                        const SizedBox(
+                          height: 9,
+                        ),
+                        CustomTextField(true, "jina@email.com",controller: _emailController,
+                                      validator: combine([
+                                        withMessage('Email is empty', isTextEmpty),
+                                        withMessage('Email is invalid', isInvalidEmail)
+                                      ]),),
+                        const SizedBox(
+                          height: 13,
+                        ),
+                        const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("Password",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF696565)))),
+                        const SizedBox(
+                          height: 9,
+                        ),
+                        CustomTextField(false, "**********",controller: _passwordController,
+                                    validator: combine([
+                                      withMessage('password is empty', isTextEmpty),
+                                      withMessage(
+                                          'password is invalid', isPasswordInvalid)
+                                    ]),
+                                    obscureText: hidePassword,
+                                    obscuringCharacter: "*",
+                                   ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Checkbox(value: false, onChanged: (onChanged) {}),
+                                const Text(
+                                  'Remember Me',
+                                  style: TextStyle(fontSize: kSMedium),
+                                )
+                              ],
+                            ),
+                            TextButton(
+                                onPressed: () {},
+                                child: const Text(
+                                  "Forgot Password",
+                                  style: TextStyle(fontSize: kSMedium),
+                                ))
+                          ],
+                        ),
+                        const SizedBox(
+                          height: kLarge,
+                        ),
+                        GestureDetector(
+                            onTap: () {
+                              if (validateSaveLogin()) {
+                                        if (state.status == AuthStatus.loading) {
+                                        } else {
+                                          authBloc.add(AuthEvent.login(
+                                              request: {
+                                            "email": _emailController.text.trim(),
+                                            "password": _passwordController.text.trim(),
+                                        }));
+                                        }
+                                      }
+                            },
+                            child: CustomFilledButton(state.status == AuthStatus.loading
+                                            ? "Loading..."
+                                            : 'Sign In')),
+                        const SizedBox(
+                          height: kSMedium,
+                        ),
+                        OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                                minimumSize: const Size.fromHeight(56),
+                                side: BorderSide(color: Color(0xFF414141)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(kMedium))),
+                            onPressed: () async{
+                              try {
+                              // Initialize Google Sign-In
+                              final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final theme = Theme.of(context).colorScheme;
-//     return Scaffold(
-//       backgroundColor: theme.surface,
-//       body: BlocConsumer<AuthBloc, AuthState>(
-//         bloc: _authBloc,
-//         listener: (context, state) {
-//           switch (state.status) {
-//             case AuthStatus.failure:
-//               ScaffoldMessenger.of(context).showSnackBar(
-//                 SnackBar(
-//                   content: Center(
-//                       child: Text(state.failure!.error.toString(),
-//                           style: TextStyle(color: theme.inverseSurface))),
-//                   backgroundColor: theme.error,
-//                   behavior: SnackBarBehavior.floating,
-//                 ),
-//               );
-//               break;
-//             case AuthStatus.success:
-//               _authBloc.add(
-//                 AuthEvent.sendOtp(
-//                   id: user!.id,
-//                   channel: "sms",
-//                 ),
-//               );
-//               context.pushNamed(AppRoute.otpVerify.name, extra: user);
-//               break;
-//             default:
-//               break;
-//           }
-//         },
-//         builder: (context, state) {
-//           return BlocListener<UserBloc, UserState>(
-//             bloc: _userBloc,
-//             listener: (context, state) {
-//               switch (state.status) {
-//                 case UserStatus.failure:
-//                   ScaffoldMessenger.of(context).showSnackBar(
-//                     SnackBar(
-//                       content: Center(
-//                           child: Text(state.failure!.error.toString(),
-//                               style: TextStyle(color: theme.surface))),
-//                       backgroundColor: theme.error,
-//                       behavior: SnackBarBehavior.floating,
-//                     ),
-//                   );
-//                   break;
-//                 case UserStatus.success:
-//                   service<Talker>().info(state.user);
+                              // Trigger the Google Sign-In flow
+                              final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
-//                   _authBloc.add(
-//                     AuthEvent.phoneLogin(
-//                       id: state.user!.id,
-//                       password: _passwordController.text.trim(),
-//                     ),
-//                   );
-//                   setState(() {
-//                     user = state.user;
-//                   });
-//                   break;
-//                 default:
-//                   break;
-//               }
-//             },
-//             child: SafeArea(
-//               child: Padding(
-//                 padding: const EdgeInsets.symmetric(horizontal: kMedium),
-//                 child: Form(
-//                   key: _formKey,
-//                   child: SingleChildScrollView(
-//                     child: Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-//                         const SizedBox(
-//                           height: kLarge,
-//                         ),
-//                         Center(
-//                             child: Image.asset(
-//                           "assets/logo.png",
-//                           width: (280 * (2 / 3)),
-//                         )),
-//                         const SizedBox(
-//                           height: kXXLarge,
-//                         ),
-//                         const Text(
-//                           "Welcome back!",
-//                           style: TextStyle(
-//                             fontSize: kXLMedium,
-//                             fontWeight: FontWeight.bold,
-//                           ),
-//                         ),
-//                         const SizedBox(
-//                           height: kMedium,
-//                         ),
-//                         const Text(
-//                           "Enter your country and phone number to access your account.",
-//                           style: TextStyle(
-//                             fontSize: kMedium,
-//                             fontWeight: FontWeight.normal,
-//                           ),
-//                         ),
-//                         const SizedBox(
-//                           height: kMedium,
-//                         ),
-//                         Text(
-//                           usePhone ? "Primary Phone Number" : "Email Address",
-//                           style: const TextStyle(
-//                             fontSize: kMedium,
-//                             fontWeight: FontWeight.normal,
-//                           ),
-//                         ),
-//                         const SizedBox(
-//                           height: kSmall,
-//                         ),
-//                         if (usePhone)
-//                           IntlPhoneField(
-//                             initialCountryCode: "KE",
-//                             disableLengthCheck: true,
-//                             showCountryFlag: false,
-//                             controller: _phoneController,
-//                             autovalidateMode:
-//                                 AutovalidateMode.onUserInteraction,
-//                             dropdownIconPosition: IconPosition.trailing,
-//                             dropdownDecoration: const BoxDecoration(
-//                               shape: BoxShape.circle,
-//                             ),
-//                             enabled: state.status != AuthStatus.loading,
-//                             flagsButtonPadding: const EdgeInsets.only(
-//                               left: kMedium,
-//                               right: kSmall,
-//                             ),
-//                             inputFormatters: [
-//                               FilteringTextInputFormatter.digitsOnly,
-//                               // LengthLimitingTextInputFormatter(9),
-//                             ],
-//                             validator: (value) {
-//                               if (value!.number.isEmpty) {
-//                                 return "Phone number is required";
-//                               }
-//                               if (value.number.length < 9) {
-//                                 return "Phone number is too short";
-//                               }
+                              if (googleUser != null) {
 
-//                               return null;
-//                             },
-//                             dropdownIcon: Icon(
-//                               CupertinoIcons.chevron_down,
-//                               color: theme.inverseSurface,
-//                               size: kMedium,
-//                             ),
-//                             pickerDialogStyle: PickerDialogStyle(
-//                                 backgroundColor: theme.surface,
-//                                 countryCodeStyle:
-//                                     TextStyle(color: theme.inverseSurface)),
-//                             decoration: InputDecoration(
-//                               filled: true,
-//                               enabled: state.status == AuthStatus.loading,
-//                               hintText: "7123456789",
-//                               contentPadding: const EdgeInsets.symmetric(
-//                                 horizontal: kMedium,
-//                                 vertical: kMedium,
-//                               ),
-//                             ),
-//                             onChanged: (newPhone) {
-//                               completeNumber = newPhone.completeNumber;
-//                               // setState(() {});
-//                             },
-//                             onCountryChanged: (country) {
-//                               print('Country changed to: ${country.name}');
-//                             },
-//                           ),
-//                         if (!usePhone)
-//                           TextFormField(
-//                             keyboardType: TextInputType.emailAddress,
-//                             validator: combine([
-//                               withMessage('Email is empty', isTextEmpty),
-//                               withMessage('Email is invalid', isInvalidEmail),
-//                             ]),
-//                             enabled: state.status != AuthStatus.loading,
-//                             controller:
-//                                 usePhone ? _phoneController : _emailController,
-//                             decoration: const InputDecoration(
-//                               border: OutlineInputBorder(),
-//                               hintText: 'Enter your email',
-//                             ),
-//                           ),
-//                         const SizedBox(
-//                           height: kMedium,
-//                         ),
-//                         const Text(
-//                           "Password",
-//                           style: TextStyle(
-//                             fontSize: kMedium,
-//                             fontWeight: FontWeight.normal,
-//                           ),
-//                         ),
-//                         const SizedBox(
-//                           height: kSmall,
-//                         ),
-//                         TextFormField(
-//                           controller: _passwordController,
-//                           obscuringCharacter: "*",
-//                           obscureText: showPassword,
-//                           enabled: state.status != AuthStatus.loading,
-//                           validator: combine([
-//                             withMessage('Password is empty', isTextEmpty),
-//                           ]),
-//                           decoration:  InputDecoration(
-//                             suffixIcon: GestureDetector(
-//                               onTap: () {
-//                                 setState(() {
-//                                   showPassword = !showPassword;
-//                                 });
-//                               },
-//                               child: Icon(
-//                                 showPassword
-//                                     ? Icons.visibility_outlined
-//                                     : Icons.visibility_off_outlined,
-//                               ),
-//                             ),
-//                             hintText: '**********',
-//                           ),
-//                         ),
-//                         const SizedBox(
-//                           height: kMedium,
-//                         ),
-//                         Row(
-//                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                           children: [
-//                             Row(
-//                               children: [
-//                                 //Reduce the size of flutter switch
-//                                 //https://github.com/flutter/flutter/issues/84093
-//                                 Transform.scale(
-//                                   scale: 0.7,
-//                                   child: Switch(
-//                                       value: rememberMe,
-//                                       onChanged: (value) {
-//                                         setState(() {
-//                                           rememberMe = !rememberMe;
-//                                         });
-//                                       }),
-//                                 ),
-//                                 Text(
-//                                   "Remember Me",
-//                                   style: TextStyle(color: theme.inverseSurface),
-//                                 )
-//                               ],
-//                             ),
-//                             TextButton(
-//                                 onPressed: () {},
-//                                 child: Text(
-//                                   "Forgot Password?",
-//                                   style: TextStyle(color: theme.inverseSurface),
-//                                 )),
-//                           ],
-//                         ),
-//                         const SizedBox(
-//                           height: kMedium,
-//                         ),
-//                         FilledButton(
-//                             style: FilledButton.styleFrom(
-//                                 shape: RoundedRectangleBorder(
-//                                     borderRadius:
-//                                         BorderRadius.circular(kSmall)),
-//                                 minimumSize: Size(context.width, 60)),
-//                             onPressed: () {
-//                               if (_formKey.currentState!.validate() &&
-//                                   state.status != AuthStatus.loading) {
-//                                 if (!usePhone) {
-//                                   _authBloc.add(AuthEvent.login(
-//                                       request: LoginRequest(
-//                                     email: _emailController.text.trim(),
-//                                     password: _passwordController.text.trim(),
-//                                     remember: rememberMe,
-//                                   )));
-//                                 } else {
-//                                   _userBloc.add(UserEvent.userPhone(
-//                                     phone: completeNumber!,
-//                                   ));
-//                                 }
-//                               }
-//                               // context.pushNamed(AppRoute.otpVerify.name);
-//                             },
-//                             child: Row(
-//                               mainAxisAlignment: MainAxisAlignment.center,
-//                               children: [
-//                                 if (state.status == AuthStatus.loading)
-//                                   Container(
-//                                       margin:
-//                                           const EdgeInsets.only(right: kMedium),
-//                                       height: kXLMedium,
-//                                       width: kXLMedium,
-//                                       child: CircularProgressIndicator(
-//                                           color: theme.surface)),
-//                                 const Text("Continue",
-//                                     style: TextStyle(fontSize: kMedium)),
-//                               ],
-//                             )),
-//                         const SizedBox(
-//                           height: kMedium,
-//                         ),
-//                         const Row(
-//                           children: [
-//                             Expanded(child: Divider()),
-//                             Padding(
-//                               padding:
-//                                   EdgeInsets.symmetric(horizontal: kMedium),
-//                               child: Text(" OR "),
-//                             ),
-//                             Expanded(child: Divider()),
-//                           ],
-//                         ),
-//                         const SizedBox(
-//                           height: kMedium,
-//                         ),
-//                         OutlinedButton(
-//                             style: OutlinedButton.styleFrom(
-//                                 shape: RoundedRectangleBorder(
-//                                     borderRadius:
-//                                         BorderRadius.circular(kSmall)),
-//                                 minimumSize: Size(context.width, 60)),
-//                             onPressed: () {
-//                               setState(() {
-//                                 usePhone = !usePhone;
-//                               });
-//                             },
-//                             child: Text(
-//                               usePhone
-//                                   ? "Login with Email"
-//                                   : "Login with Phone",
-//                               style: TextStyle(
-//                                   color: theme.inverseSurface,
-//                                   fontSize: kMedium),
-//                             )),
-//                         const SizedBox(
-//                           height: kMedium,
-//                         ),
-//                         FilledButton(
-//                             style: FilledButton.styleFrom(
-//                               shape: RoundedRectangleBorder(
-//                                   borderRadius: BorderRadius.circular(kSmall)),
-//                               backgroundColor: theme.inverseSurface,
-//                               minimumSize: Size(
-//                                 context.width,
-//                                 60,
-//                               ),
-//                             ),
-//                             onPressed: () {
-//                               if (_formKey.currentState!.validate()) {
-//                                 if (usePhone) {}
-//                               }
-//                             },
-//                             child: Text(
-//                               "Login with Medlyne Card",
-//                               style: TextStyle(
-//                                   color: theme.surface, fontSize: kMedium),
-//                             )),
-//                         const SizedBox(
-//                           height: kXLarge,
-//                         ),
-//                         RichText(
-//                             text: TextSpan(
-//                                 style: TextStyle(color: theme.inverseSurface),
-//                                 text: "Dont have an account? ",
-//                                 children: [
-//                               TextSpan(
-//                                   recognizer: TapGestureRecognizer()
-//                                     ..onTap = () {
-//                                       context.pushNamed(AppRoute.signup.name);
-//                                     },
-//                                   style: TextStyle(color: theme.primary),
-//                                   text: "Sign up")
-//                             ])),
-//                         const SizedBox(
-//                           height: kMedium,
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
+                                authBloc.add(AuthEvent.googlelogin(
+                                    request: {
+                                      "name": googleUser.displayName,
+                                      "email":googleUser.email,
+                                      "googleId":googleUser.id,
+                                      "picture":googleUser.photoUrl
+                                    }));
+
+
+                              } else {
+                                print("Google Sign-In canceled by user.");
+                                return null;
+                              }
+                              } catch (e) {
+                                print("Error during Google Sign-In: $e");
+                                return null;
+                              }
+
+
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  "assets/images/googlelogo2.png",
+                                  height: kLarge,
+                                ),
+                                const SizedBox(
+                                  width: kSMedium,
+                                ),
+                                Text(
+                                  state.status == AuthStatus.loading
+                                      ? "Loading..."
+                                      :'Sign In with Google',
+                                  style:
+                                      const TextStyle(color: Color(0xFF525252), fontSize: 13),
+                                )
+                              ],
+                            ))
+                      ],
+                    ),
+                  ),
+                );
+          },
+        ),
+      ),
+    );
+  }
+   bool validateSaveLogin() {
+    final form = _loginFormKey.currentState;
+    if (form!.validate()) {
+      form.save();
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+CustomTextField(bool isEmail, String hintText,{final TextEditingController? controller,final String? Function(String?)? validator,bool obscureText = false,String? obscuringCharacter}) {
+  return TextFormField(
+    obscureText: !isEmail,
+    controller: controller,
+    validator: validator,
+    keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
+    obscuringCharacter: "*",
+    onTapOutside: (bool) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    },
+    decoration: InputDecoration(
+      suffixIcon: !isEmail? IconButton(
+                                  onPressed: () {
+                                   
+                                      obscureText = !obscureText;
+                                   
+                                  },
+                                  icon: Icon(
+                                    obscureText
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ):const SizedBox(),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(kMedium),
+            borderSide: const BorderSide(color: Color(0xFFC6C6C6))),
+        filled: false,
+        hintText: hintText,
+        hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFC6C6C6)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(kMedium),
+            borderSide: BorderSide(color: AppColors.primaryColor))),
+  );
+}
+
+//button with the app colors spanning entire width
+CustomFilledButton(String buttonText) {
+  return Container(
+    height: 56,
+    width: double.infinity,
+    clipBehavior: Clip.hardEdge,
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(kMedium),
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            AppColors.defaultAppRed,
+            AppColors.defaultAppPurple,
+          ],
+        )),
+    child: Center(
+        child: Text(
+      buttonText,
+      style: TextStyle(color: AppColors.inputFillColor, fontSize: 18),
+    )),
+  );
+}
+CustomisableFilledButton(String buttonText,bool? fullyRounded,double? height,double textSize) {
+  return Container(
+    height: height??56,
+    width: double.infinity,
+    clipBehavior: Clip.hardEdge,
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(fullyRounded??false?72:kMedium),
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            AppColors.defaultAppRed,
+            AppColors.defaultAppPurple,
+          ],
+        )),
+    child: Center(
+        child: Text(
+          buttonText,
+          style: TextStyle(color: AppColors.inputFillColor, fontSize: textSize),
+        )),
+  );
+}
+CustomOutlinedButton(String buttonText) {
+  return Container(
+    height: 56,
+    width: double.infinity,
+    clipBehavior: Clip.hardEdge,
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(kMedium),
+        border: Border.all()
+    ),
+    child: Center(
+        child: Text(
+          buttonText,
+          style: TextStyle(color: AppColors.blackColor, fontSize: 18),
+        )),
+  );
+}
+LoginSignUpSwitch(BuildContext context, bool isSignInPage) {
+  return Container(
+    padding: EdgeInsets.all(6),
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(kLarge), color: Color(0xFFF0F0F0)),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        GestureDetector(
+          onTap: () {
+            context.go('/signIn');
+          },
+          child: Container(
+            alignment: Alignment.center,
+            height: 32,
+            width: 101,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(kLarge),
+                color: isSignInPage ? Color(0xFF656060) : Color(0xFFF0F0F0)),
+            child: Text(
+              "Login",
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.normal,
+                  color: isSignInPage
+                      ? AppColors.inputFillColor
+                      : Color(0xFF292323)),
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            context.go('/signUp');
+          },
+          child: Container(
+            alignment: Alignment.center,
+            height: 34,
+            width: 101,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(kLarge),
+                color: isSignInPage ? Color(0xFFF0F0F0) : Color(0xFF656060)),
+            child: Text(
+              "Sign Up",
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.normal,
+                  color: isSignInPage
+                      ? Color(0xFF292323)
+                      : AppColors.inputFillColor),
+            ),
+          ),
+        )
+      ],
+    ),
+  );
+}

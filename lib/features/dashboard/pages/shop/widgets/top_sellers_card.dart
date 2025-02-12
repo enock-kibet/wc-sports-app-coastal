@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sports_app/common/dimens.dart';
+import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/router/router.dart';
 
 import 'package:sports_app/theme/theme.dart';
 
 class TopSellersCard extends StatelessWidget {
-  final Map<String,dynamic> product;
+  final Product product;
   const TopSellersCard({
     super.key, required this.product,
   });
@@ -36,7 +37,8 @@ class TopSellersCard extends StatelessWidget {
                     topRight: Radius.circular(kSmall),
                   ),
                   child: Image.network(
-                    product["imageUrl"],
+                    //"https://srv19716098.ultasrv.net/SportApp/images/"+product.imageUrl,
+                    product.imageUrl,
                     width: double.infinity,
                     height: 150,
                     fit: BoxFit.cover,
@@ -54,8 +56,8 @@ class TopSellersCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(product["name"],
-                                maxLines: 2,
+                            Text(product.name,
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
@@ -65,7 +67,7 @@ class TopSellersCard extends StatelessWidget {
                               height: kXSmall,
                             ),
                             Text(
-                              product["description"],
+                              product.description,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -76,7 +78,7 @@ class TopSellersCard extends StatelessWidget {
                               height: kXSmall,
                             ),
                             Text(
-                              "Ksh ${product['amount']}",
+                              "Ksh ${product.price}",
                               style: const TextStyle(
                                   fontSize: kSMedium,
                                   fontWeight: FontWeight.bold),

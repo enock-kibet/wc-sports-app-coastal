@@ -25,10 +25,10 @@ class ErrorHandler {
           switch (statusCode) {
             case 400:
               return Failure(
-                error: error.response?.data["msg"] ?? 'Something went wrong',
+                error: error.response?.data["msg"] ?? error.response?.data["messages"][0]??'Something went wrong',
               );
             case 401:
-              return Failure(error: 'Unauthorized');
+              return Failure(error: error.response?.data["msg"] ?? 'Unauthorized');
             case 403:
               return Failure(error: 'Forbidden');
             case 402:
@@ -45,7 +45,7 @@ class ErrorHandler {
                   error: error.response?.data["msg"] ?? 'Validation error');
             case 500:
               return Failure(
-                error: 'An error occured! Our team is resolving this!',
+                error:error.response?.data["msg"] ?? 'An error occured! Our team is resolving this!',
               );
             case 502:
               return Failure(

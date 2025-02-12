@@ -1,13 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sports_app/common/dimens.dart';
+import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/router/router.dart';
 
 import 'package:sports_app/theme/theme.dart';
 
 class ProductCard extends StatelessWidget {
-  final Map<String,dynamic> match;
+  final MatchType match;
   const ProductCard({
     super.key, required this.match,
   });
@@ -35,12 +37,13 @@ class ProductCard extends StatelessWidget {
                     topLeft: Radius.circular(kSmall),
                     topRight: Radius.circular(kSmall),
                   ),
-                  child: Image.asset(
-                    "assets/images/rugby.png",
-                    width: double.infinity,
+                  child: CachedNetworkImage(
+                    imageUrl: RandomImageUrl(),
+                    errorWidget: (context, url, error) => Icon(Icons.person,size: 48,color: AppColors.whiteColor,),
                     height: 150,
+                    width: double.infinity,
                     fit: BoxFit.cover,
-                  ),
+                  )
                 ),
                 const SizedBox(
                   height: kXSmall,
@@ -54,7 +57,7 @@ class ProductCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(match["name"],
+                            Text(match.matchName,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -65,7 +68,7 @@ class ProductCard extends StatelessWidget {
                               height: kXSmall,
                             ),
                              Text(
-                              "${match["venue"]["name"]} .14 Oct,2024",
+                              "${match.matchVenue} ${getStringDate(match.matchDate)}",
                               style: TextStyle(
                                   fontSize: kSMedium * 0.8,
                                   fontWeight: FontWeight.normal),

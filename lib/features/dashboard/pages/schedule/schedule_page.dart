@@ -1,12 +1,18 @@
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
-import 'package:sports_app/features/app/blocs/product/match_bloc.dart';
+import 'package:sports_app/common/extension/buildcontext.dart';
+import 'package:sports_app/data/models/match/match.dart';
+import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/features/app/blocs/matches/match_bloc.dart';
+import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/theme/app_colors.dart';
 import 'package:sports_app/theme/theme.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 class SchedulePage extends StatefulWidget {
   const SchedulePage({super.key});
@@ -16,10 +22,11 @@ class SchedulePage extends StatefulWidget {
 }
 
 class _SchedulePageState extends State<SchedulePage> {
-  DateTime selectedDate=DateTime.now();
-  DateTime today= DateTime.now();
+
   @override
   Widget build(BuildContext context) {
+    service<Talker>().info(getStringDate(DateTime.now()));
+
     return Scaffold(
       body:
           AppBackground(childWidget: Column(
@@ -51,11 +58,8 @@ class _SchedulePageState extends State<SchedulePage> {
                         ),
                         EasyDateTimeLine(
                           initialDate: DateTime.now(),
-                          onDateChange: (selectedDatee) {
-                            selectedDate= selectedDatee;
-                            context
-                                .read<MatchBloc>()
-                                .add(const MatchEvent.matches());
+                          onDateChange: (selectedDate) {
+                            context.read<MatchBloc>().add( MatchEvent.datedMatch(date: selectedDate));
                           },
                           headerProps: const EasyHeaderProps(
                             monthPickerType: MonthPickerType.switcher,
@@ -93,23 +97,25 @@ class _SchedulePageState extends State<SchedulePage> {
                     return const Center(child: CircularProgressIndicator(),);
                   }
                   if(state.status==MatchStatus.failure){
+                    service<Talker>().error(state.failure!.error);
                     return Center(child: Text(state.failure!.error),);
                   }
                   if(state.status==MatchStatus.success) {
+                    service<Talker>().info(state.datedMatches.toString());
                     //Check if date is not today
-                    if(selectedDate.day != today.day){
-                      return  Center(
-                        child: Text("No Matches",style: TextStyle(color: AppColors.whiteColor),),
-                      );
-                    }
-
+                    // if(selectedDate.day != today.day){
+                    //   return  Center(
+                    //     child: Text("No Matches",style: TextStyle(color: AppColors.whiteColor),),
+                    //   );
+                    // }
+                    service<Talker>().info(state.datedMatches.length);
                     return Expanded(
                       child: ListView(
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         children: [
-                          ...List.generate(state.matches.length, (index){
-                            final match= state.matches[index];
+                          ...List.generate(state.datedMatches.length, (index){
+                            final match= state.datedMatches[index];
                             return
                               Container(
                                 margin: const EdgeInsets.symmetric(horizontal: kSmall,vertical: kSmall),
@@ -122,21 +128,21 @@ class _SchedulePageState extends State<SchedulePage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      match["name"],
+                                      match.matchName,
                                       textAlign: TextAlign.start,
                                       style: const TextStyle(
-                                          fontSize: kMedium, fontWeight: FontWeight.bold),
+                                          fontSize:18, fontWeight: FontWeight.bold),
                                     ),
                                     const SizedBox(
                                       height: kSmall,
                                     ),
                                     Row(
                                       children: [
-                                        Icon(Icons.map),
+                                        Icon(Icons.location_on,size: kSMedium,),
                                         SizedBox(
-                                          width: kSmall,
+                                          width: kXSmall,
                                         ),
-                                        Text(match["venue"]["name"])
+                                        Text(match.matchVenue,style: TextStyle(fontSize: 10,fontWeight: FontWeight.w300),)
                                       ],
                                     ),
                                     const SizedBox(
@@ -150,11 +156,11 @@ class _SchedulePageState extends State<SchedulePage> {
                                           decoration: BoxDecoration(
                                               color: AppColors.greyColor.withOpacity(0.3),
                                               borderRadius: BorderRadius.circular(kMedium)),
-                                          child: const Text("Friday, 27 Oct 2024",
-                                              style: TextStyle(fontWeight: FontWeight.bold)),
+                                          child: Text(getStringDate(match.matchDate),
+                                              style: context.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
                                         ),
-                                        const Text("Ksh500",
-                                            style: TextStyle(fontWeight: FontWeight.bold)),
+                                        Text("Ksh ${match.matchPrice.toString()}",
+                                            style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
                                       ],
                                     ),
                                     const SizedBox(
@@ -172,12 +178,9 @@ class _SchedulePageState extends State<SchedulePage> {
                                           width: kLarge,
                                         ),
                                         Expanded(
-                                            child: FilledButton(
-                                                style: FilledButton.styleFrom(
-                                                    minimumSize:
-                                                    const Size(double.infinity, 50)),
-                                                onPressed: () {},
-                                                child: const Text("Buy Ticket")))
+                                            child: CustomFilledButton(
+                                              "Buy Ticket"
+                                                ))
                                       ],
                                     ),
                                   ],

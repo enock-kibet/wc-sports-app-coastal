@@ -17,6 +17,6 @@ class ProductState with _$ProductState {
   const factory ProductState({
     @Default(ProductStatus.initial) ProductStatus status,
     Failure? failure,
-    @Default([]) List<dynamic> products,
+    @Default([]) List<Product> products,
   }) = _ProductState;
 }

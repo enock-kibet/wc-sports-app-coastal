@@ -1,47 +1,123 @@
 part of 'service.dart';
 
 class ProductService {
-  HttpResult<List<dynamic>> getProducts() async {
+  HttpResult<List<Product>> getProducts() async {
     return Http.get(
-      "products",
-      deserializer: (data) => data["data"],
+      "https://srv19716098.ultasrv.net/SportApp/api/Product",
+      //"https://wencesportswebapplication.vercel.app/api/shop/products",
+      deserializer: (data) {
+        List<Product> productList = [];
+        for (var record in data["data"]) {
+          try{
+            Product product = Product(
+                id: record["id"],
+                name: record["name"],
+                description: record["description"],
+                price: record["price"],
+                category: record["category"],
+                imageUrl: record["imageUrl"]);
+            productList.add(product);
+          }catch(e){
+            service<Talker>().error("Error parsing product record: $e");
+          }
+        }
+        return productList;
+      },
     );
   }
 }
 
 class MatchService {
-  HttpResult<List<dynamic>> getMatches() async {
+  HttpResult<List<MatchType>> getMatches() async {
     return Http.get(
-      "matches",
-      deserializer: (data) => data["data"],
+      "https://srv19716098.ultasrv.net/SportApp/api/Match",
+      deserializer: (data){
+        List<MatchType> matchList = [];
+
+        for (var record in data["data"]) {
+          try {
+            // Extracting the first match date if available
+            String? matchDateString = (record["matchDates"] as List).isNotEmpty
+                ? record["matchDates"][0]["date"]
+                : null;
+
+            MatchType match = MatchType(
+              matchId: record["id"] ?? "Unknown ID",
+              teamOne: record["clubOne"]?["name"] ?? "Unknown Team",
+              teamTwo: record["clubTwo"]?["name"] ?? "Unknown Team",
+              matchName: record["name"] ?? "Unnamed Match",
+              matchDescription: record["description"]?? "No Description",
+              matchDate: matchDateString != null
+                  ? DateTime.tryParse(matchDateString) ?? DateTime.now()
+                  : DateTime.now(),
+              matchVenue: record["venue"]?["name"] ?? "Unknown Venue",
+              matchLocation: record["venue"]?["location"] ?? "Unknown Location",
+              matchPrice: getRandomMultipleOf50()?.toDouble() ?? 50.0,
+            );
+
+            matchList.add(match);
+          } catch (e) {
+            print("Error parsing match record: $e");
+          }
+        }
+
+        return matchList;
+      },
     );
   }
 }
 
 class AuthService {
-  HttpResult<String> login(Map<String,dynamic> data) async {
+  HttpResult<dynamic> login(Map<String,dynamic> data) async {
     return Http.post(
-      "auth/login",
+      "https://srv19716098.ultasrv.net/SportApp/api/User/emaillogin?email=${data["email"]}&password=${data["password"]}",
+      //"https://wencesportswebapplication.vercel.app/api/auth/emaillogin",
       data,
-      deserializer: (data) => data["session"],
+      deserializer: (data) => User.fromJson(data["user"]),
     );
   }
 
-  HttpResult<String> signup(Map<String,dynamic> data) async {
+  HttpResult<dynamic> signup(Map<String,dynamic> data) async {
     return Http.post(
-      "auth/sign-up",
+      "https://srv19716098.ultasrv.net/SportApp/api/User/sign-up?name=${data["name"]}&email=${data["email"]}&password=${data["password"]}&confirmpassword=${data["password"]}",
+      // "https://wencesportswebapplication.vercel.app/api/auth/emailSignUp",
       data,
-      deserializer: (data) => data["session"],
+      deserializer: (data) => User.fromJson(data["user"]),
+    );
+  }
+  HttpResult<dynamic> verifyOtp(Map<String,dynamic> data) async {
+    return Http.post(
+      "https://srv19716098.ultasrv.net/SportApp/api/User/verifyEmail?otp=${data["otp"]}&email=${data["email"]}",
+      // "https://wencesportswebapplication.vercel.app/api/auth/verifyEmail",
+      data,
+      deserializer: (data) => User.fromJson(data["user"]),
+    );
+  }
+  HttpResult<dynamic> googleLogin(Map<String,dynamic> data) async {
+    return Http.post(
+      "https://srv19716098.ultasrv.net/SportApp/api/User/googlelogin",
+      //"https://wencesportswebapplication.vercel.app/api/auth/googleSignIn",
+      data,
+      deserializer: (data) => User.fromJson(data["user"]),
+    );
+  }
+  HttpResult<String> resendOtp(Map<String,dynamic> data) async {
+    return Http.post(
+      "https://srv19716098.ultasrv.net/SportApp/api/User/generate-otp?email=${data["email"]}",
+      // "https://wencesportswebapplication.vercel.app/api/auth/resendOtp",
+      data,
+      deserializer: (data) => data["msg"],
     );
   }
 
   HttpResult<String> logout() async {
     return Http.post(
-      "auth/sign-out",
+      "https://wencesportswebapplication.vercel.app/api/auth/sign-out",
       {},
       deserializer: (data) => data["msg"],
     );
   }
+
 }
 
 class StripeService {
@@ -62,10 +138,17 @@ class StripeService {
 }
 
 class ProfileService {
-  HttpResult<dynamic> getMe() async {
+  HttpResult<dynamic> getMe( ) async {
     return Http.get(
       "auth/me",
       deserializer: (data) => data["user"],
+    );
+  }
+  HttpResult<User> updateProfilePicture(FormData data) async {
+    return Http.post(
+      "https://wencesportswebapplication.vercel.app/api/auth/uploadthing",
+      data,
+      deserializer: (data)=>User.fromJson(data["user"]),
     );
   }
 }

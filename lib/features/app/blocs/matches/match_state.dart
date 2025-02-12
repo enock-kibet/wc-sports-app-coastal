@@ -17,6 +17,9 @@ class MatchState with _$MatchState {
   const factory MatchState({
     @Default(MatchStatus.initial) MatchStatus status,
     Failure? failure,
-    @Default([]) List<dynamic> matches,
+    @Default([]) List<MatchType> matches,
+    @Default([]) List<MatchType> datedMatches,
+    @Default([]) List<MatchType> searchedMatches
   }) = _MatchState;
 }
+

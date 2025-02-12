@@ -1,28 +1,42 @@
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sports_app/data/models/user/user.dart';
 
 class AppPreferences {
-  /// Store Auth data in shared preferences
-  Future<void> storeAuthData(String data) async {
-    await SharedPreferences.getInstance().then(
-      (value) => value.setString("USER", data),
-    );
+
+  SharedPreferencesAsync get asyncPrefs => SharedPreferencesAsync();
+
+  /// Store data whether the app is running for the first time
+  Future<void> storeFirstTimeRun(bool isFirstTime)async {
+    await asyncPrefs.setBool("firstTimeRun", isFirstTime);
   }
 
-  /// Get Auth data from shared preferences
-  Future<String?> getAuthData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final data = prefs.getString("USER");
-    if (data != null) {
-      return data;
+  /// Get data whether the app is running for the first time
+  Future<bool> getFirstTimeRun()async{
+    return await asyncPrefs.getBool("firstTimeRun")??true;
+  }
+
+  /// Store User data in shared preferences
+  Future<void> storeUserData(User user) async{
+    await asyncPrefs.setStringList(
+        "USERDATA", [user.name,user.email,user.picture??"",user.emailVerified.toString()]);
+  }
+
+  /// Get User data from shared preferences
+  Future<User?> getUserData() async{
+    final userData=await asyncPrefs.getStringList("USERDATA");
+    User? user;
+    try{
+      user = User(name:userData![0],email:userData![1],picture:userData?[2],emailVerified:(userData?[3]=="true"));
+    }catch(_){
+      user = null;
     }
-    return null;
+    return user;
   }
 
   ///Remove user from shared preferences
-  Future<bool?> removeUser() async {
-    var prefs = await SharedPreferences.getInstance();
-
-    return prefs.remove("USER");
+  Future<void> removeUser() async {
+    await asyncPrefs.remove("USERDATA");
+    // await asyncPrefs.remove("USER");
   }
 }

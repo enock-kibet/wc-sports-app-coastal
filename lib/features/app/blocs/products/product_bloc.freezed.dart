@@ -168,7 +168,7 @@ abstract class _ProductsFetched implements ProductEvent {
 mixin _$ProductState {
   ProductStatus get status => throw _privateConstructorUsedError;
   Failure? get failure => throw _privateConstructorUsedError;
-  List<dynamic> get products => throw _privateConstructorUsedError;
+  List<Product> get products => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $ProductStateCopyWith<ProductState> get copyWith =>
@@ -181,7 +181,7 @@ abstract class $ProductStateCopyWith<$Res> {
           ProductState value, $Res Function(ProductState) then) =
       _$ProductStateCopyWithImpl<$Res, ProductState>;
   @useResult
-  $Res call({ProductStatus status, Failure? failure, List<dynamic> products});
+  $Res call({ProductStatus status, Failure? failure, List<Product> products});
 }
 
 /// @nodoc
@@ -213,7 +213,7 @@ class _$ProductStateCopyWithImpl<$Res, $Val extends ProductState>
       products: null == products
           ? _value.products
           : products // ignore: cast_nullable_to_non_nullable
-              as List<dynamic>,
+              as List<Product>,
     ) as $Val);
   }
 }
@@ -226,7 +226,7 @@ abstract class _$$ProductStateImplCopyWith<$Res>
       __$$ProductStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({ProductStatus status, Failure? failure, List<dynamic> products});
+  $Res call({ProductStatus status, Failure? failure, List<Product> products});
 }
 
 /// @nodoc
@@ -256,7 +256,7 @@ class __$$ProductStateImplCopyWithImpl<$Res>
       products: null == products
           ? _value._products
           : products // ignore: cast_nullable_to_non_nullable
-              as List<dynamic>,
+              as List<Product>,
     ));
   }
 }
@@ -267,7 +267,7 @@ class _$ProductStateImpl implements _ProductState {
   const _$ProductStateImpl(
       {this.status = ProductStatus.initial,
       this.failure,
-      final List<dynamic> products = const []})
+      final List<Product> products = const []})
       : _products = products;
 
   @override
@@ -275,10 +275,10 @@ class _$ProductStateImpl implements _ProductState {
   final ProductStatus status;
   @override
   final Failure? failure;
-  final List<dynamic> _products;
+  final List<Product> _products;
   @override
   @JsonKey()
-  List<dynamic> get products {
+  List<Product> get products {
     if (_products is EqualUnmodifiableListView) return _products;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_products);
@@ -314,14 +314,14 @@ abstract class _ProductState implements ProductState {
   const factory _ProductState(
       {final ProductStatus status,
       final Failure? failure,
-      final List<dynamic> products}) = _$ProductStateImpl;
+      final List<Product> products}) = _$ProductStateImpl;
 
   @override
   ProductStatus get status;
   @override
   Failure? get failure;
   @override
-  List<dynamic> get products;
+  List<Product> get products;
   @override
   @JsonKey(ignore: true)
   _$$ProductStateImplCopyWith<_$ProductStateImpl> get copyWith =>

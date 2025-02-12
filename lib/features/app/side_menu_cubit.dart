@@ -17,3 +17,14 @@ class SideMenuCubit extends Cubit<GlobalKey<ScaffoldState>> {
     }
   }
 }
+class HideCubit extends Cubit<bool> {
+  HideCubit() : super(false);
+
+  void reveal() {
+    emit(true);
+  }
+
+  void hide() {
+    emit(false);
+  }
+}

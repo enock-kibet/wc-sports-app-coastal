@@ -3,15 +3,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/mixin/input_validation_mixin.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
+import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../common/dimens.dart';
 import '../../theme/app_colors.dart';
-import 'login_page2.dart';
+import 'login_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -51,6 +53,7 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
         bloc: authBloc,
         listener: (context, state) {
           if (state.status == AuthStatus.success) {
+            context.read<UserBloc>().add(UpdateUser(state.data));
             service<Talker>().info('Login Success');
             //show success snackbar
             ScaffoldMessenger.of(context).showSnackBar(
@@ -68,7 +71,6 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                 ),
               ),
             );
-            context.go("/otp");
           }
           if (state.status == AuthStatus.failure) {
             service<Talker>().error('Register Failed');
@@ -227,6 +229,7 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                                             "name":name,
                                             "email": _emailController.text.trim(),
                                             "password": _passwordController.text.trim(),
+                                            "confirmpassword":_passwordController.text.trim()
                                         }
                                         ));
                                         }
@@ -244,7 +247,34 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                             side: BorderSide(color: Color(0xFF414141)),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(kMedium))),
-                        onPressed: () {},
+                        onPressed: () async{
+                          try {
+                            // Initialize Google Sign-In
+                            final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
+
+                            // Trigger the Google Sign-In flow
+                            final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+                            if (googleUser != null) {
+
+                              authBloc.add(AuthEvent.googlelogin(
+                                  request: {
+                                    "name": googleUser.displayName,
+                                    "email":googleUser.email,
+                                    "googleId":googleUser.id,
+                                    "picture":googleUser.photoUrl
+                                  }));
+
+
+                            } else {
+                              print("Google Sign-In canceled by user.");
+                              return null;
+                            }
+                          } catch (e) {
+                            print("Error during Google Sign-In: $e");
+                            return null;
+                          }
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

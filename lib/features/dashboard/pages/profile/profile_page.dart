@@ -1,13 +1,18 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
-import 'package:sports_app/data/repository/auth_repository.dart';
+import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
+import 'package:sports_app/localization/app_prefs_manager.dart';
+import 'package:sports_app/main.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/app_colors.dart';
 
@@ -18,60 +23,18 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
+
 class _ProfilePageState extends State<ProfilePage> {
-  Map<String,dynamic>? user;
+  late User currentUser;
   bool loading=false;
-  getUserInfo()async{
-    loading=true;
-    final response =await service<ProfileService>().getMe();
-    response.when(onError: (error){}, onSuccess: (data){
-      setState(() {
-        user=data;
-        loading=false;
-      });
-    });
-  }
-  Future<void> _logoutDialog() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext dialogcontext) {
-        return AlertDialog(
-          title: const Text('Are you sure?'),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('You are about to logout!!'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.red,
-              ),
-              child: const Text('Yes, logout'),
-              onPressed: () {
-                AuthRepository.instance.logout();
-                context.goNamed(AppRoute.signIn.name);
-              },
-            ),
-            TextButton(
-              child: const Text('No, stay loggedIn'),
-              onPressed: () {
-                Navigator.of(dialogcontext).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+
+
   @override
   void initState() {
-    getUserInfo();
+    currentUser  = service<AppPreferencesManager>().currentUserValue!;
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,14 +52,32 @@ class _ProfilePageState extends State<ProfilePage> {
                     left: 0,
                     child: Column(
                       children: [
-                       const CircleAvatar(
-                          radius: 40,
-                          backgroundImage:
-                              AssetImage('assets/images/shirt.png'),
-                        ),
-                        Text(user?["name"]??"",
-                            style: const TextStyle(
-                                fontSize: kLarge, fontWeight: FontWeight.bold)),
+
+                          Container(
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: AppColors.whiteColor,
+                                    width: 1.4
+                                )
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(88),
+                              child: BlocBuilder<UserBloc,User?>(
+                                builder: (context,user){
+                                  return CachedNetworkImage(
+                                    errorWidget: (context, url, error) => Icon(Icons.person,size: 48,color: AppColors.defaultAppPurple,),
+                                    imageUrl: user?.picture??"",
+                                    width: 88,
+                                    height: 88,
+                                    fit: BoxFit.cover,
+                                  );
+                                }
+
+                              ),
+                            ),
+                          ),
+                        Text(currentUser.name, style: const TextStyle(fontSize: kMedium, fontWeight: FontWeight.bold)),
                         Text("0 Points")
                       ],
                     ),
@@ -143,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 image: LucideIcons.logOut,
                 title: "Logout",
                 press: () {
-                   _logoutDialog();
+                   logoutDialog(context);
                 }
               ),
             ],
@@ -248,4 +229,39 @@ class InforCard extends StatelessWidget {
       ),
     );
   }
+}
+Future<void> logoutDialog(BuildContext context) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext dialogcontext) {
+      return AlertDialog(
+        title: const Text('Are you sure?'),
+        content: const SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text('You are about to logout!!'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Yes, logout'),
+            onPressed: () async{
+              await service<AppPreferencesManager>().logOut();
+            },
+          ),
+          TextButton(
+            child: const Text('No, stay loggedIn'),
+            onPressed: () {
+              Navigator.of(dialogcontext).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

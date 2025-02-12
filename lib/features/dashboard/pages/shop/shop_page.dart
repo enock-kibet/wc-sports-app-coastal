@@ -5,12 +5,17 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
-import 'package:sports_app/features/app/blocs/matches/product_bloc.dart';
+import 'package:sports_app/data/models/user/user.dart';
+import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/features/app/blocs/products/product_bloc.dart';
 
 import 'package:sports_app/features/dashboard/pages/shop/widgets/top_sellers_card.dart';
+import 'package:sports_app/localization/app_prefs_manager.dart';
+import 'package:sports_app/main.dart';
 import 'package:sports_app/theme/app_colors.dart';
 import 'package:sports_app/theme/theme.dart';
 import 'package:auto_height_grid_view/auto_height_grid_view.dart';
+import 'package:sports_app/utils/dotted.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
@@ -20,6 +25,7 @@ class ShopPage extends StatefulWidget {
 }
 
 class _ShopPageState extends State<ShopPage> {
+  User currentUser = service<AppPreferencesManager>().currentUserValue!;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,11 +146,11 @@ class _ShopPageState extends State<ShopPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Hi Ogwambo!",
+            Text("Hi ${truncateText(currentUser.name,limit: 16)}",
                 style: TextStyle(
                     color: AppColors.whiteColor,
-                    fontSize: kLarge,
-                    fontWeight: FontWeight.bold)),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700)),
             Text("Nairobi, Kenya",
                 style: TextStyle(
                     color: AppColors.whiteColor,

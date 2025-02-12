@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_app/common/dimens.dart';
+import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/theme.dart';
 
@@ -69,7 +71,8 @@ class _OnboardingState extends State<Onboarding> {
                               ),
               
                               GestureDetector(
-                                onTap: (){
+                                onTap: ()async{
+                                  await service<AppPreferencesManager>().clearFirstTime();
                                   context.go("/signIn");
                                 },
                                 child: Container(

@@ -3,7 +3,9 @@ part of 'auth_bloc.dart';
 @freezed
 class AuthEvent with _$AuthEvent {
   const factory AuthEvent.login({required dynamic request}) = _Login;
-  const factory AuthEvent.sendOtp({required String phone}) = _SendOtp;
+  const factory AuthEvent.verifyOtp({required dynamic request}) = _VerifyOtp;
+  const factory AuthEvent.googlelogin({required dynamic request}) = _GoogleLogin;
+  const factory AuthEvent.resendOtp({required dynamic request}) = _ResendOtp;
   const factory AuthEvent.verifyandResetPassword(
       {required Map<String, dynamic> data}) = _VerifyAndResetPassword;
   const factory AuthEvent.registering({required dynamic request}) =

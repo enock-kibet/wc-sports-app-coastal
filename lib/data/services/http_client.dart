@@ -4,14 +4,7 @@ class RequestInterceptor extends Interceptor {
   @override
   FutureOr<dynamic> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) {
-    final authToken = AuthRepository.instance.authUser;
-    if (authToken != null && authToken.isNotEmpty) {
-      options.headers["Authorization"] = "Bearer $authToken";
-      options.headers["cookie"] =
-        "jwt=$authToken";
-    }
-
-    options.headers['Accept'] = 'application/json';
+        options.headers['Accept'] = 'application/json';
     
     super.onRequest(options, handler);
   }
@@ -20,9 +13,7 @@ class RequestInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401 &&
         !err.response!.realUri.path.contains("v1/login")) {
-      /// LOGOUT the user and clear the auth token
-      AuthenticationRepository.instance.logout();
-    }
+          }
     super.onError(err, handler);
   }
 }
@@ -34,7 +25,7 @@ final cookieJar = CookieJar();
 
 class Http {
   static final dio = Dio(BaseOptions(
-    baseUrl: BASE_URL,
+    //baseUrl: BASE_URL,
     receiveDataWhenStatusError: true,
     connectTimeout: const Duration(milliseconds: TIMEOUT),
     sendTimeout: const Duration(milliseconds: TIMEOUT),
@@ -71,7 +62,6 @@ class Http {
         queryParameters: queryParams,
         onReceiveProgress: progressCallback,
       );
-
       return MultipleResult.onSuccess(
         data: deserializer != null ? deserializer(res.data) : res.data,
       );
@@ -106,13 +96,16 @@ class Http {
         onSendProgress: progressCallback,
       );
       return MultipleResult.onSuccess(
+
         data: deserializer != null ? deserializer(res.data) : res.data,
       );
     } on DioException catch (error) {
+      debugPrint("dio exception: ${error.error.toString()}");
       return MultipleResult.onError(
         error: ErrorHandler(error).handle(),
       );
-    } on Exception catch (_) {
+    } on Exception catch (error) {
+      debugPrint(" some exception: ${error.toString()}");
       return MultipleResult.onError(
         error: Failure(error: "Unexpected error occurred"),
       );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sports_app/common/dimens.dart';
+import 'package:sports_app/utils/utils.dart';
 
 import 'app_colors.dart';
 
@@ -8,7 +9,7 @@ import 'app_colors.dart';
 ThemeData lightMode = ThemeData(
   brightness: Brightness.light,
   useMaterial3: true,
-  textTheme: GoogleFonts.interTextTheme(),//.jetBrainsMonoTextTheme(),
+  textTheme: createTextTheme(),//.jetBrainsMonoTextTheme(),
   //fontFamily: 'Inter',
   buttonTheme: ButtonThemeData(
     buttonColor: AppColors.primaryColor,

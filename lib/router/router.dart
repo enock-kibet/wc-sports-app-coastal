@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sports_app/data/models/match/match.dart';
+import 'package:sports_app/data/models/products/product.dart';
 
 import 'package:sports_app/data/services/service.dart';
-import 'package:sports_app/features/auth/login_page2.dart';
+import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/features/auth/onboarding.dart';
 import 'package:sports_app/features/auth/otp_page.dart';
 import 'package:sports_app/features/auth/sign_up_page.dart';
@@ -17,7 +21,7 @@ import 'package:sports_app/features/dashboard/pages/profile/profile_page.dart';
 import 'package:sports_app/features/dashboard/pages/schedule/schedule_page.dart';
 import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/standings/standinds_page.dart';
-import 'package:sports_app/splash_screen.dart';
+import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../features/dashboard/base_screen.dart';
@@ -45,6 +49,7 @@ enum AppRoute {
   aboutUs
 }
 
+
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream stream) {
     stream.listen((event) {
@@ -67,16 +72,10 @@ final GlobalKey<NavigatorState> _shellNavigatorDKey =
 
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: "/splash",
+  initialLocation: "/home",
   observers: [TalkerRouteObserver(service<Talker>())],
   routes: [
-    GoRoute(
-      path: "/splash",
-      name: AppRoute.splash.name,
-      builder: (context, state) {
-        return const SplashScreen();
-      },
-    ),
+
     GoRoute(
       path: "/standing",
       name: AppRoute.standings.name,
@@ -172,6 +171,7 @@ final router = GoRouter(
         StatefulShellBranch(
           navigatorKey: _shellNavigatorAKey,
           routes: [
+
             GoRoute(
                 path: "/home",
                 name: AppRoute.home.name,
@@ -190,7 +190,7 @@ final router = GoRouter(
                     pageBuilder: (context, state) {
                       return MaterialPage(
                         child: MatchDetailsPage(
-                          match: state.extra as Map<String,dynamic>,
+                          match: state.extra as MatchType,
                           key: state.pageKey,
                         ),
                       );
@@ -230,7 +230,7 @@ final router = GoRouter(
                     pageBuilder: (context, state) {
                       return  MaterialPage(
                         child: ShopDetailsPage(
-                          product: state.extra as Map<String,dynamic>,
+                          product: state.extra as Product,
                           key: state.pageKey,
                         ),
                       );
@@ -290,6 +290,28 @@ final router = GoRouter(
       ],
     ),
   ],
+  refreshListenable: StreamToListenable([service<AppPreferencesManager>().stream]),
+  redirect: (context,state){
+    AuthenticationStatus authenticationStatus = service<AppPreferencesManager>().currentAuthStateValue;
+    debugPrint(state.matchedLocation);
+    if(authenticationStatus==AuthenticationStatus.firstTime){
+      return "/onboarding";
+    }
+    if(authenticationStatus==AuthenticationStatus.notAuthenticated&&state.matchedLocation!="/signUp"){
+      return "/signIn";
+    }
+    if(authenticationStatus==AuthenticationStatus.notAuthenticated&&state.matchedLocation=="/signUp"){
+      return "/signUp";
+    }
+    if(authenticationStatus==AuthenticationStatus.notVerified){
+      return "/otp";
+    }
+    if(authenticationStatus==AuthenticationStatus.verified && (state.matchedLocation=="/signUp"||state.matchedLocation=="/signIn" || state.matchedLocation=="/otp")){
+      return "/home";
+    }
+    return null;
+  },
+
   errorPageBuilder: (context, state) {
     return CupertinoPage(
         child: Center(
@@ -297,3 +319,25 @@ final router = GoRouter(
     ));
   },
 );
+class StreamToListenable extends ChangeNotifier {
+  late final List<StreamSubscription> subscriptions;
+
+  StreamToListenable(List<Stream> streams) {
+    subscriptions = [];
+    for (var e in streams) {
+      var s = e.asBroadcastStream().listen(_tt);
+      subscriptions.add(s);
+    }
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    for (var e in subscriptions) {
+      e.cancel();
+    }
+    super.dispose();
+  }
+
+  void _tt(event) => notifyListeners();
+}

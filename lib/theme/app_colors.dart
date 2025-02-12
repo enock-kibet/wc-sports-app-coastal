@@ -16,4 +16,5 @@ class AppColors {
   static Color dangerColor = Colors.red;
   static Color warningColor = Colors.orange;
   static Color hintTextColor = const Color(0xFF4D4D4D);
+  static Color blackColor = const Color(0xFF000000);
 }

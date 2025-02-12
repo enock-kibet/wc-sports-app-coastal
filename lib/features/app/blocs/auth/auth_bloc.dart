@@ -1,33 +1,26 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-
 import 'package:sports_app/data/error/failure.dart';
-import 'package:sports_app/data/repository/auth_repository.dart';
-import 'package:sports_app/data/repository/authentication.dart';
+import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
-import 'package:sports_app/localization/app_prefs.dart';
+import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-
 part 'auth_event.dart';
 part 'auth_state.dart';
 part 'auth_bloc.freezed.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   late AuthService _authService;
-  late AppPreferences appPreferences;
-  late AuthenticationRepository authRepository;
-  // late ProfileService _profileService;
-  // final DownloadBloc downloadBloc;
+  late ProfileService _profileService;
 
   AuthBloc() : super(const AuthState()) {
     _authService = service<AuthService>();
+    _profileService = service<ProfileService>();
 
-    appPreferences = service<AppPreferences>();
-    authRepository = AuthenticationRepository.instance;
+
     on<_Login>((event, emit) async {
       emit(state.copyWith(status: AuthStatus.loading));
-      final authResponse =
-          await _authService.login(event.request);
+      final authResponse = await _authService.login(event.request);
       authResponse.when(onError: (error) {
         emit(state.copyWith(
           status: AuthStatus.failure,
@@ -37,10 +30,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(state.copyWith(
           status: AuthStatus.success,
           failure: null,
+          data:loginRes as User
         ));
-        await appPreferences.storeAuthData(loginRes);
-        await authRepository.login();
-        await AuthRepository.instance.login(loginRes);
+        await service<AppPreferencesManager>().saveValue(loginRes);
+        service<Talker>().info(loginRes);
       });
     });
 
@@ -57,82 +50,87 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(state.copyWith(
           status: AuthStatus.success,
           failure: null,
+          data:registerRes as User
         ));
+        await service<AppPreferencesManager>().saveValue(registerRes);
         service<Talker>().info(registerRes);
-         await appPreferences.storeAuthData(registerRes);
-         await authRepository.login();
-        await AuthRepository.instance.login(registerRes);
+
       });
     });
-    // on<_SendOtp>((event, emit) async {
-    //   emit(state.copyWith(status: AuthStatus.loading));
-    //   final authResponse =
-    //       await _authService.sendOtp(event.phone, (count, total) {});
-    //   authResponse.when(onError: (error) {
-    //     emit(state.copyWith(
-    //       status: AuthStatus.failure,
-    //       failure: error,
-    //     ));
-    //   }, onSuccess: (registerRes) {
-    //     emit(state.copyWith(
-    //       status: AuthStatus.success,
-    //       failure: null,
-    //     ));
-    //     service<Talker>().info(registerRes);
-    //   });
-    // });
-    // on<_VerifyAndResetPassword>((event, emit) async {
-    //   emit(state.copyWith(status: AuthStatus.loading));
-    //   final authResponse = await _authService.verifyAndResetPassword(
-    //       event.data, (count, total) {});
-    //   authResponse.when(onError: (error) {
-    //     emit(state.copyWith(
-    //       status: AuthStatus.failure,
-    //       failure: error,
-    //     ));
-    //   }, onSuccess: (registerRes) {
-    //     emit(state.copyWith(
-    //       status: AuthStatus.success,
-    //       failure: null,
-    //     ));
-    //     service<Talker>().info(registerRes);
-    //   });
-    // });
-    // on<_EditProfile>((event, emit) async {
-    //   emit(state.copyWith(status: AuthStatus.loading));
-    //   final profileResponse = await _profileService.editProfile(
-    //       request: event.request, (count, total) {});
-    //   profileResponse.when(onError: (error) {
-    //     emit(state.copyWith(
-    //       status: AuthStatus.failure,
-    //       failure: error,
-    //     ));
-    //   }, onSuccess: (res) {
-    //     emit(state.copyWith(
-    //       status: AuthStatus.success,
-    //       failure: null,
-    //       data: res,
-    //     ));
-    //     service<Talker>().info(res);
-    //   });
-    // });
-    // on<_MyProfile>((event, emit) async {
-    //   emit(state.copyWith(status: AuthStatus.loading));
-    //   final profileResponse =
-    //       await _profileService.myProfile(id: event.id, (count, total) {});
-    //   profileResponse.when(onError: (error) {
-    //     emit(state.copyWith(
-    //       status: AuthStatus.failure,
-    //       failure: error,
-    //     ));
-    //   }, onSuccess: (res) {
-    //     emit(state.copyWith(
-    //       status: AuthStatus.success,
-    //       failure: null,
-    //       data: res,
-    //     ));
-    //     service<Talker>().info(res);
-    //   });
-    // });
-  }
+
+    on<_VerifyOtp>((event,emit)async{
+      emit((state.copyWith(status: AuthStatus.loading)));
+      final authResponse = await _authService.verifyOtp(event.request);
+      authResponse.when(onError: (error) {
+        emit(state.copyWith(
+          status: AuthStatus.failure,
+          failure: error,
+        ));
+      }, onSuccess: (registerRes) async{
+        emit(state.copyWith(
+            status: AuthStatus.success,
+            failure: null,
+            data:registerRes as User
+        ));
+        await service<AppPreferencesManager>().saveValue(registerRes);
+
+      });
+    });
+
+    on<_ResendOtp>((event,emit) async{
+      emit(state.copyWith(status: AuthStatus.loading));
+      final authResponse = await _authService.resendOtp(event.request);
+      authResponse.when(
+          onError: (Failure error) {
+            emit(state.copyWith(
+              status: AuthStatus.failure,
+              failure: error
+            ));
+          },
+          onSuccess: (String data) {
+            emit(state.copyWith(
+                status: AuthStatus.success,
+                data: data));
+          });
+    });
+
+    on<_GoogleLogin>((event,emit) async{
+      emit(state.copyWith(status: AuthStatus.loading));
+      final authResponse = await _authService.googleLogin(event.request);
+      authResponse.when(
+          onError: (Failure error) {
+            emit(state.copyWith(
+                status: AuthStatus.failure,
+                failure: error
+            ));
+          },
+          onSuccess: (dynamic data) async{
+            emit(state.copyWith(
+                status: AuthStatus.success,
+                data: data as User));
+            await service<AppPreferencesManager>().saveValue(data);
+          }
+      );
+    });
+
+    on<_EditProfile>((event,emit) async{
+      emit(state.copyWith(status: AuthStatus.loading));
+      final authResponse = await _profileService.updateProfilePicture(event.request);
+      authResponse.when(
+          onError: (Failure error) {
+            emit(state.copyWith(
+                status: AuthStatus.failure,
+                failure: error
+            ));
+          },
+          onSuccess: (dynamic data) async{
+            emit(state.copyWith(
+                status: AuthStatus.success,
+                data: data as User));
+            await service<AppPreferencesManager>().saveValue(data);
+
+          }
+      );
+    });
+}
 }

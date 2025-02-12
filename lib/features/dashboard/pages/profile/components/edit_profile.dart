@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -6,8 +7,11 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:sports_app/common/custom_text_form_field.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/huge_icon_button.dart';
+import 'package:sports_app/data/models/user/user.dart';
+import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 import 'package:sports_app/features/dashboard/pages/profile/widgets/profile_list_item.dart';
 import 'package:sports_app/router/router.dart';
+import 'package:sports_app/theme/app_colors.dart';
 
 class EditProfileMain extends StatefulWidget {
   const EditProfileMain({super.key});
@@ -21,6 +25,11 @@ class _EditProfileMainState extends State<EditProfileMain> {
   final _oldPassword = TextEditingController();
   final _newPassword = TextEditingController();
   final _confirmNewPassword = TextEditingController();
+
+  Future<bool> _onBackPressed()async{
+    context.goNamed(AppRoute.profile.name);
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +47,7 @@ class _EditProfileMainState extends State<EditProfileMain> {
               HugeIconButton(
                 icon: HugeIcons.strokeRoundedArrowLeft01,
                 onPressed: () {
-                  context.pop();
+                  context.goNamed(AppRoute.profile.name);
                 },
               ),
               Text(
@@ -49,19 +58,30 @@ class _EditProfileMainState extends State<EditProfileMain> {
             ],
           ),
         ),
-        extendBodyBehindAppBar: true,
+        extendBodyBehindAppBar: false,
         body: SingleChildScrollView(
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 68, left: 24, right: 24),
+                padding: const EdgeInsets.only(top: 0, left: 24, right: 24),
                 child: Center(
-                  child: SizedBox(
+                  child: Container(
                     height: 200,
                     width: 200,
-                    child: Image.asset(
-                      'assets/origin.png',
-                    ),
+                    child: ClipRRect(
+                      borderRadius:BorderRadius.circular(48),
+                      child: BlocBuilder<UserBloc,User?>(
+                      builder: (context,user) {
+                        return CachedNetworkImage(
+                          imageUrl: user?.picture??"",
+                          errorWidget: (context, url, error) => Icon(Icons.person,size: 48,color: AppColors.greyColor,),
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.fitHeight,
+                        );
+                      }
+                  ),
+                ),
                   ),
                 ),
               ),
