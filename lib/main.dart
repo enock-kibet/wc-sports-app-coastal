@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/foundation.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:sports_app/features/app/blocs/matches/match_schedule/schedule_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
@@ -13,10 +14,7 @@ import 'features/app/blocs/products/product_bloc.dart';
 import 'router/router.dart';
 import 'theme/light_theme.dart';
 
-
-
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
   setUpService();
   await service<AppPreferencesManager>().init();
@@ -24,7 +22,14 @@ void main() async {
   // Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
   // Stripe.urlScheme = 'flutterstripe';
   // await Stripe.instance.applySettings();
-  runApp(const MyApp());
+  final runnableApp = _buildRunnableApp(
+    isWeb: kIsWeb,
+    webAppWidth: 560.0,
+    app: const MyApp(),
+  );
+  runApp(
+    runnableApp,
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -40,11 +45,12 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create:(_)=>UserBloc(service<AppPreferencesManager>().currentUserValue)),
+        BlocProvider(
+            create: (_) =>
+                UserBloc(service<AppPreferencesManager>().currentUserValue)),
         BlocProvider(create: (_) => SideMenuCubit()),
         BlocProvider(create: (_) => HideCubit()),
         BlocProvider(create: (_) => ScheduleBloc()),
-
         BlocProvider<ProductBloc>(
           create: (_) => ProductBloc()
             ..add(
@@ -66,4 +72,22 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+}
+
+Widget _buildRunnableApp({
+  required bool isWeb,
+  required double webAppWidth,
+  required Widget app,
+}) {
+  if (!isWeb) {
+    return app;
+  }
+  return Center(
+    child: ClipRect(
+      child: SizedBox(
+        width: webAppWidth,
+        child: app,
+      ),
+    ),
+  );
 }
