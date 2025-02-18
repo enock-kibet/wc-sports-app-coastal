@@ -10,7 +10,7 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       name: json['name']??json["username"]as String,
       email: json['email'] as String,
       emailVerified: json['emailVerified'] as bool,
-      picture: json['picture'] as String?,
+      picture: addDomain(json['picture']) as String?,
     );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>

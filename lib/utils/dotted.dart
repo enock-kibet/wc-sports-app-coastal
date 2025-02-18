@@ -53,3 +53,35 @@ extension StringCasingExtension on String {
     }).join(' ');
   }
 }
+
+String replaceDomain(String url) {
+  // Old and new domain
+  const oldDomain = 'https://srv19716098.ultasrv.net';
+  const newDomain = 'https://backend.wencetechnologies.com';
+
+  // Check if the URL starts with the old domain
+  if (url.startsWith(oldDomain)) {
+    // Replace the old domain with the new one
+    return url.replaceFirst(oldDomain, newDomain);
+  }
+
+  // Return the original URL if no match is found
+  return url;
+}
+String addDomain(String url) {
+  // Old and new domain
+  const oldDomain = 'https://srv19716098.ultasrv.net';
+  const newDomain = 'https://backend.wencetechnologies.com';
+
+  // Check if the URL starts with the old domain
+  if (url.startsWith(oldDomain)) {
+    // Replace the old domain with the new one
+    return url.replaceFirst(oldDomain, newDomain);
+  }
+  if (url.startsWith(newDomain)){
+    return url;
+  }
+
+  // Return the original URL if no match is found
+  return "$newDomain/SportApp$url";
+}

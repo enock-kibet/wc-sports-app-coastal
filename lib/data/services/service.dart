@@ -19,6 +19,7 @@ import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/repository/geolocation_repository.dart';
 import 'package:sports_app/localization/app_prefs.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
+import 'package:sports_app/utils/dotted.dart';
 import 'package:talker_dio_logger/talker_dio_logger.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 part 'local.dart';

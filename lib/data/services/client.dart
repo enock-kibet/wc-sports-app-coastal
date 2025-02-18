@@ -3,7 +3,7 @@ part of 'service.dart';
 class ProductService {
   HttpResult<List<Product>> getProducts() async {
     return Http.get(
-      "https://srv19716098.ultasrv.net/SportApp/api/Product",
+      "https://backend.wencetechnologies.com/SportApp/api/Product",
       //"https://wencesportswebapplication.vercel.app/api/shop/products",
       deserializer: (data) {
         List<Product> productList = [];
@@ -15,7 +15,7 @@ class ProductService {
                 description: record["description"],
                 price: record["price"],
                 category: record["category"],
-                imageUrl: record["imageUrl"]);
+                imageUrl: replaceDomain(record["imageUrl"]));
             productList.add(product);
           }catch(e){
             service<Talker>().error("Error parsing product record: $e");
@@ -27,10 +27,12 @@ class ProductService {
   }
 }
 
+
+
 class MatchService {
   HttpResult<List<MatchType>> getMatches() async {
     return Http.get(
-      "https://srv19716098.ultasrv.net/SportApp/api/Match",
+      "https://backend.wencetechnologies.com/SportApp/api/Match",
       deserializer: (data){
         List<MatchType> matchList = [];
 
@@ -70,7 +72,7 @@ class MatchService {
 class AuthService {
   HttpResult<dynamic> login(Map<String,dynamic> data) async {
     return Http.post(
-      "https://srv19716098.ultasrv.net/SportApp/api/User/emaillogin?email=${data["email"]}&password=${data["password"]}",
+      "https://backend.wencetechnologies.com/SportApp/api/User/emaillogin?email=${data["email"]}&password=${data["password"]}",
       //"https://wencesportswebapplication.vercel.app/api/auth/emaillogin",
       data,
       deserializer: (data) => User.fromJson(data["user"]),
@@ -79,7 +81,7 @@ class AuthService {
 
   HttpResult<dynamic> signup(Map<String,dynamic> data) async {
     return Http.post(
-      "https://srv19716098.ultasrv.net/SportApp/api/User/sign-up?name=${data["name"]}&email=${data["email"]}&password=${data["password"]}&confirmpassword=${data["password"]}",
+      "https://backend.wencetechnologies.com/SportApp/api/User/sign-up?name=${data["name"]}&email=${data["email"]}&password=${data["password"]}&confirmpassword=${data["password"]}",
       // "https://wencesportswebapplication.vercel.app/api/auth/emailSignUp",
       data,
       deserializer: (data) => User.fromJson(data["user"]),
@@ -87,7 +89,7 @@ class AuthService {
   }
   HttpResult<dynamic> verifyOtp(Map<String,dynamic> data) async {
     return Http.post(
-      "https://srv19716098.ultasrv.net/SportApp/api/User/verifyEmail?otp=${data["otp"]}&email=${data["email"]}",
+      "https://backend.wencetechnologies.com/SportApp/api/User/verifyEmail?otp=${data["otp"]}&email=${data["email"]}",
       // "https://wencesportswebapplication.vercel.app/api/auth/verifyEmail",
       data,
       deserializer: (data) => User.fromJson(data["user"]),
@@ -95,7 +97,7 @@ class AuthService {
   }
   HttpResult<dynamic> googleLogin(Map<String,dynamic> data) async {
     return Http.post(
-      "https://srv19716098.ultasrv.net/SportApp/api/User/googlelogin",
+      "https://backend.wencetechnologies.com/SportApp/api/User/googlelogin",
       //"https://wencesportswebapplication.vercel.app/api/auth/googleSignIn",
       data,
       deserializer: (data) => User.fromJson(data["user"]),
@@ -103,7 +105,7 @@ class AuthService {
   }
   HttpResult<String> resendOtp(Map<String,dynamic> data) async {
     return Http.post(
-      "https://srv19716098.ultasrv.net/SportApp/api/User/generate-otp?email=${data["email"]}",
+      "https://backend.wencetechnologies.com/SportApp/api/User/generate-otp?email=${data["email"]}",
       // "https://wencesportswebapplication.vercel.app/api/auth/resendOtp",
       data,
       deserializer: (data) => data["msg"],

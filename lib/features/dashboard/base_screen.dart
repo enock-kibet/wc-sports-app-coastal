@@ -38,154 +38,160 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      child: BlocBuilder<SideMenuCubit, GlobalKey<ScaffoldState>>(
-        builder: (context, state) {
-          return UpgradeAlert(
-            navigatorKey: router.routerDelegate.navigatorKey,
-            child: Scaffold(
-              key: state,
-              drawer:  Drawer(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Stack(
-                          alignment: Alignment.topLeft,
-                          children: [
-                            Image.asset("assets/images/drawer_bg.png",fit: BoxFit.fitWidth),
-                            Positioned(
-                                left: kXLMedium,
-                                bottom: kXLMedium,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Image.asset("assets/images/profile_pic.png",height: 72,),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: AppColors.whiteColor,
-                                          width: 1.4
-                                        )
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius:BorderRadius.circular(72),
-                                        child: BlocBuilder<UserBloc,User?>(
-                                          builder: (context,user) {
-                                            return CachedNetworkImage(
-                                              imageUrl: user?.picture??"",
-                                              errorWidget: (context, url, error) => Icon(Icons.person,size: 48,color: AppColors.whiteColor,),
-                                              width: 72,
-                                              height: 72,
-                                              fit: BoxFit.cover,
-                                            );
-                                          }
-                                        ),
+    return BlocBuilder<SideMenuCubit, GlobalKey<ScaffoldState>>(
+      builder: (context, state) {
+        return UpgradeAlert(
+          navigatorKey: router.routerDelegate.navigatorKey,
+          child: Scaffold(
+            key: state,
+            drawer:  Drawer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
+                        alignment: Alignment.topLeft,
+                        children: [
+                          Image.asset("assets/images/drawer_bg.png",fit: BoxFit.fitWidth),
+                          Positioned(
+                              left: kXLMedium,
+                              bottom: kXLMedium,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Image.asset("assets/images/profile_pic.png",height: 72,),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColors.whiteColor,
+                                        width: 1.4
+                                      )
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius:BorderRadius.circular(72),
+                                      child: BlocBuilder<UserBloc,User?>(
+                                        builder: (context,user) {
+                                          return CachedNetworkImage(
+                                            imageUrl: user?.picture??"",
+                                            errorWidget: (context, url, error) => Icon(Icons.person,size: 48,color: AppColors.whiteColor,),
+                                            width: 72,
+                                            height: 72,
+                                            fit: BoxFit.cover,
+                                          );
+                                        }
                                       ),
                                     ),
-                                    SizedBox(height: 12,),
-                                    Text(currentUser.name,style: TextStyle(color: AppColors.inputFillColor,fontSize: kMedium,fontWeight: FontWeight.bold),),
-                                    Text(currentUser.email,style: TextStyle(color: AppColors.inputFillColor,fontSize: kSMedium,)),
-                                    SizedBox(height: kXXLarge,),
-                                  ],
-                                ))
+                                  ),
+                                  SizedBox(height: 12,),
+                                  Text(currentUser.name,style: TextStyle(color: AppColors.inputFillColor,fontSize: kMedium,fontWeight: FontWeight.bold),),
+                                  Text(currentUser.email,style: TextStyle(color: AppColors.inputFillColor,fontSize: kSMedium,)),
+                                  SizedBox(height: kXXLarge,),
+                                ],
+                              ))
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: kXLMedium,top: kXXXLarge),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            GestureDetector(
+                              onTap:(){
+                                context.pushNamed(AppRoute.standings.name);
+                              },
+                              child: RowIconButton(Icons.arrow_circle_up_outlined, "Standings"),
+                            ),
+                            const SizedBox(height: kLarge,),
+                            RowIconButton(Icons.perm_media_outlined, "Team Media"),
+                            const SizedBox(height: kLarge,),
+                            RowIconButton(Icons.people, "Membership"),
+
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: kXLMedium,top: kXXXLarge),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              GestureDetector(
-                                onTap:(){
-                                  context.pushNamed(AppRoute.standings.name);
-                                },
-                                child: RowIconButton(Icons.arrow_circle_up_outlined, "Standings"),
-                              ),
-                              const SizedBox(height: kLarge,),
-                              RowIconButton(Icons.perm_media_outlined, "Team Media"),
-                              const SizedBox(height: kLarge,),
-                              RowIconButton(Icons.people, "Membership"),
-
-                            ],
-                          ),
-                        ),
-                      ],),
-
-                    GestureDetector(
-                      onTap: (){
-                        logoutDialog(context);
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: kXLMedium,vertical: kXLMedium),
-                        child: RowIconButton(Icons.logout, "Logout"),
-
                       ),
-                    )
+                    ],),
 
-                  ],
-                ),
+                  GestureDetector(
+                    onTap: (){
+                      logoutDialog(context);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: kXLMedium,vertical: kXLMedium),
+                      child: RowIconButton(Icons.logout, "Logout"),
+
+                    ),
+                  )
+
+                ],
               ),
-              body: widget.navigationShell,
-              bottomNavigationBar: BottomNavigationBar(
-                  elevation: kSmall,
-                  currentIndex: widget.navigationShell.currentIndex,
-                  unselectedFontSize: kSMedium,
-                  selectedFontSize: kSMedium,
-                  onTap: _onTap,
-                  selectedItemColor: AppColors.darkColor,
-                  unselectedItemColor: const Color(0xff919191),
-                  type: BottomNavigationBarType.fixed,
-                  items: [
-                    BottomNavigationBarItem(
-                      icon: SvgPicture.asset(
-                        "assets/icons/home.svg",
-                        color: widget.navigationShell.currentIndex == 0
-                            ? AppColors.darkColor
-                            : null,
-                      ),
-                      label: 'Home',
+            ),
+            body: widget.navigationShell,
+            bottomNavigationBar: BottomNavigationBar(
+                elevation: kSmall,
+                currentIndex: widget.navigationShell.currentIndex,
+                unselectedFontSize: kSMedium,
+                selectedFontSize: kSMedium,
+                onTap: _onTap,
+                selectedItemColor: AppColors.darkColor,
+                unselectedItemColor: const Color(0xff919191),
+                type: BottomNavigationBarType.fixed,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset(
+                      widget.navigationShell.currentIndex == 0?"assets/icons/home_b.svg":"assets/icons/home.svg",
+                      color: widget.navigationShell.currentIndex == 0
+                          ? AppColors.darkColor
+                          : AppColors.greyColor,
                     ),
-                    BottomNavigationBarItem(
-                      icon: SvgPicture.asset(
-                        "assets/icons/date.svg",
-                        color: widget.navigationShell.currentIndex == 1
-                            ? AppColors.darkColor
-                            : null,
-                      ),
-                      //Icon(LucideIcons.beer),
-                      label: 'Schedule',
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset(
+                      widget.navigationShell.currentIndex == 1?"assets/icons/date_b.svg":"assets/icons/date.svg",
+                      color: widget.navigationShell.currentIndex == 1
+                          ? AppColors.darkColor
+                          : AppColors.greyColor,
                     ),
-                    BottomNavigationBarItem(
-                      icon: SvgPicture.asset(
-                        "assets/icons/shopping-basket.svg",
-                        color: widget.navigationShell.currentIndex == 2
-                            ? AppColors.darkColor
-                            : null,
-                      ),
-                      label: 'Shop',
+                    //Icon(LucideIcons.beer),
+                    label: 'Schedule',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset(
+                      widget.navigationShell.currentIndex == 2?"assets/icons/shop_b.svg":"assets/icons/shop.svg",
+                      color: widget.navigationShell.currentIndex == 2
+                          ? AppColors.darkColor
+                          : AppColors.greyColor,
                     ),
-                    BottomNavigationBarItem(
+                    label: 'Shop',
+                  ),
+                  BottomNavigationBarItem(
                       icon: SvgPicture.asset(
-                        "assets/icons/profile.svg",
+                        widget.navigationShell.currentIndex == 3?"assets/icons/team_b.svg":"assets/icons/team.svg",
                         color: widget.navigationShell.currentIndex == 3
                             ? AppColors.darkColor
-                            : null,
+                            : AppColors.greyColor,
                       ),
-                      label: 'Profile',
+                    label: 'Team'
+                  ),
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset(
+                      widget.navigationShell.currentIndex == 4?"assets/icons/profile_b.svg":"assets/icons/profile.svg",
+                      color: widget.navigationShell.currentIndex == 4
+                          ? AppColors.darkColor
+                          : AppColors.greyColor,
                     ),
-                  ]),
-            ),
-          );
-        },
-      ),
+                    label: 'Profile',
+                  ),
+                ]),
+          ),
+        );
+      },
     );
   }
 

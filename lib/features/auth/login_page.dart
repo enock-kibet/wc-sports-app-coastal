@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
          bloc: authBloc,
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.status == AuthStatus.success) {
             context.read<UserBloc>().add(UpdateUser(state.data));
             //show success snackbar
@@ -71,6 +71,7 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
           if (state.status == AuthStatus.failure) {
             service<Talker>().error('Login Failed');
             service<Talker>().error(state.failure!.error);
+            await GoogleSignIn(scopes: ['profile', 'email']).signOut();
             //show snackbar
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -162,11 +163,11 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
                           children: [
                             Row(
                               children: [
-                                Checkbox(value: false, onChanged: (onChanged) {}),
-                                const Text(
-                                  'Remember Me',
-                                  style: TextStyle(fontSize: kSMedium),
-                                )
+                                // Checkbox(value: false, onChanged: (onChanged) {}),
+                                // const Text(
+                                //   'Remember Me',
+                                //   style: TextStyle(fontSize: kSMedium),
+                                // )
                               ],
                             ),
                             TextButton(
@@ -285,6 +286,7 @@ CustomTextField(bool isEmail, String hintText,{final TextEditingController? cont
       FocusManager.instance.primaryFocus?.unfocus();
     },
     decoration: InputDecoration(
+      contentPadding: EdgeInsets.symmetric(horizontal: kMedium,vertical: 14),
       suffixIcon: !isEmail? IconButton(
                                   onPressed: () {
                                    

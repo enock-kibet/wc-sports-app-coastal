@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sports_app/utils/dotted.dart';
 
 part 'user.freezed.dart';
 part 'user.g.dart';

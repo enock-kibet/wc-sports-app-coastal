@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/localization/app_prefs.dart';
 
@@ -66,6 +67,7 @@ class AppPreferencesManager {
   }
 
   Future<void> logOut()async{
+    final GoogleSignInAccount? googleSignIn =await GoogleSignIn(scopes: ['profile', 'email']).signOut();
     await _prefs.removeUser();
     _currentUser = await _prefs.getUserData();
     _status=_verificationStatus(_currentUser);

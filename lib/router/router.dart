@@ -21,6 +21,7 @@ import 'package:sports_app/features/dashboard/pages/profile/profile_page.dart';
 import 'package:sports_app/features/dashboard/pages/schedule/schedule_page.dart';
 import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/standings/standinds_page.dart';
+import 'package:sports_app/features/dashboard/pages/team/team.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -29,6 +30,7 @@ import '../features/dashboard/pages/help/help.dart';
 import '../features/dashboard/pages/pages.dart';
 
 enum AppRoute {
+  team,
   splash,
   home,
   schedule,
@@ -69,6 +71,8 @@ final GlobalKey<NavigatorState> _shellNavigatorCKey =
     GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorDKey =
     GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _shellNavigatorEKey = 
+GlobalKey<NavigatorState>();
 
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
@@ -241,6 +245,20 @@ final router = GoRouter(
         ),
         StatefulShellBranch(
           navigatorKey: _shellNavigatorDKey,
+            
+            routes: [
+              GoRoute(
+                path: "/team",
+                name: AppRoute.team.name,
+                pageBuilder: (context,state){
+                  return const MaterialPage(
+                      child: TeamPage()
+                  );
+                }
+              ),
+            ]),
+        StatefulShellBranch(
+          navigatorKey: _shellNavigatorEKey,
           routes: [
             GoRoute(
               path: "/profile",

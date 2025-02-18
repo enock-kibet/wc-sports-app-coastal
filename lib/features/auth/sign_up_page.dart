@@ -51,7 +51,7 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: authBloc,
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.status == AuthStatus.success) {
             context.read<UserBloc>().add(UpdateUser(state.data));
             service<Talker>().info('Login Success');
@@ -75,6 +75,7 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
           if (state.status == AuthStatus.failure) {
             service<Talker>().error('Register Failed');
             service<Talker>().error(state.failure!.error);
+            await GoogleSignIn(scopes: ['profile', 'email']).signOut();
             //show snackbar
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

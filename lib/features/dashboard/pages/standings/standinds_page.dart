@@ -21,7 +21,8 @@ class _StandingPageState extends State<StandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body:
+      Container(
         padding: const EdgeInsets.only(bottom: kXSmall),
         child: SingleChildScrollView(
           child: Column(
