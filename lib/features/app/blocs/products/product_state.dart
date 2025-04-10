@@ -4,7 +4,11 @@ enum ProductStatus {
   initial,
   loading,
   success,
-  failure;
+  failure,
+  processingPayment,
+  successfulPayment,
+  ;
+
 
   bool get isInitial => this == ProductStatus.initial;
   bool get isLoading => this == ProductStatus.loading;
@@ -17,6 +21,7 @@ class ProductState with _$ProductState {
   const factory ProductState({
     @Default(ProductStatus.initial) ProductStatus status,
     Failure? failure,
+    String? authorizationUrl,
     @Default([]) List<Product> products,
   }) = _ProductState;
 }

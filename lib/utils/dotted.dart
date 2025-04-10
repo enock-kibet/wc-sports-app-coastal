@@ -72,6 +72,7 @@ String addDomain(String url) {
   // Old and new domain
   const oldDomain = 'https://srv19716098.ultasrv.net';
   const newDomain = 'https://backend.wencetechnologies.com';
+  const uploadThingDomain = 'https://utfs';
 
   // Check if the URL starts with the old domain
   if (url.startsWith(oldDomain)) {
@@ -79,6 +80,9 @@ String addDomain(String url) {
     return url.replaceFirst(oldDomain, newDomain);
   }
   if (url.startsWith(newDomain)){
+    return url;
+  }
+  if(url.startsWith(uploadThingDomain)){
     return url;
   }
 

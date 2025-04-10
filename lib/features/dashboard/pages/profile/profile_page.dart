@@ -11,6 +11,9 @@ import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
+import 'package:sports_app/features/auth/login_page.dart';
+import 'package:sports_app/features/dashboard/pages/profile/components/circular_icon_container.dart';
+import 'package:sports_app/features/dashboard/pages/profile/components/circular_toggle.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/main.dart';
 import 'package:sports_app/router/router.dart';
@@ -98,14 +101,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 image: LucideIcons.footprints,
                 title: "Points Management",
                 press: () {
-                  context.pushNamed(AppRoute.standings.name);
+                  context.pushNamed(AppRoute.pointsManagement.name);
                 },
               ),
               InforCard(
                 image: LucideIcons.moon,
                 title: "Change Theme",
                 press: () {
-                  context.pushNamed(AppRoute.teamMedia.name);
+                  _showBottomSheet(context);
                 },
               ),
               InforCard(
@@ -265,3 +268,102 @@ Future<void> logoutDialog(BuildContext context) async {
     },
   );
 }
+void _showBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true, // Allows full-screen height if needed
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    builder: (context) {
+      return _BottomSheetContent();
+    },
+  );
+}
+class _BottomSheetContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.55, // 40% height initially
+        minChildSize: 0.2, // Minimum size
+        maxChildSize: 1.0, // Almost full screen
+        builder: (context, scrollController) {
+          return Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            child: Column(
+              children: [
+                // Drag Handle
+                Container(
+                  width: 48,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: const Color(0xffc4c4c4),
+                    borderRadius: BorderRadius.circular(2.5),
+                  ),
+                ),
+                const SizedBox(height: 20),
+      
+                // Sheet Content
+                Expanded(
+                  child: ListView(
+                    controller: scrollController,
+                    children: [
+                      Center(
+                        child: Text(
+                          'Choose Theme',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 32,),
+                      Row(
+                        children: [
+                          CircularIconButton(icon: Icons.light_mode_outlined),
+                          const SizedBox(width: 16,),
+                          Text("Light Mode"),
+                          Spacer(),
+                          DotToggleButton(isOn: true, onToggle: (){})
+                        ],
+                      ),
+                      SizedBox(height: 16,),
+                      Row(
+                        children: [
+                          CircularIconButton(icon: Icons.dark_mode_outlined),
+                          const SizedBox(width: 16,),
+                          Text("Dark Mode"),
+                          Spacer(),
+                          DotToggleButton(isOn: false, onToggle: (){})
+                        ],
+                      ),
+                      SizedBox(height: 16,),Row(
+                        children: [
+                          CircularIconButton(icon: Icons.phone_iphone_rounded),
+                          const SizedBox(width: 16,),
+                          Text("Set to Device Mode"),
+                          Spacer(),
+                          DotToggleButton(isOn: false, onToggle: (){})
+                        ],
+                      ),
+                      SizedBox(height: 36,),
+                      CustomFilledButton("Apply")
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+

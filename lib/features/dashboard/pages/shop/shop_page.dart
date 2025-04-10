@@ -1,21 +1,32 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
+import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/products/product_bloc.dart';
-
+import 'package:sports_app/features/auth/login_page.dart';
+import 'package:sports_app/features/dashboard/pages/profile/components/circular_toggle.dart';
+import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/shop/widgets/top_sellers_card.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
-import 'package:sports_app/main.dart';
 import 'package:sports_app/theme/app_colors.dart';
 import 'package:sports_app/theme/theme.dart';
 import 'package:auto_height_grid_view/auto_height_grid_view.dart';
 import 'package:sports_app/utils/dotted.dart';
+
+import '../profile/components/circular_icon_container.dart';
+
+part 'widgets/price_card.dart';
+part 'widgets/text_avator_text.dart';
+part 'widgets/buy_merch_bottom_sheet.dart';
+part 'widgets/animatedoverlaysnackbar.dart';
+
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
@@ -33,6 +44,7 @@ class _ShopPageState extends State<ShopPage> {
         builder: (context, state) {
           switch (state.status) {
             case ProductStatus.success:
+            case ProductStatus.successfulPayment:
               return SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: kMedium),
@@ -54,11 +66,6 @@ class _ShopPageState extends State<ShopPage> {
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.whiteColor),
                               ),
-                              // TextButton(
-                              //     onPressed: () {},
-                              //     child: Text("See All",
-                              //         style: TextStyle(
-                              //             color: AppColors.whiteColor)))
                             ],
                           ),
                           const SizedBox(height: kMedium),
@@ -122,7 +129,7 @@ class _ShopPageState extends State<ShopPage> {
               borderSide: BorderSide(
                 color: AppColors.whiteColor,
               )),
-          hintText: "Search HRBC events",
+          hintText: "Search merch",
           hintStyle: TextStyle(
               fontWeight: FontWeight.w300,
               color: AppColors.whiteColor.withOpacity(0.8))),

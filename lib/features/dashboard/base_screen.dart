@@ -103,7 +103,8 @@ class _BaseScreenState extends State<BaseScreen> {
                           children: [
                             GestureDetector(
                               onTap:(){
-                                context.pushNamed(AppRoute.standings.name);
+                                context.pushNamed(AppRoute.team.name,extra: true );
+                                context.pop();
                               },
                               child: RowIconButton(Icons.arrow_circle_up_outlined, "Standings"),
                             ),

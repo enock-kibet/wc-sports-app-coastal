@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../common/dimens.dart';
 import '../../theme/app_colors.dart';
@@ -24,6 +26,8 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
   late AuthBloc authBloc;
+  final ValueNotifier<bool> _isChecked = ValueNotifier(false);
+  final ValueNotifier<bool> _isHidden = ValueNotifier(true);
   final _registerFormKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -196,23 +200,81 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                     const SizedBox(
                       height: 9,
                     ),
-                    CustomTextField(false, "**********",controller: _passwordController,
-                                    validator: combine([
-                                      withMessage('password is empty', isTextEmpty),
-                                      withMessage(
-                                          'password is invalid', isPasswordInvalid)
-                                    ]),
-                                    obscureText: hidePassword,
-                                    obscuringCharacter: "*",),
-                    Row(
-                      children: [
-                        Checkbox(value: false, onChanged: (onChanged) {}),
-                        const Text(
-                          'Agree to Terms & Conditions',
-                          style: TextStyle(fontSize: 12),
-                        )
-                      ],
+                    ValueListenableBuilder(valueListenable: _isHidden, builder: (context,value,child){
+                      return CustomTextField(false, "**********",controller: _passwordController,
+                        validator: combine([
+                          withMessage('password is empty', isTextEmpty),
+                          withMessage('password is invalid', isPasswordInvalid)
+                        ]),
+                        obscureText: _isHidden.value,
+                        obscuringCharacter: "*",
+                        toggleVisibility: (){
+                          _isHidden.value = !_isHidden.value;
+                        }
+                      );
+                    }),
+
+
+                    ValueListenableBuilder<bool>(
+                      valueListenable: _isChecked,
+                      builder: (context,value,child) {
+                        return FormField<bool>(
+                          initialValue: value,
+                          validator: (val){
+                            if(!(val??false)){
+                              return "Accept terms to proceed.";
+                            }
+                            return null;
+                          },
+                          builder: (state) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                         value: state.value,
+                                         onChanged: (onChanged) {
+                                           //_isChecked.value = onChanged??false;
+                                           state.didChange(onChanged);
+                                         }),
+                                    RichText(
+                                      text: TextSpan(
+                                        text: 'Agree to ',
+                                        style: const TextStyle(color: Colors.black),
+                                        children: [
+                                          TextSpan(
+                                            text: 'Terms & Conditions',
+                                            style: const TextStyle(
+                                              color: Colors.blue,
+                                              decoration: TextDecoration.underline,
+                                            ),
+                                            recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                            launchURL("https://wencetechnologies.com/SportsApp/Terms%26Conditions.html"); // Call your URL launcher function
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                  ],
+                                ),
+                                if(state.hasError)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left:12.0),
+                                    child: Text(
+                                      state.errorText ?? '',
+                                      style: TextStyle(color: Colors.red,fontSize: kSMedium),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          }
+                        );
+                      }
                     ),
+
                     const SizedBox(
                       height: kLarge,
                     ),
@@ -310,5 +372,13 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
     } else {
       return false;
     }
+  }
+}
+void launchURL(String url) async {
+  final Uri uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } else {
+    throw 'Could not launch $url';
   }
 }

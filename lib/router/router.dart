@@ -15,6 +15,7 @@ import 'package:sports_app/features/dashboard/pages/about/about_us.dart';
 import 'package:sports_app/features/dashboard/pages/home/match_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/media/team_media_page.dart';
 import 'package:sports_app/features/dashboard/pages/notifications/notification_page.dart';
+import 'package:sports_app/features/dashboard/pages/points/points_page.dart';
 import 'package:sports_app/features/dashboard/pages/profile/components/edit_profile.dart';
 import 'package:sports_app/features/dashboard/pages/profile/components/personal_details.dart';
 import 'package:sports_app/features/dashboard/pages/profile/profile_page.dart';
@@ -22,6 +23,7 @@ import 'package:sports_app/features/dashboard/pages/schedule/schedule_page.dart'
 import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/standings/standinds_page.dart';
 import 'package:sports_app/features/dashboard/pages/team/team.dart';
+import 'package:sports_app/features/dashboard/pages/webview/paymentwebview.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -48,7 +50,9 @@ enum AppRoute {
   signIn,
   otp,
   help,
-  aboutUs
+  aboutUs,
+  pointsManagement,
+  paymentWebView
 }
 
 
@@ -227,6 +231,7 @@ final router = GoRouter(
                   return const MaterialPage(child: ShopPage());
                 },
                 routes: [
+
                   GoRoute(
                     path: "shopdetails",
                     parentNavigatorKey: rootNavigatorKey,
@@ -239,7 +244,21 @@ final router = GoRouter(
                         ),
                       );
                     },
-                  )
+                    routes: []
+                  ),
+                  GoRoute(
+                    path: "paymentWebView",
+                    name: AppRoute.paymentWebView.name,
+                    parentNavigatorKey: rootNavigatorKey,
+                    pageBuilder: (context, state) {
+                      return MaterialPage(
+                        child: PaymentWebView(
+                          paymentUrl: state.extra as String,
+                          key: state.pageKey,
+                        ),
+                      );
+                    },
+                  ),
                 ])
           ],
         ),
@@ -251,8 +270,10 @@ final router = GoRouter(
                 path: "/team",
                 name: AppRoute.team.name,
                 pageBuilder: (context,state){
-                  return const MaterialPage(
-                      child: TeamPage()
+                  return  MaterialPage(
+                      child: TeamPage(
+                        showBackNavigation: state.extra==null?false:true ,
+                      )
                   );
                 }
               ),
@@ -276,6 +297,14 @@ final router = GoRouter(
                   builder: (context, state) {
                     return const EditProfileMain();
                   },
+                ),
+                GoRoute(
+                    path: "pointsmanagement",
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: AppRoute.pointsManagement.name,
+                    builder: (context,state){
+                      return const PointsPage();
+                    }
                 ),
                 GoRoute(
                   path: "help",

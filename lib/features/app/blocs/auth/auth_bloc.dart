@@ -21,38 +21,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<_Login>((event, emit) async {
       emit(state.copyWith(status: AuthStatus.loading));
       final authResponse = await _authService.login(event.request);
-      authResponse.when(onError: (error) {
+      await authResponse.when(onError: (error) {
         emit(state.copyWith(
           status: AuthStatus.failure,
           failure: error,
         ));
       }, onSuccess: (loginRes) async {
+        await service<AppPreferencesManager>().saveValue(loginRes);
+
         emit(state.copyWith(
           status: AuthStatus.success,
           failure: null,
           data:loginRes as User
         ));
-        await service<AppPreferencesManager>().saveValue(loginRes);
         service<Talker>().info(loginRes);
       });
     });
 
     on<_Registered>((event, emit) async {
       emit(state.copyWith(status: AuthStatus.loading));
-      final authResponse =
-          await _authService.signup(event.request);
-      authResponse.when(onError: (error) {
+      final authResponse = await _authService.signup(event.request);
+      await authResponse.when(onError: (error) {
         emit(state.copyWith(
           status: AuthStatus.failure,
           failure: error,
         ));
       }, onSuccess: (registerRes) async{
+        await service<AppPreferencesManager>().saveValue(registerRes);
         emit(state.copyWith(
           status: AuthStatus.success,
           failure: null,
           data:registerRes as User
         ));
-        await service<AppPreferencesManager>().saveValue(registerRes);
         service<Talker>().info(registerRes);
 
       });
@@ -61,18 +61,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<_VerifyOtp>((event,emit)async{
       emit((state.copyWith(status: AuthStatus.loading)));
       final authResponse = await _authService.verifyOtp(event.request);
-      authResponse.when(onError: (error) {
+      await authResponse.when(onError: (error) {
         emit(state.copyWith(
           status: AuthStatus.failure,
           failure: error,
         ));
       }, onSuccess: (registerRes) async{
+        await service<AppPreferencesManager>().saveValue(registerRes);
         emit(state.copyWith(
             status: AuthStatus.success,
             failure: null,
             data:registerRes as User
         ));
-        await service<AppPreferencesManager>().saveValue(registerRes);
 
       });
     });
@@ -97,7 +97,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<_GoogleLogin>((event,emit) async{
       emit(state.copyWith(status: AuthStatus.loading));
       final authResponse = await _authService.googleLogin(event.request);
-      authResponse.when(
+      await authResponse.when(
           onError: (Failure error) {
             emit(state.copyWith(
                 status: AuthStatus.failure,
@@ -113,24 +113,49 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     });
 
-    on<_EditProfile>((event,emit) async{
+    on<_EditProfile>((event, emit) async {
       emit(state.copyWith(status: AuthStatus.loading));
-      final authResponse = await _profileService.updateProfilePicture(event.request);
-      authResponse.when(
-          onError: (Failure error) {
-            emit(state.copyWith(
-                status: AuthStatus.failure,
-                failure: error
-            ));
-          },
-          onSuccess: (dynamic data) async{
-            emit(state.copyWith(
-                status: AuthStatus.success,
-                data: data as User));
-            await service<AppPreferencesManager>().saveValue(data);
 
-          }
+      final authResponse = await _profileService.updateProfilePicture(event.request);
+
+      await authResponse.when(
+        onError: (failure) async {
+          emit(state.copyWith(
+            status: AuthStatus.failure,
+            failure: failure,
+          ));
+        },
+        onSuccess: (userData) async {
+          final serverResponse = await _profileService.updateProfileLink({
+            "email": userData.email,
+            "picture": userData.picture ?? "",
+          });
+
+          await serverResponse.when(
+            onError: (failure) async {
+              emit(state.copyWith(
+                status: AuthStatus.failure,
+                failure: failure,
+              ));
+            },
+            onSuccess: (updatedUserData) async {
+              try {
+                await service<AppPreferencesManager>().saveValue(updatedUserData);
+                emit(state.copyWith(
+                  status: AuthStatus.success,
+                  data: updatedUserData,
+                ));
+              } catch (e) {
+                emit(state.copyWith(
+                  status: AuthStatus.failure,
+                  failure: Failure(error: "Failed to save user data: $e"),
+                ));
+              }
+            },
+          );
+        },
       );
     });
+
 }
 }

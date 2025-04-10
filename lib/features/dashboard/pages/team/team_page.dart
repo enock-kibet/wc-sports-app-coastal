@@ -1,7 +1,9 @@
 part of "team.dart";
 
 class TeamPage extends StatefulWidget {
-  const TeamPage({super.key});
+  final bool showBackNavigation;
+
+  const TeamPage({super.key ,this.showBackNavigation=false});
 
   @override
   State<TeamPage> createState() => _TeamPageState();
@@ -19,47 +21,52 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
     return Scaffold(
       body: AppBackground(
         childWidget: SafeArea(
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: kSMedium),
-            decoration: BoxDecoration(
-              color: AppColors.whiteColor,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(36),
-                topRight: Radius.circular(36),
-              )
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 39,),
-                Text("Team",style: context.textTheme.headlineLarge?.copyWith(fontSize: 16),),
-                const SizedBox(height: 20,),
-                TabBar(
-                  dividerColor: AppColors.greyColor,
-                  unselectedLabelStyle: TextStyle(fontFamily: "Inter",fontWeight: FontWeight.w500,fontSize: 10,color: AppColors.greyColor,letterSpacing: 1),
-                  indicator: UnderlineTabIndicator(
-                    borderSide: BorderSide(width: 4,color: AppColors.blackColor),
-                    borderRadius: const BorderRadius.only(
-                      topLeft:Radius.circular(3),
-                      topRight: Radius.circular(3)
-                    )
-                  ),
-                  labelStyle: TextStyle(fontFamily: "Inter",fontWeight: FontWeight.w700,fontSize: 10,color: AppColors.darkColor,letterSpacing: 1),
+          child: Stack(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: kSMedium),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(36),
+                    topRight: Radius.circular(36),
+                  )
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 39,),
+                    Text("Team",style: context.textTheme.headlineLarge?.copyWith(fontSize: 16),),
+                    const SizedBox(height: 20,),
+                    TabBar(
+                      dividerColor: AppColors.greyColor,
+                      unselectedLabelStyle: TextStyle(fontFamily: "Inter",fontWeight: FontWeight.w500,fontSize: 10,color: AppColors.greyColor,letterSpacing: 1),
+                      indicator: UnderlineTabIndicator(
+                        borderSide: BorderSide(width: 4,color: AppColors.blackColor),
+                        borderRadius: const BorderRadius.only(
+                          topLeft:Radius.circular(3),
+                          topRight: Radius.circular(3)
+                        )
+                      ),
+                      labelStyle: TextStyle(fontFamily: "Inter",fontWeight: FontWeight.w700,fontSize: 10,color: AppColors.darkColor,letterSpacing: 1),
 
-                  controller: tabController,
-                    tabs: [
-                  Tab(text: 'ROSTER',),
-                  Tab(text: 'STATS',),
-                  Tab(text: 'STANDINGS'),
-                ]),
-                Expanded(child: TabBarView(
-                    controller: tabController,
-                    children: [
-                      TeamRoster(),
-                      TeamStats(),
-                      TeamStandings(),
-                    ]))
-              ],
-            ),
+                      controller: tabController,
+                        tabs: [
+                      Tab(text: 'ROSTER',),
+                      Tab(text: 'STATS',),
+                      Tab(text: 'STANDINGS'),
+                    ]),
+                    Expanded(child: TabBarView(
+                        controller: tabController,
+                        children: [
+                          TeamRoster(),
+                          TeamStats(),
+                          TeamStandings(),
+                        ]))
+                  ],
+                ),
+              ),
+              widget.showBackNavigation? Positioned( top:20,left:20,child: CustomIconButton(size: 40,onButtonPress: (){context.pop();}, icon: Icons.arrow_back)):Container()
+            ],
           ),
         ),
       ),

@@ -59,14 +59,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       });
       _authBloc.add(AuthEvent.editProfile(request: formData));
       await file.delete();
-      // await croppedFile.delete();
 
-      // if (croppedFile != null) {
-      //   final base64String = await _encodeImage(croppedFile);
-      //   setState(() {
-      //     profilePicture = base64String;
-      //   });
-      // }
     }
   }
 
@@ -258,7 +251,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                         // ref.read(profileNotifierProvider.notifier).updateUserProfile(
                         //     ref.read(userProvider)!.user!.id, userProfile);
                       },
-                      child: const Text('Update Profile')),
+                      child:  Text(state.status==AuthStatus.loading?'Loading...':'Update Profile')),
                 ),
                 const SizedBox(height: 36),
               ],

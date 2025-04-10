@@ -10,6 +10,7 @@ import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+import 'package:upgrader/upgrader.dart';
 
 import '../../common/dimens.dart';
 import '../../theme/app_colors.dart';
@@ -22,12 +23,13 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
+  final ValueNotifier<bool> _isHidden = ValueNotifier(true);
   late AuthBloc authBloc;
   final _loginFormKey = GlobalKey<FormState>();
   final TextEditingController _emailController =
-      TextEditingController(text: kDebugMode ? 'codewithmbugua@gmail.com' : '');
+      TextEditingController(text: kDebugMode ? 'xtriimgamer3@gmail.com' : '');
   final TextEditingController _passwordController =
-      TextEditingController(text: kDebugMode ? 'secretpassword123' : '');
+      TextEditingController(text: kDebugMode ? 'Qwerty123456' : '');
   bool hidePassword = true;
   @override
   void initState() {
@@ -149,15 +151,19 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
                         const SizedBox(
                           height: 9,
                         ),
-                        CustomTextField(false, "**********",controller: _passwordController,
-                                    validator: combine([
-                                      withMessage('password is empty', isTextEmpty),
-                                      withMessage(
-                                          'password is invalid', isPasswordInvalid)
-                                    ]),
-                                    obscureText: hidePassword,
-                                    obscuringCharacter: "*",
-                                   ),
+                        ValueListenableBuilder(valueListenable: _isHidden, builder: (context,value,child){
+                          return CustomTextField(false, "**********",controller: _passwordController,
+                              validator: combine([
+                                withMessage('password is empty', isTextEmpty),
+                                withMessage('password is invalid', isPasswordInvalid)
+                              ]),
+                              obscureText: _isHidden.value,
+                              obscuringCharacter: "*",
+                              toggleVisibility: (){
+                                _isHidden.value = !_isHidden.value;
+                              }
+                          );
+                        }),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -275,9 +281,9 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
   }
 }
 
-CustomTextField(bool isEmail, String hintText,{final TextEditingController? controller,final String? Function(String?)? validator,bool obscureText = false,String? obscuringCharacter}) {
+CustomTextField(bool isEmail, String hintText,{final TextEditingController? controller,final String? Function(String?)? validator,bool obscureText = false,String? obscuringCharacter, VoidCallback? toggleVisibility }) {
   return TextFormField(
-    obscureText: !isEmail,
+    obscureText: obscureText,
     controller: controller,
     validator: validator,
     keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
@@ -289,7 +295,7 @@ CustomTextField(bool isEmail, String hintText,{final TextEditingController? cont
       contentPadding: EdgeInsets.symmetric(horizontal: kMedium,vertical: 14),
       suffixIcon: !isEmail? IconButton(
                                   onPressed: () {
-                                   
+                                      toggleVisibility!();
                                       obscureText = !obscureText;
                                    
                                   },
@@ -331,7 +337,7 @@ CustomFilledButton(String buttonText) {
     child: Center(
         child: Text(
       buttonText,
-      style: TextStyle(color: AppColors.inputFillColor, fontSize: 18),
+      style: TextStyle(color: AppColors.inputFillColor, fontSize: 18,fontWeight: FontWeight.w500),
     )),
   );
 }

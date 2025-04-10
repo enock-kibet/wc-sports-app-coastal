@@ -9,13 +9,7 @@ class ProductService {
         List<Product> productList = [];
         for (var record in data["data"]) {
           try{
-            Product product = Product(
-                id: record["id"],
-                name: record["name"],
-                description: record["description"],
-                price: record["price"],
-                category: record["category"],
-                imageUrl: replaceDomain(record["imageUrl"]));
+            Product product = Product.fromJson(record);
             productList.add(product);
           }catch(e){
             service<Talker>().error("Error parsing product record: $e");
@@ -23,6 +17,13 @@ class ProductService {
         }
         return productList;
       },
+    );
+  }
+  HttpResult<String> productPayment(Map<String,dynamic> data)async {
+    return Http.post(
+        'https://backend.wencetechnologies.com/SportApp/api/Order/makepayments',
+        data,
+      deserializer: (data)=>data["authorizationUrl"]
     );
   }
 }
@@ -149,6 +150,13 @@ class ProfileService {
   HttpResult<User> updateProfilePicture(FormData data) async {
     return Http.post(
       "https://wencesportswebapplication.vercel.app/api/auth/uploadthing",
+      data,
+      deserializer: (data)=>User.fromJson(data["user"]),
+    );
+  }
+  HttpResult<User> updateProfileLink(Map<String,String> data) async {
+    return Http.post(
+      "https://backend.wencetechnologies.com/SportApp/api/User/updatePic",
       data,
       deserializer: (data)=>User.fromJson(data["user"]),
     );

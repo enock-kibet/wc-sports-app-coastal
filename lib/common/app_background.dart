@@ -29,15 +29,15 @@ class AppBackground extends StatelessWidget {
           ),
           child: childWidget,
         ),
-        Positioned(
-          top: -100,
-          right: -100,
-          child: Container(
-            height: 200,
-            width:200,
-            decoration: const BoxDecoration(gradient: RadialGradient(colors: [Color(0XA0FFFFFF),Color(0X00FFFFFF)]),),
-          ),
-        )
+        // Positioned(
+        //   bottom: -100,
+        //   right: -100,
+        //   child: Container(
+        //     height: 200,
+        //     width:200,
+        //     decoration: const BoxDecoration(gradient: RadialGradient(colors: [Color(0XA0FFFFFF),Color(0X00FFFFFF)]),),
+        //   ),
+        // )
       ],
     );
   }

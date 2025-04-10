@@ -31,5 +31,21 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         ));
       });
     });
+    on<_ProductsPurchase>((event, emit) async {
+      emit(state.copyWith(status: ProductStatus.processingPayment));
+      final recordResponse = await _productService.productPayment(event.request);
+      recordResponse.when(onError: (error) {
+        emit(state.copyWith(
+          status: ProductStatus.failure,
+          failure: error,
+        ));
+      }, onSuccess: (data) async {
+        emit(state.copyWith(
+          status: ProductStatus.successfulPayment,
+          authorizationUrl: data,
+          failure: null,
+        ));
+      });
+    });
   }
 }

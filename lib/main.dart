@@ -14,6 +14,8 @@ import 'features/app/blocs/products/product_bloc.dart';
 import 'router/router.dart';
 import 'theme/light_theme.dart';
 
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+GlobalKey<ScaffoldMessengerState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setUpService();
@@ -65,6 +67,7 @@ class _MyAppState extends State<MyApp> {
         ),
       ],
       child: MaterialApp.router(
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
         title: 'Sports App',
         debugShowCheckedModeBanner: false,
         theme: lightMode,
@@ -91,3 +94,17 @@ Widget _buildRunnableApp({
     ),
   );
 }
+// _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
+//   name: json['name']??json["username"]as String,
+//   email: json['email'] as String,
+//   emailVerified: json['emailVerified']??false as bool,
+//   picture: addDomain(json['picture']??"") as String?,
+// );
+//
+// Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
+//     <String, dynamic>{
+//       'name': instance.name,
+//       'email': instance.email,
+//       'emailVerified': instance.emailVerified,
+//       'picture': instance.picture,
+//     };
