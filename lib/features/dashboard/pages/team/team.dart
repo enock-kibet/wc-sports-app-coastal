@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/buildcontext.dart';
+import 'package:sports_app/data/models/player/player.dart';
 import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/features/dashboard/pages/pages.dart';
+import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/theme.dart';
 
 part 'team_page.dart';

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_app/data/models/match/match.dart';
+import 'package:sports_app/data/models/player/player.dart';
 import 'package:sports_app/data/models/products/product.dart';
 
 import 'package:sports_app/data/services/service.dart';
@@ -22,6 +23,7 @@ import 'package:sports_app/features/dashboard/pages/profile/profile_page.dart';
 import 'package:sports_app/features/dashboard/pages/schedule/schedule_page.dart';
 import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/standings/standinds_page.dart';
+import 'package:sports_app/features/dashboard/pages/team/player/player.dart';
 import 'package:sports_app/features/dashboard/pages/team/team.dart';
 import 'package:sports_app/features/dashboard/pages/webview/paymentwebview.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
@@ -52,7 +54,8 @@ enum AppRoute {
   help,
   aboutUs,
   pointsManagement,
-  paymentWebView
+  paymentWebView,
+  playerProfile
 }
 
 
@@ -275,7 +278,19 @@ final router = GoRouter(
                         showBackNavigation: state.extra==null?false:true ,
                       )
                   );
-                }
+                },
+                routes: [
+                  GoRoute(
+                    path: "playerProfile",
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: AppRoute.playerProfile.name,
+                    builder: (context, state) {
+                      return  PlayerPage(
+                        player: state.extra as PlayerProfileData,
+                      );
+                    },
+                  ),
+                ]
               ),
             ]),
         StatefulShellBranch(
@@ -299,7 +314,7 @@ final router = GoRouter(
                   },
                 ),
                 GoRoute(
-                    path: "pointsmanagement",
+                    path: "pointsManagement",
                     parentNavigatorKey: rootNavigatorKey,
                     name: AppRoute.pointsManagement.name,
                     builder: (context,state){

@@ -71,11 +71,11 @@ Widget TeamStatValues({String Category="Points", String?name =null,String?detail
     ],
   );
 }
-Widget PlayerImage({double? width= null,double? height= null,}){
+Widget PlayerImage({String? image=null, double? width= null,double? height= null,double radius=6}){
   return ClipRRect(
-      borderRadius:BorderRadius.circular(6),
+      borderRadius:BorderRadius.circular(radius),
       child:CachedNetworkImage(
-        imageUrl: "https://y2tsq5l02b.ufs.sh/f/m2LAP0R1sVFECvXPwxg2DKTQP5rMpfbGiAYNsaRkeLdJv1Uw",
+        imageUrl: image??"https://y2tsq5l02b.ufs.sh/f/m2LAP0R1sVFECvXPwxg2DKTQP5rMpfbGiAYNsaRkeLdJv1Uw",
         errorWidget: (context, url, error) => Icon(Icons.person,size: 48,color: AppColors.whiteColor,),
         width: width??116,
         height: height??144,
