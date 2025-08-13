@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:sports_app/features/app/blocs/matches/match_schedule/schedule_bloc.dart';
+import 'package:sports_app/features/app/blocs/media/media_bloc.dart';
+import 'package:sports_app/features/app/blocs/notifications/notification_bloc.dart';
+import 'package:sports_app/features/app/blocs/products/cart_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 
 import 'package:sports_app/features/app/side_menu_cubit.dart';
@@ -15,7 +18,7 @@ import 'router/router.dart';
 import 'theme/light_theme.dart';
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
-GlobalKey<ScaffoldMessengerState>();
+    GlobalKey<ScaffoldMessengerState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setUpService();
@@ -63,6 +66,29 @@ class _MyAppState extends State<MyApp> {
           create: (_) => MatchBloc()
             ..add(
               const MatchEvent.matches(),
+            ),
+        ),
+        BlocProvider<NotificationBloc>(
+          create: (_) => NotificationBloc()
+            ..add(
+              const NotificationEvent.notifications(),
+            ),
+        ),
+        BlocProvider<MediaBloc>(
+          create: (_) => MediaBloc()
+            ..add(
+              const MediaEvent.media(),
+            ),
+        ),
+        BlocProvider<CartBloc>(
+          create: (_) => CartBloc()
+            ..add(
+              CartEvent.getCartItems(
+                request: {
+                  "email":
+                      service<AppPreferencesManager>().currentUserValue!.email,
+                },
+              ),
             ),
         ),
       ],

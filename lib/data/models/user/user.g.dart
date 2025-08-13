@@ -10,7 +10,8 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       name: json['name'] as String,
       email: json['email'] as String,
       emailVerified: json['emailVerified'] as bool,
-      picture: addDomain(json['picture']??"") as String?,
+      picture: json['picture'] as String?,
+      token: json['token'] as String?,
     );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
@@ -19,20 +20,5 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
       'email': instance.email,
       'emailVerified': instance.emailVerified,
       'picture': instance.picture,
+      'token': instance.token,
     };
-// Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
-//     <String, dynamic>{
-//       'name': instance.name,
-//       'email': instance.email,
-//       'emailVerified': instance.emailVerified,
-//       'picture': instance.picture,
-//     };
-
-
-// _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
-//   name: json['name']??json["username"]as String,
-//   email: json['email'] as String,
-//   emailVerified: json['emailVerified']??false as bool,
-//   picture: addDomain(json['picture']??"") as String?,
-// );
-//

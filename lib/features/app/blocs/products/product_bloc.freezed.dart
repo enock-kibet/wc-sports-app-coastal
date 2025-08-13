@@ -20,18 +20,24 @@ mixin _$ProductEvent {
   TResult when<TResult extends Object?>({
     required TResult Function() products,
     required TResult Function(dynamic request) buyProducts,
+    required TResult Function(dynamic request) buyBulkProducts,
+    required TResult Function(dynamic request) addToCart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? products,
     TResult? Function(dynamic request)? buyProducts,
+    TResult? Function(dynamic request)? buyBulkProducts,
+    TResult? Function(dynamic request)? addToCart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? products,
     TResult Function(dynamic request)? buyProducts,
+    TResult Function(dynamic request)? buyBulkProducts,
+    TResult Function(dynamic request)? addToCart,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -39,18 +45,24 @@ mixin _$ProductEvent {
   TResult map<TResult extends Object?>({
     required TResult Function(_ProductsFetched value) products,
     required TResult Function(_ProductsPurchase value) buyProducts,
+    required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
+    required TResult Function(_ProductToCart value) addToCart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ProductsFetched value)? products,
     TResult? Function(_ProductsPurchase value)? buyProducts,
+    TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult? Function(_ProductToCart value)? addToCart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ProductsFetched value)? products,
     TResult Function(_ProductsPurchase value)? buyProducts,
+    TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult Function(_ProductToCart value)? addToCart,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -114,6 +126,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
   TResult when<TResult extends Object?>({
     required TResult Function() products,
     required TResult Function(dynamic request) buyProducts,
+    required TResult Function(dynamic request) buyBulkProducts,
+    required TResult Function(dynamic request) addToCart,
   }) {
     return products();
   }
@@ -123,6 +137,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? products,
     TResult? Function(dynamic request)? buyProducts,
+    TResult? Function(dynamic request)? buyBulkProducts,
+    TResult? Function(dynamic request)? addToCart,
   }) {
     return products?.call();
   }
@@ -132,6 +148,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? products,
     TResult Function(dynamic request)? buyProducts,
+    TResult Function(dynamic request)? buyBulkProducts,
+    TResult Function(dynamic request)? addToCart,
     required TResult orElse(),
   }) {
     if (products != null) {
@@ -145,6 +163,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
   TResult map<TResult extends Object?>({
     required TResult Function(_ProductsFetched value) products,
     required TResult Function(_ProductsPurchase value) buyProducts,
+    required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
+    required TResult Function(_ProductToCart value) addToCart,
   }) {
     return products(this);
   }
@@ -154,6 +174,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ProductsFetched value)? products,
     TResult? Function(_ProductsPurchase value)? buyProducts,
+    TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult? Function(_ProductToCart value)? addToCart,
   }) {
     return products?.call(this);
   }
@@ -163,6 +185,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ProductsFetched value)? products,
     TResult Function(_ProductsPurchase value)? buyProducts,
+    TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult Function(_ProductToCart value)? addToCart,
     required TResult orElse(),
   }) {
     if (products != null) {
@@ -244,6 +268,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
   TResult when<TResult extends Object?>({
     required TResult Function() products,
     required TResult Function(dynamic request) buyProducts,
+    required TResult Function(dynamic request) buyBulkProducts,
+    required TResult Function(dynamic request) addToCart,
   }) {
     return buyProducts(request);
   }
@@ -253,6 +279,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? products,
     TResult? Function(dynamic request)? buyProducts,
+    TResult? Function(dynamic request)? buyBulkProducts,
+    TResult? Function(dynamic request)? addToCart,
   }) {
     return buyProducts?.call(request);
   }
@@ -262,6 +290,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? products,
     TResult Function(dynamic request)? buyProducts,
+    TResult Function(dynamic request)? buyBulkProducts,
+    TResult Function(dynamic request)? addToCart,
     required TResult orElse(),
   }) {
     if (buyProducts != null) {
@@ -275,6 +305,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
   TResult map<TResult extends Object?>({
     required TResult Function(_ProductsFetched value) products,
     required TResult Function(_ProductsPurchase value) buyProducts,
+    required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
+    required TResult Function(_ProductToCart value) addToCart,
   }) {
     return buyProducts(this);
   }
@@ -284,6 +316,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ProductsFetched value)? products,
     TResult? Function(_ProductsPurchase value)? buyProducts,
+    TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult? Function(_ProductToCart value)? addToCart,
   }) {
     return buyProducts?.call(this);
   }
@@ -293,6 +327,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ProductsFetched value)? products,
     TResult Function(_ProductsPurchase value)? buyProducts,
+    TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult Function(_ProductToCart value)? addToCart,
     required TResult orElse(),
   }) {
     if (buyProducts != null) {
@@ -313,10 +349,307 @@ abstract class _ProductsPurchase implements ProductEvent {
 }
 
 /// @nodoc
+abstract class _$$ProductsBulkPurchaseImplCopyWith<$Res> {
+  factory _$$ProductsBulkPurchaseImplCopyWith(_$ProductsBulkPurchaseImpl value,
+          $Res Function(_$ProductsBulkPurchaseImpl) then) =
+      __$$ProductsBulkPurchaseImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({dynamic request});
+}
+
+/// @nodoc
+class __$$ProductsBulkPurchaseImplCopyWithImpl<$Res>
+    extends _$ProductEventCopyWithImpl<$Res, _$ProductsBulkPurchaseImpl>
+    implements _$$ProductsBulkPurchaseImplCopyWith<$Res> {
+  __$$ProductsBulkPurchaseImplCopyWithImpl(_$ProductsBulkPurchaseImpl _value,
+      $Res Function(_$ProductsBulkPurchaseImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? request = freezed,
+  }) {
+    return _then(_$ProductsBulkPurchaseImpl(
+      request: freezed == request
+          ? _value.request
+          : request // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ProductsBulkPurchaseImpl implements _ProductsBulkPurchase {
+  const _$ProductsBulkPurchaseImpl({required this.request});
+
+  @override
+  final dynamic request;
+
+  @override
+  String toString() {
+    return 'ProductEvent.buyBulkProducts(request: $request)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ProductsBulkPurchaseImpl &&
+            const DeepCollectionEquality().equals(other.request, request));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(request));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ProductsBulkPurchaseImplCopyWith<_$ProductsBulkPurchaseImpl>
+      get copyWith =>
+          __$$ProductsBulkPurchaseImplCopyWithImpl<_$ProductsBulkPurchaseImpl>(
+              this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() products,
+    required TResult Function(dynamic request) buyProducts,
+    required TResult Function(dynamic request) buyBulkProducts,
+    required TResult Function(dynamic request) addToCart,
+  }) {
+    return buyBulkProducts(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? products,
+    TResult? Function(dynamic request)? buyProducts,
+    TResult? Function(dynamic request)? buyBulkProducts,
+    TResult? Function(dynamic request)? addToCart,
+  }) {
+    return buyBulkProducts?.call(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? products,
+    TResult Function(dynamic request)? buyProducts,
+    TResult Function(dynamic request)? buyBulkProducts,
+    TResult Function(dynamic request)? addToCart,
+    required TResult orElse(),
+  }) {
+    if (buyBulkProducts != null) {
+      return buyBulkProducts(request);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_ProductsFetched value) products,
+    required TResult Function(_ProductsPurchase value) buyProducts,
+    required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
+    required TResult Function(_ProductToCart value) addToCart,
+  }) {
+    return buyBulkProducts(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_ProductsFetched value)? products,
+    TResult? Function(_ProductsPurchase value)? buyProducts,
+    TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult? Function(_ProductToCart value)? addToCart,
+  }) {
+    return buyBulkProducts?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_ProductsFetched value)? products,
+    TResult Function(_ProductsPurchase value)? buyProducts,
+    TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult Function(_ProductToCart value)? addToCart,
+    required TResult orElse(),
+  }) {
+    if (buyBulkProducts != null) {
+      return buyBulkProducts(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ProductsBulkPurchase implements ProductEvent {
+  const factory _ProductsBulkPurchase({required final dynamic request}) =
+      _$ProductsBulkPurchaseImpl;
+
+  dynamic get request;
+  @JsonKey(ignore: true)
+  _$$ProductsBulkPurchaseImplCopyWith<_$ProductsBulkPurchaseImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ProductToCartImplCopyWith<$Res> {
+  factory _$$ProductToCartImplCopyWith(
+          _$ProductToCartImpl value, $Res Function(_$ProductToCartImpl) then) =
+      __$$ProductToCartImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({dynamic request});
+}
+
+/// @nodoc
+class __$$ProductToCartImplCopyWithImpl<$Res>
+    extends _$ProductEventCopyWithImpl<$Res, _$ProductToCartImpl>
+    implements _$$ProductToCartImplCopyWith<$Res> {
+  __$$ProductToCartImplCopyWithImpl(
+      _$ProductToCartImpl _value, $Res Function(_$ProductToCartImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? request = freezed,
+  }) {
+    return _then(_$ProductToCartImpl(
+      request: freezed == request
+          ? _value.request
+          : request // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ProductToCartImpl implements _ProductToCart {
+  const _$ProductToCartImpl({required this.request});
+
+  @override
+  final dynamic request;
+
+  @override
+  String toString() {
+    return 'ProductEvent.addToCart(request: $request)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ProductToCartImpl &&
+            const DeepCollectionEquality().equals(other.request, request));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(request));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ProductToCartImplCopyWith<_$ProductToCartImpl> get copyWith =>
+      __$$ProductToCartImplCopyWithImpl<_$ProductToCartImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() products,
+    required TResult Function(dynamic request) buyProducts,
+    required TResult Function(dynamic request) buyBulkProducts,
+    required TResult Function(dynamic request) addToCart,
+  }) {
+    return addToCart(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? products,
+    TResult? Function(dynamic request)? buyProducts,
+    TResult? Function(dynamic request)? buyBulkProducts,
+    TResult? Function(dynamic request)? addToCart,
+  }) {
+    return addToCart?.call(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? products,
+    TResult Function(dynamic request)? buyProducts,
+    TResult Function(dynamic request)? buyBulkProducts,
+    TResult Function(dynamic request)? addToCart,
+    required TResult orElse(),
+  }) {
+    if (addToCart != null) {
+      return addToCart(request);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_ProductsFetched value) products,
+    required TResult Function(_ProductsPurchase value) buyProducts,
+    required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
+    required TResult Function(_ProductToCart value) addToCart,
+  }) {
+    return addToCart(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_ProductsFetched value)? products,
+    TResult? Function(_ProductsPurchase value)? buyProducts,
+    TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult? Function(_ProductToCart value)? addToCart,
+  }) {
+    return addToCart?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_ProductsFetched value)? products,
+    TResult Function(_ProductsPurchase value)? buyProducts,
+    TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult Function(_ProductToCart value)? addToCart,
+    required TResult orElse(),
+  }) {
+    if (addToCart != null) {
+      return addToCart(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ProductToCart implements ProductEvent {
+  const factory _ProductToCart({required final dynamic request}) =
+      _$ProductToCartImpl;
+
+  dynamic get request;
+  @JsonKey(ignore: true)
+  _$$ProductToCartImplCopyWith<_$ProductToCartImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
 mixin _$ProductState {
   ProductStatus get status => throw _privateConstructorUsedError;
   Failure? get failure => throw _privateConstructorUsedError;
   String? get authorizationUrl => throw _privateConstructorUsedError;
+  String? get message => throw _privateConstructorUsedError;
   List<Product> get products => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -334,6 +667,7 @@ abstract class $ProductStateCopyWith<$Res> {
       {ProductStatus status,
       Failure? failure,
       String? authorizationUrl,
+      String? message,
       List<Product> products});
 }
 
@@ -353,6 +687,7 @@ class _$ProductStateCopyWithImpl<$Res, $Val extends ProductState>
     Object? status = null,
     Object? failure = freezed,
     Object? authorizationUrl = freezed,
+    Object? message = freezed,
     Object? products = null,
   }) {
     return _then(_value.copyWith(
@@ -367,6 +702,10 @@ class _$ProductStateCopyWithImpl<$Res, $Val extends ProductState>
       authorizationUrl: freezed == authorizationUrl
           ? _value.authorizationUrl
           : authorizationUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
               as String?,
       products: null == products
           ? _value.products
@@ -388,6 +727,7 @@ abstract class _$$ProductStateImplCopyWith<$Res>
       {ProductStatus status,
       Failure? failure,
       String? authorizationUrl,
+      String? message,
       List<Product> products});
 }
 
@@ -405,6 +745,7 @@ class __$$ProductStateImplCopyWithImpl<$Res>
     Object? status = null,
     Object? failure = freezed,
     Object? authorizationUrl = freezed,
+    Object? message = freezed,
     Object? products = null,
   }) {
     return _then(_$ProductStateImpl(
@@ -419,6 +760,10 @@ class __$$ProductStateImplCopyWithImpl<$Res>
       authorizationUrl: freezed == authorizationUrl
           ? _value.authorizationUrl
           : authorizationUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
               as String?,
       products: null == products
           ? _value._products
@@ -435,6 +780,7 @@ class _$ProductStateImpl implements _ProductState {
       {this.status = ProductStatus.initial,
       this.failure,
       this.authorizationUrl,
+      this.message,
       final List<Product> products = const []})
       : _products = products;
 
@@ -445,6 +791,8 @@ class _$ProductStateImpl implements _ProductState {
   final Failure? failure;
   @override
   final String? authorizationUrl;
+  @override
+  final String? message;
   final List<Product> _products;
   @override
   @JsonKey()
@@ -456,7 +804,7 @@ class _$ProductStateImpl implements _ProductState {
 
   @override
   String toString() {
-    return 'ProductState(status: $status, failure: $failure, authorizationUrl: $authorizationUrl, products: $products)';
+    return 'ProductState(status: $status, failure: $failure, authorizationUrl: $authorizationUrl, message: $message, products: $products)';
   }
 
   @override
@@ -468,12 +816,18 @@ class _$ProductStateImpl implements _ProductState {
             (identical(other.failure, failure) || other.failure == failure) &&
             (identical(other.authorizationUrl, authorizationUrl) ||
                 other.authorizationUrl == authorizationUrl) &&
+            (identical(other.message, message) || other.message == message) &&
             const DeepCollectionEquality().equals(other._products, _products));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, status, failure,
-      authorizationUrl, const DeepCollectionEquality().hash(_products));
+  int get hashCode => Object.hash(
+      runtimeType,
+      status,
+      failure,
+      authorizationUrl,
+      message,
+      const DeepCollectionEquality().hash(_products));
 
   @JsonKey(ignore: true)
   @override
@@ -487,6 +841,7 @@ abstract class _ProductState implements ProductState {
       {final ProductStatus status,
       final Failure? failure,
       final String? authorizationUrl,
+      final String? message,
       final List<Product> products}) = _$ProductStateImpl;
 
   @override
@@ -495,6 +850,8 @@ abstract class _ProductState implements ProductState {
   Failure? get failure;
   @override
   String? get authorizationUrl;
+  @override
+  String? get message;
   @override
   List<Product> get products;
   @override

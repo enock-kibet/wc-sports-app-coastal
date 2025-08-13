@@ -55,7 +55,7 @@ class _SideMenuState extends State<SideMenu> {
             press: () {
               context.read<SideMenuCubit>().closeDrawer();
 
-              // context.pushNamed(AppRoute.teamMedia.name);
+              context.pushNamed(AppRoute.media.name);
             },
           ),
           SideMenuIconTile(

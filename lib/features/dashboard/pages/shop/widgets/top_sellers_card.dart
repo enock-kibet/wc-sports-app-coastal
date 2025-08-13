@@ -10,7 +10,8 @@ import 'package:sports_app/theme/theme.dart';
 class TopSellersCard extends StatelessWidget {
   final Product product;
   const TopSellersCard({
-    super.key, required this.product,
+    super.key,
+    required this.product,
   });
 
   @override

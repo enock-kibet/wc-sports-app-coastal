@@ -5,6 +5,9 @@ class RequestInterceptor extends Interceptor {
   FutureOr<dynamic> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) {
         options.headers['Accept'] = 'application/json';
+    options.headers['Content-Type'] = 'application/json';
+    options.headers['Authorization'] =
+        'Bearer ${service<AppPreferencesManager>().currentUserValue?.token}';
     
     super.onRequest(options, handler);
   }
@@ -85,7 +88,7 @@ class Http {
     Options? options,
     Deserializer<T>? deserializer,
     Map<String, dynamic>? queryParams,
-    ProgressCallback? progressCallback,
+        ProgressCallback? progressCallback, Map<String, String> headers = const {},
   }) async {
     try {
       final res = await dio.post(

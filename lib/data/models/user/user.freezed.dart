@@ -24,6 +24,7 @@ mixin _$User {
   String get email => throw _privateConstructorUsedError;
   bool get emailVerified => throw _privateConstructorUsedError;
   String? get picture => throw _privateConstructorUsedError;
+  String? get token => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -35,7 +36,12 @@ abstract class $UserCopyWith<$Res> {
   factory $UserCopyWith(User value, $Res Function(User) then) =
       _$UserCopyWithImpl<$Res, User>;
   @useResult
-  $Res call({String name, String email, bool emailVerified, String? picture});
+  $Res call(
+      {String name,
+      String email,
+      bool emailVerified,
+      String? picture,
+      String? token});
 }
 
 /// @nodoc
@@ -55,6 +61,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? email = null,
     Object? emailVerified = null,
     Object? picture = freezed,
+    Object? token = freezed,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -73,6 +80,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.picture
           : picture // ignore: cast_nullable_to_non_nullable
               as String?,
+      token: freezed == token
+          ? _value.token
+          : token // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -84,7 +95,12 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       __$$UserImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, String email, bool emailVerified, String? picture});
+  $Res call(
+      {String name,
+      String email,
+      bool emailVerified,
+      String? picture,
+      String? token});
 }
 
 /// @nodoc
@@ -101,6 +117,7 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? email = null,
     Object? emailVerified = null,
     Object? picture = freezed,
+    Object? token = freezed,
   }) {
     return _then(_$UserImpl(
       name: null == name
@@ -119,6 +136,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.picture
           : picture // ignore: cast_nullable_to_non_nullable
               as String?,
+      token: freezed == token
+          ? _value.token
+          : token // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -130,7 +151,8 @@ class _$UserImpl implements _User {
       {required this.name,
       required this.email,
       required this.emailVerified,
-      required this.picture});
+      required this.picture,
+      required this.token});
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
@@ -143,10 +165,12 @@ class _$UserImpl implements _User {
   final bool emailVerified;
   @override
   final String? picture;
+  @override
+  final String? token;
 
   @override
   String toString() {
-    return 'User(name: $name, email: $email, emailVerified: $emailVerified, picture: $picture)';
+    return 'User(name: $name, email: $email, emailVerified: $emailVerified, picture: $picture, token: $token)';
   }
 
   @override
@@ -158,13 +182,14 @@ class _$UserImpl implements _User {
             (identical(other.email, email) || other.email == email) &&
             (identical(other.emailVerified, emailVerified) ||
                 other.emailVerified == emailVerified) &&
-            (identical(other.picture, picture) || other.picture == picture));
+            (identical(other.picture, picture) || other.picture == picture) &&
+            (identical(other.token, token) || other.token == token));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, name, email, emailVerified, picture);
+      Object.hash(runtimeType, name, email, emailVerified, picture, token);
 
   @JsonKey(ignore: true)
   @override
@@ -185,7 +210,8 @@ abstract class _User implements User {
       {required final String name,
       required final String email,
       required final bool emailVerified,
-      required final String? picture}) = _$UserImpl;
+      required final String? picture,
+      required final String? token}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
@@ -197,6 +223,8 @@ abstract class _User implements User {
   bool get emailVerified;
   @override
   String? get picture;
+  @override
+  String? get token;
   @override
   @JsonKey(ignore: true)
   _$$UserImplCopyWith<_$UserImpl> get copyWith =>

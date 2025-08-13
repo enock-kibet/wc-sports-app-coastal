@@ -19,7 +19,7 @@ class AppPreferences {
   /// Store User data in shared preferences
   Future<void> storeUserData(User user) async{
     await asyncPrefs.setStringList(
-        "USERDATA", [user.name,user.email,user.picture??"",user.emailVerified.toString()]);
+        "USERDATA", [user.name,user.email,user.picture??"",user.emailVerified.toString(), user.token??""]);
   }
 
   /// Get User data from shared preferences
@@ -27,7 +27,7 @@ class AppPreferences {
     final userData=await asyncPrefs.getStringList("USERDATA");
     User? user;
     try{
-      user = User(name:userData![0],email:userData![1],picture:userData?[2],emailVerified:(userData?[3]=="true"));
+      user = User(name:userData![0],email:userData![1],picture:userData?[2],emailVerified:(userData?[3]=="true"),token:userData?[4]);
     }catch(_){
       user = null;
     }

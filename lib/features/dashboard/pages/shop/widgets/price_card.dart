@@ -2,24 +2,41 @@ part of '../shop_page.dart';
 
 
 class PriceCard extends StatelessWidget {
-  final VoidCallback smallAdd;
-  final VoidCallback mediumAdd;
-  final VoidCallback largeAdd;
-  final (double,int,int,int) value;
-  final VoidCallback smallSubtract;
-  final VoidCallback mediumSubtract;
-  final VoidCallback largeSubtract;
   final Product product;
-  const PriceCard({super.key, required this.smallAdd, required this.mediumAdd, required this.largeAdd, required this.smallSubtract, required this.mediumSubtract, required this.largeSubtract, required this.product,required this.value});
+  final Map<String, int> variantCounts;
+  final void Function(String size, int newCount) updateCount;
+
+  const PriceCard({
+    super.key,
+    required this.product,
+    required this.variantCounts,
+    required this.updateCount,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // If no variants, show nothing
+    if (product.variants!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Column(
-      children: [
-        SizeGuideRow(size:"Small",product:product,add:smallAdd,subtract: smallSubtract,value: value.$2.toString(),),
-        SizeGuideRow(size:"Medium",product:product,add:mediumAdd,subtract: mediumSubtract,value:value.$3.toString()),
-        SizeGuideRow(size: "Large",product:product,add:largeAdd,subtract: largeSubtract,value:value.$4.toString()),
-      ],
+      children: product.variants!.map((variant) {
+        final count = variantCounts[variant.productTypeName] ?? 0;
+        return SizeGuideRow(
+          size: "`${variant.productTypeName}`",
+          product: product,
+          add: () => updateCount(
+            "`${variant.productTypeName}`",
+            count < 99 ? count + 1 : count,
+          ),
+          subtract: () => updateCount(
+            "`${variant.productTypeName}`",
+            count > 0 ? count - 1 : count,
+          ),
+          value: count.toString(),
+        );
+      }).toList(),
     );
   }
 }
@@ -38,36 +55,73 @@ class SizeGuideRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Find variant matching this size
+    final variant = product.variants?.firstWhere(
+          (v) => v.productTypeName == size,
+      orElse: () => Variant(
+        variantId: '',
+        productTypeName: size,
+        productid: product.id,
+        typePrice: 0.0,
+        units: 0,
+      ),
+    );
+
     return Column(
-      children:[
+      children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(size,style: TextStyle(fontWeight: FontWeight.w500,color: Color(0xff292323))),
-              Spacer(),
-              const Text('(Ksh) ',style: TextStyle(fontWeight: FontWeight.w500,color: Color(0xff292323))),
-              Text("${product.price}",style: TextStyle(fontWeight: FontWeight.bold,color: Color(0xff292323)),),
-              const SizedBox(width: 16,),
+              Text(
+                size,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff292323),
+                ),
+              ),
+              const Spacer(),
+              const Text(
+                '(Ksh) ',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff292323),
+                ),
+              ),
+              Text(
+                "${variant?.typePrice}", // <-- now using variant price
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xff292323),
+                ),
+              ),
+              const SizedBox(width: 16),
               CustomIconButton(onButtonPress: subtract, icon: Icons.remove),
-              const SizedBox(width: 12,),
-              SizedBox(width: 16,child: Center(child: Text(value,style: TextStyle(fontWeight: FontWeight.w300),))),
-              const SizedBox(width: 12,),
+              const SizedBox(width: 12),
+              SizedBox(
+                width: 16,
+                child: Center(
+                  child: Text(
+                    value,
+                    style: const TextStyle(fontWeight: FontWeight.w300),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
               CustomIconButton(
                 icon: Icons.add,
                 onButtonPress: add,
                 backgroundColor: AppColors.defaultAppPurple,
                 iconColor: AppColors.whiteColor,
                 borderColor: AppColors.defaultAppPurple,
-              )
-
-            ],),
-
+              ),
+            ],
+          ),
         ),
-        Divider(color: AppColors.greyColor,),
+        Divider(color: AppColors.greyColor),
       ],
-    );;
+    );
   }
 }
 

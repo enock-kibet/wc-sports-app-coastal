@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -14,6 +16,7 @@ import 'package:sports_app/data/error/error_handler.dart';
 import 'package:sports_app/data/error/failure.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/models/multiple_results/multiple_result.dart';
+import 'package:sports_app/data/models/products/cart.dart';
 import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/repository/geolocation_repository.dart';
@@ -22,6 +25,9 @@ import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/utils/dotted.dart';
 import 'package:talker_dio_logger/talker_dio_logger.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+
+import '../models/notifications/notification.dart';
+import '../models/media/media.dart';
 part 'local.dart';
 part 'http_client.dart';
 part 'client.dart';
@@ -37,12 +43,17 @@ setUpService() {
     talker.verbose('Talker initialization completed');
     return talker;
   });
-  service.registerLazySingleton<AppPreferencesManager>(()=> AppPreferencesManager());
+  service.registerLazySingleton<AppPreferencesManager>(
+      () => AppPreferencesManager());
   service.registerLazySingleton<ProductService>(() => ProductService());
   service.registerLazySingleton<MatchService>(() => MatchService());
   service.registerLazySingleton<ProfileService>(() => ProfileService());
   service.registerLazySingleton<AuthService>(() => AuthService());
   service.registerLazySingleton<StripeService>(() => StripeService());
+  service
+      .registerLazySingleton<NotificationService>(() => NotificationService());
+  service.registerLazySingleton<MediaService>(() => MediaService());
+  service.registerLazySingleton<CartService>(() => CartService());
   service.registerLazySingleton<GeolocationRepository>(
       () => GeolocationRepository());
 }

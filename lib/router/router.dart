@@ -14,6 +14,7 @@ import 'package:sports_app/features/auth/otp_page.dart';
 import 'package:sports_app/features/auth/sign_up_page.dart';
 import 'package:sports_app/features/dashboard/pages/about/about_us.dart';
 import 'package:sports_app/features/dashboard/pages/home/match_details_page.dart';
+import 'package:sports_app/features/dashboard/pages/media/media_page.dart';
 import 'package:sports_app/features/dashboard/pages/media/team_media_page.dart';
 import 'package:sports_app/features/dashboard/pages/notifications/notification_page.dart';
 import 'package:sports_app/features/dashboard/pages/points/points_page.dart';
@@ -45,6 +46,7 @@ enum AppRoute {
   standings,
   notifications,
   teamMedia,
+  media,
   profileDetails,
   editProfile,
   onboarding,
@@ -79,7 +81,11 @@ final GlobalKey<NavigatorState> _shellNavigatorCKey =
 final GlobalKey<NavigatorState> _shellNavigatorDKey =
     GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorEKey = 
-GlobalKey<NavigatorState>();
+    GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _shellNavigatorFKey =
+    GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _shellNavigatorGKey =
+    GlobalKey<NavigatorState>();
 
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
@@ -154,18 +160,6 @@ final router = GoRouter(
       pageBuilder: (context, state) {
         return MaterialPage(
           child: TeamMediaPage(
-            key: state.pageKey,
-          ),
-        );
-      },
-    ),
-    GoRoute(
-      path: "/notifications",
-      name: AppRoute.notifications.name,
-      parentNavigatorKey: rootNavigatorKey,
-      pageBuilder: (context, state) {
-        return MaterialPage(
-          child: NotificationPage(
             key: state.pageKey,
           ),
         );
@@ -348,6 +342,34 @@ final router = GoRouter(
               ]
             )
           ],
+        ),
+        StatefulShellBranch(
+          navigatorKey: _shellNavigatorFKey,
+          routes: [
+            GoRoute(
+              path: "/notifications",
+              name: AppRoute.notifications.name,
+              pageBuilder: (context, state) {
+                return const MaterialPage(
+                  child: NotificationPage(),
+                );
+              },
+            ),
+          ]
+        ),
+        StatefulShellBranch(
+            navigatorKey: _shellNavigatorGKey,
+            routes: [
+              GoRoute(
+                path: "/media",
+                name: AppRoute.media.name,
+                pageBuilder: (context, state) {
+                  return const MaterialPage(
+                    child: MediaPage(),
+                  );
+                },
+              ),
+            ]
         ),
       ],
     ),

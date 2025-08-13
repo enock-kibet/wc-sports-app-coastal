@@ -109,7 +109,14 @@ class _BaseScreenState extends State<BaseScreen> {
                               child: RowIconButton(Icons.arrow_circle_up_outlined, "Standings"),
                             ),
                             const SizedBox(height: kLarge,),
-                            RowIconButton(Icons.perm_media_outlined, "Team Media"),
+                            // RowIconButton(Icons.perm_media_outlined, "Team Media"),
+                            GestureDetector(
+                              onTap:(){
+                                context.pushNamed(AppRoute.media.name,extra: true );
+                                context.pop();
+                              },
+                              child: RowIconButton(Icons.perm_media_outlined, "Team Media"),
+                            ),
                             const SizedBox(height: kLarge,),
                             RowIconButton(Icons.people, "Membership"),
 

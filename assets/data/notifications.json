@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "message": "Empty your cart to keep your 15% discount",
+    "time": "2hrs Ago"
+  },
+  {
+    "id": 2,
+    "message": "Your order #1234 has been shipped",
+    "time": "1hr Ago"
+  },
+  {
+    "id": 3,
+    "message": "New arrivals in your favorite category",
+    "time": "Just now"
+  },
+  {
+    "id": 4,
+    "message": "Your wishlist item is on sale!",
+    "time": "Yesterday"
+  }
+]
