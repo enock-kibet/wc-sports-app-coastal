@@ -7,7 +7,7 @@ part 'point_history_card_data.g.dart';
 @freezed
 class PointHistoryCardData with _$PointHistoryCardData {
   const factory PointHistoryCardData({
-    required PointCardType type,
+    // required PointCardType type,
     required DateTime date,
     @Default(1) int tickets,
     @Default(700) int amount,

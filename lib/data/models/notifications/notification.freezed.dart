@@ -20,9 +20,17 @@ Notifications _$NotificationsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Notifications {
-  String get id => throw _privateConstructorUsedError;
-  String get message => throw _privateConstructorUsedError;
-  String get time => throw _privateConstructorUsedError;
+  int get id => throw _privateConstructorUsedError;
+  String get userId => throw _privateConstructorUsedError;
+  String? get cartId => throw _privateConstructorUsedError;
+  String get notificationType => throw _privateConstructorUsedError;
+  String get channel => throw _privateConstructorUsedError;
+  String? get campaignId => throw _privateConstructorUsedError;
+  String? get attributionWindow => throw _privateConstructorUsedError;
+  String get notificationKey => throw _privateConstructorUsedError;
+  String get createdUtc => throw _privateConstructorUsedError;
+  String get updatedUtc => throw _privateConstructorUsedError;
+  String? get notificationText => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -36,7 +44,18 @@ abstract class $NotificationsCopyWith<$Res> {
           Notifications value, $Res Function(Notifications) then) =
       _$NotificationsCopyWithImpl<$Res, Notifications>;
   @useResult
-  $Res call({String id, String message, String time});
+  $Res call(
+      {int id,
+      String userId,
+      String? cartId,
+      String notificationType,
+      String channel,
+      String? campaignId,
+      String? attributionWindow,
+      String notificationKey,
+      String createdUtc,
+      String updatedUtc,
+      String? notificationText});
 }
 
 /// @nodoc
@@ -53,22 +72,62 @@ class _$NotificationsCopyWithImpl<$Res, $Val extends Notifications>
   @override
   $Res call({
     Object? id = null,
-    Object? message = null,
-    Object? time = null,
+    Object? userId = null,
+    Object? cartId = freezed,
+    Object? notificationType = null,
+    Object? channel = null,
+    Object? campaignId = freezed,
+    Object? attributionWindow = freezed,
+    Object? notificationKey = null,
+    Object? createdUtc = null,
+    Object? updatedUtc = null,
+    Object? notificationText = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
               as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
+      cartId: freezed == cartId
+          ? _value.cartId
+          : cartId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      notificationType: null == notificationType
+          ? _value.notificationType
+          : notificationType // ignore: cast_nullable_to_non_nullable
               as String,
-      time: null == time
-          ? _value.time
-          : time // ignore: cast_nullable_to_non_nullable
+      channel: null == channel
+          ? _value.channel
+          : channel // ignore: cast_nullable_to_non_nullable
               as String,
+      campaignId: freezed == campaignId
+          ? _value.campaignId
+          : campaignId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      attributionWindow: freezed == attributionWindow
+          ? _value.attributionWindow
+          : attributionWindow // ignore: cast_nullable_to_non_nullable
+              as String?,
+      notificationKey: null == notificationKey
+          ? _value.notificationKey
+          : notificationKey // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdUtc: null == createdUtc
+          ? _value.createdUtc
+          : createdUtc // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedUtc: null == updatedUtc
+          ? _value.updatedUtc
+          : updatedUtc // ignore: cast_nullable_to_non_nullable
+              as String,
+      notificationText: freezed == notificationText
+          ? _value.notificationText
+          : notificationText // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -81,7 +140,18 @@ abstract class _$$NotificationsImplCopyWith<$Res>
       __$$NotificationsImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String message, String time});
+  $Res call(
+      {int id,
+      String userId,
+      String? cartId,
+      String notificationType,
+      String channel,
+      String? campaignId,
+      String? attributionWindow,
+      String notificationKey,
+      String createdUtc,
+      String updatedUtc,
+      String? notificationText});
 }
 
 /// @nodoc
@@ -96,22 +166,62 @@ class __$$NotificationsImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? message = null,
-    Object? time = null,
+    Object? userId = null,
+    Object? cartId = freezed,
+    Object? notificationType = null,
+    Object? channel = null,
+    Object? campaignId = freezed,
+    Object? attributionWindow = freezed,
+    Object? notificationKey = null,
+    Object? createdUtc = null,
+    Object? updatedUtc = null,
+    Object? notificationText = freezed,
   }) {
     return _then(_$NotificationsImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
               as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
+      cartId: freezed == cartId
+          ? _value.cartId
+          : cartId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      notificationType: null == notificationType
+          ? _value.notificationType
+          : notificationType // ignore: cast_nullable_to_non_nullable
               as String,
-      time: null == time
-          ? _value.time
-          : time // ignore: cast_nullable_to_non_nullable
+      channel: null == channel
+          ? _value.channel
+          : channel // ignore: cast_nullable_to_non_nullable
               as String,
+      campaignId: freezed == campaignId
+          ? _value.campaignId
+          : campaignId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      attributionWindow: freezed == attributionWindow
+          ? _value.attributionWindow
+          : attributionWindow // ignore: cast_nullable_to_non_nullable
+              as String?,
+      notificationKey: null == notificationKey
+          ? _value.notificationKey
+          : notificationKey // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdUtc: null == createdUtc
+          ? _value.createdUtc
+          : createdUtc // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedUtc: null == updatedUtc
+          ? _value.updatedUtc
+          : updatedUtc // ignore: cast_nullable_to_non_nullable
+              as String,
+      notificationText: freezed == notificationText
+          ? _value.notificationText
+          : notificationText // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -120,21 +230,47 @@ class __$$NotificationsImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$NotificationsImpl implements _Notifications {
   const _$NotificationsImpl(
-      {required this.id, required this.message, required this.time});
+      {required this.id,
+      required this.userId,
+      this.cartId,
+      required this.notificationType,
+      required this.channel,
+      this.campaignId,
+      this.attributionWindow,
+      required this.notificationKey,
+      required this.createdUtc,
+      required this.updatedUtc,
+      this.notificationText});
 
   factory _$NotificationsImpl.fromJson(Map<String, dynamic> json) =>
       _$$NotificationsImplFromJson(json);
 
   @override
-  final String id;
+  final int id;
   @override
-  final String message;
+  final String userId;
   @override
-  final String time;
+  final String? cartId;
+  @override
+  final String notificationType;
+  @override
+  final String channel;
+  @override
+  final String? campaignId;
+  @override
+  final String? attributionWindow;
+  @override
+  final String notificationKey;
+  @override
+  final String createdUtc;
+  @override
+  final String updatedUtc;
+  @override
+  final String? notificationText;
 
   @override
   String toString() {
-    return 'Notifications(id: $id, message: $message, time: $time)';
+    return 'Notifications(id: $id, userId: $userId, cartId: $cartId, notificationType: $notificationType, channel: $channel, campaignId: $campaignId, attributionWindow: $attributionWindow, notificationKey: $notificationKey, createdUtc: $createdUtc, updatedUtc: $updatedUtc, notificationText: $notificationText)';
   }
 
   @override
@@ -143,13 +279,40 @@ class _$NotificationsImpl implements _Notifications {
         (other.runtimeType == runtimeType &&
             other is _$NotificationsImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.message, message) || other.message == message) &&
-            (identical(other.time, time) || other.time == time));
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.cartId, cartId) || other.cartId == cartId) &&
+            (identical(other.notificationType, notificationType) ||
+                other.notificationType == notificationType) &&
+            (identical(other.channel, channel) || other.channel == channel) &&
+            (identical(other.campaignId, campaignId) ||
+                other.campaignId == campaignId) &&
+            (identical(other.attributionWindow, attributionWindow) ||
+                other.attributionWindow == attributionWindow) &&
+            (identical(other.notificationKey, notificationKey) ||
+                other.notificationKey == notificationKey) &&
+            (identical(other.createdUtc, createdUtc) ||
+                other.createdUtc == createdUtc) &&
+            (identical(other.updatedUtc, updatedUtc) ||
+                other.updatedUtc == updatedUtc) &&
+            (identical(other.notificationText, notificationText) ||
+                other.notificationText == notificationText));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, message, time);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      userId,
+      cartId,
+      notificationType,
+      channel,
+      campaignId,
+      attributionWindow,
+      notificationKey,
+      createdUtc,
+      updatedUtc,
+      notificationText);
 
   @JsonKey(ignore: true)
   @override
@@ -167,19 +330,43 @@ class _$NotificationsImpl implements _Notifications {
 
 abstract class _Notifications implements Notifications {
   const factory _Notifications(
-      {required final String id,
-      required final String message,
-      required final String time}) = _$NotificationsImpl;
+      {required final int id,
+      required final String userId,
+      final String? cartId,
+      required final String notificationType,
+      required final String channel,
+      final String? campaignId,
+      final String? attributionWindow,
+      required final String notificationKey,
+      required final String createdUtc,
+      required final String updatedUtc,
+      final String? notificationText}) = _$NotificationsImpl;
 
   factory _Notifications.fromJson(Map<String, dynamic> json) =
       _$NotificationsImpl.fromJson;
 
   @override
-  String get id;
+  int get id;
   @override
-  String get message;
+  String get userId;
   @override
-  String get time;
+  String? get cartId;
+  @override
+  String get notificationType;
+  @override
+  String get channel;
+  @override
+  String? get campaignId;
+  @override
+  String? get attributionWindow;
+  @override
+  String get notificationKey;
+  @override
+  String get createdUtc;
+  @override
+  String get updatedUtc;
+  @override
+  String? get notificationText;
   @override
   @JsonKey(ignore: true)
   _$$NotificationsImplCopyWith<_$NotificationsImpl> get copyWith =>

@@ -2,83 +2,100 @@ part of '../points_page.dart';
 
 class CustomTabBarView extends StatelessWidget {
   final TabController tabController;
-  final List<PointHistoryCardData> pointsHistoryList;
+  final List<PointsData> pointsHistoryList;
+  final String balance;
 
-
-  const CustomTabBarView({super.key, required  this.tabController, required this.pointsHistoryList});
+  const CustomTabBarView(
+      {super.key,
+      required this.tabController,
+      required this.pointsHistoryList,
+      required this.balance});
 
   @override
   Widget build(BuildContext context) {
-    return TabBarView(
-        controller: tabController,
+    return TabBarView(controller: tabController, children: [
+      ListView(
+          children: pointsHistoryList
+              .map((data) => PointsCard(pointsCardData: data))
+              .toList()),
+      Column(
         children: [
-          ListView(
-            children: pointsHistoryList.map((data)=>PointsCard(pointsCardData: data)).toList()
-          ),
-           Column(
+          const PointsDistributionBreakDown(
+              title: 'Point Gain Breakdown',
+              breakdown: [
+                ['Follow social media page', '2', 'Points'],
+                ['Buy a game ticket', '2', 'Points per ticket'],
+                ['Share team media', '2', 'Points']
+              ]),
+          const PointsDistributionBreakDown(
+              title: 'Point Redeeming',
+              breakdown: [
+                ['For merchandize:', '250', 'Minimum'],
+                ['For game ticket:', '100', 'Minimum'],
+              ]),
+          const PointsDistributionBreakDown(
+              title: 'Point Transfer',
+              breakdown: [
+                ['To Friends', '100', 'Minimum'],
+              ]),
+          Spacer(),
+          Row(
             children: [
-              const PointsDistributionBreakDown(
-                  title: 'Point Gain Breakdown',
-                  breakdown: [
-                    ['Follow social media page','2','Points'],
-                    ['Buy a game ticket','2','Points per ticket'],
-                    ['Share team media','2','Points']
-                  ]),
-              const PointsDistributionBreakDown(
-                  title: 'Point Redeeming',
-                  breakdown: [
-                    ['For merchandize:','250','Minimum'],
-                    ['For game ticket:','100','Minimum'],
-                  ]),
-              const PointsDistributionBreakDown(
-                  title: 'Point Transfer',
-                  breakdown: [
-                    ['To Friends','100','Minimum'],
-                  ]),
-              Spacer(),
-              Row(
-                children: [
-                  Expanded( child: CustomOutlinedButton(text: "Transfer", onPressed: (){},radius:18)),
-                  SizedBox(width: 16,),
-                  Expanded(child: GradientFilledButton(text: "Redeem", onPressed: (){},radius: 18,))
-                ],
-              ),
-              SizedBox(height: 24,)
-
+              Expanded(
+                  child: GradientFilledButton(
+                text: "Transfer",
+                onPressed: () {
+                  showTransferPointsBottomSheet(context, balance);
+                },
+                radius: 18,
+              ))
             ],
+          ),
+          SizedBox(
+            height: 24,
           )
-        ]);
+        ],
+      )
+    ]);
   }
 }
 
 class PointsCard extends StatelessWidget {
-  final PointHistoryCardData pointsCardData;
+  final PointsData pointsCardData;
 
-  const PointsCard({super.key,required this.pointsCardData});
+  const PointsCard({super.key, required this.pointsCardData});
 
   @override
   Widget build(BuildContext context) {
     return RoundedContainer(
-        margin: EdgeInsets.only(bottom:12),
+        margin: EdgeInsets.only(bottom: 12),
         height: 60,
         radius: 16,
-        padding: EdgeInsets.symmetric(vertical: 8,horizontal: 12),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         showBorder: true,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            PointCardIcon(type:pointsCardData.type),
-            PointCardTexts(type:pointsCardData.type,date: pointsCardData.date,values: {"ticketCount":pointsCardData.tickets,"amount":pointsCardData.amount,"points":pointsCardData.points,"prize":pointsCardData.prize},)
+            PointCardIcon(type: PointCardType.SHARED_TICKET),
+            PointCardTexts(
+              type: PointCardType.SHARED_TICKET,
+              points: pointsCardData,
+              date: pointsCardData.pointtimestamp.toString(),
+              values: {
+                "points": pointsCardData.actualpoint,
+                "txType": pointsCardData.txType
+              },
+            )
           ],
-        )
-    );
+        ));
   }
 }
 
 enum PointCardType {
-  ticket("Tickets Bought", ["Ticket(s): {ticketCount}", "Amount: Ksh {amount}", "Points: {points}"]),
+  SHARED_TICKET("Tickets Bought", ["Type: {txType}", "Points: {points}"]),
   redeem("Redeemed Points", ["Points: {points}", "Prize: {prize}"]),
-  share("Shared IG Account", ["Points: +{points}"]),
+  SHARED_IG_ACCOUNT("Shared IG Account", ["Points: +{points}"]),
   followed("Followed IG Account", ["Points: +{points}"]);
 
   final String title;
@@ -95,57 +112,64 @@ enum PointCardType {
   }
 
   const PointCardType(this.title, this.subtitle);
-
 }
 
 class PointCardIcon extends StatelessWidget {
   final PointCardType type;
   final Color bgColor;
-  const PointCardIcon({super.key,this.type=PointCardType.ticket,this.bgColor=const Color(0xffefebf7) });
+  const PointCardIcon(
+      {super.key,
+      this.type = PointCardType.SHARED_TICKET,
+      this.bgColor = const Color(0xffefebf7)});
 
   @override
   Widget build(BuildContext context) {
     return RoundedContainer(
-      height:48,
+      height: 48,
       width: 48,
       isCircle: true,
-      backgroundColor: type==PointCardType.redeem?Color(0xfff9dce2):bgColor,
+      backgroundColor:
+          type == PointCardType.redeem ? Color(0xfff9dce2) : bgColor,
       child: Center(
-        child: SvgPicture.asset(
-         "assets/icons/${type.name}.svg",
-          height: 24,
-        )
-      ),
+          child: SvgPicture.asset(
+        "assets/icons/ticket.svg",
+        height: 24,
+      )),
     );
   }
 }
 
 class PointCardTexts extends StatelessWidget {
   final PointCardType type;
-  final DateTime date;
+  final PointsData points;
   final Map<String, dynamic> values; // Dynamic values for subtitles
-  PointCardTexts({
-    super.key,
-    this.type=PointCardType.followed,
-    this.values=const {
-      "ticketCount": 2,
-      "amount": 500,
-      "points": 10
-    },
-    DateTime? date
-  }):date = date ?? DateTime(2020, 11, 12, 0, 0, 0, 0, 0);
+  PointCardTexts(
+      {super.key,
+      this.type = PointCardType.followed,
+      required this.points,
+      this.values = const {"ticketCount": 2, "amount": 500, "points": 10},
+      String? date});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: EdgeInsets.only(left: 12),
+    return Padding(
+      padding: EdgeInsets.only(left: 12),
       child: SizedBox(
         height: 36,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("${type.title}-${formatDate(date)}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 13),),
-            Text(type.formattedSubtitles(values).join(" | "),style:TextStyle(fontSize: 11))
+            Text(
+              points.action == "SHARED_TICKET"
+                  ? "Shared Ticket"
+                  : points.action == "SHARED_IG_ACCOUNT"
+                      ? "Shared IG Account"
+                      : points.action,
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
+            Text(type.formattedSubtitles(values).join(" | "),
+                style: TextStyle(fontSize: 11))
             // Row(
             //
             //    children: type.formattedSubtitles(values).map((element)=>Text('$element ',style: TextStyle(fontSize: 11),)).toList()
@@ -158,13 +182,15 @@ class PointCardTexts extends StatelessWidget {
   }
 }
 
-
-
 class RowOfText extends StatelessWidget {
   final String firstText;
   final String secondText;
   final int number;
-  const RowOfText({super.key, this.firstText="Follow social media page", this.secondText ="points",this.number=2});
+  const RowOfText(
+      {super.key,
+      this.firstText = "Follow social media page",
+      this.secondText = "points",
+      this.number = 2});
 
   @override
   Widget build(BuildContext context) {
@@ -172,19 +198,28 @@ class RowOfText extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Row(
         children: [
-          Text(firstText,style: TextStyle(fontWeight:FontWeight.w300,fontSize: 14),),
+          Text(
+            firstText,
+            style: TextStyle(fontWeight: FontWeight.w300, fontSize: 14),
+          ),
           Spacer(),
           SizedBox(
             width: 120,
-            child: RichText(text: TextSpan(
-              style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: Colors.black),
-              text: "+$number ",
-              children: [TextSpan(
-                  style: TextStyle(fontSize: 14,fontWeight: FontWeight.w300,color: Colors.black),
-                text: secondText
-              )]
-
-            )),
+            child: RichText(
+                text: TextSpan(
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface),
+                    text: "+$number ",
+                    children: [
+                  TextSpan(
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                          color: Theme.of(context).colorScheme.onSurface),
+                      text: secondText)
+                ])),
           )
         ],
       ),
@@ -195,7 +230,8 @@ class RowOfText extends StatelessWidget {
 class PointsDistributionBreakDown extends StatelessWidget {
   final String title;
   final List<List<String>> breakdown;
-  const PointsDistributionBreakDown({super.key, required this.title, required this.breakdown});
+  const PointsDistributionBreakDown(
+      {super.key, required this.title, required this.breakdown});
 
   @override
   Widget build(BuildContext context) {
@@ -203,33 +239,35 @@ class PointsDistributionBreakDown extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 16,),
-
-        Text(title,style: TextStyle(fontWeight: FontWeight.w600,fontSize: 16),),
-
-        const SizedBox(height: 16,),
-
-
-        ...breakdown.map(
-                (breakdown)=>RowOfText(
-                  key:ValueKey(breakdown[0]),
-                  firstText: breakdown[0],
-                  number:int.parse(breakdown[1]),
-                  secondText: breakdown[2],)
+        const SizedBox(
+          height: 16,
         ),
-
-        const SizedBox(height: 16,),
-
-        const Divider(color: Color(0xFFc4c4c4),),
-
-        const SizedBox(height: 16,)
-
+        Text(
+          title,
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        ...breakdown.map((breakdown) => RowOfText(
+              key: ValueKey(breakdown[0]),
+              firstText: breakdown[0],
+              number: int.parse(breakdown[1]),
+              secondText: breakdown[2],
+            )),
+        const SizedBox(
+          height: 16,
+        ),
+        const Divider(
+          color: Color(0xFFc4c4c4),
+        ),
+        const SizedBox(
+          height: 16,
+        )
       ],
     );
   }
 }
-
-
 
 String formatDate(DateTime date) {
   // Get the day and determine the suffix (st, nd, rd, th)
@@ -261,9 +299,19 @@ String getDaySuffix(int day) {
 
 String _monthAbbreviation(int month) {
   const List<String> months = [
-    "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    "",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
   ];
   return months[month];
 }
-

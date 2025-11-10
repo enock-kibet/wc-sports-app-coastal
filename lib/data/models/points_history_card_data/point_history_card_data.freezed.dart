@@ -20,7 +20,7 @@ PointHistoryCardData _$PointHistoryCardDataFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PointHistoryCardData {
-  PointCardType get type => throw _privateConstructorUsedError;
+// required PointCardType type,
   DateTime get date => throw _privateConstructorUsedError;
   int get tickets => throw _privateConstructorUsedError;
   int get amount => throw _privateConstructorUsedError;
@@ -40,12 +40,7 @@ abstract class $PointHistoryCardDataCopyWith<$Res> {
       _$PointHistoryCardDataCopyWithImpl<$Res, PointHistoryCardData>;
   @useResult
   $Res call(
-      {PointCardType type,
-      DateTime date,
-      int tickets,
-      int amount,
-      int points,
-      String? prize});
+      {DateTime date, int tickets, int amount, int points, String? prize});
 }
 
 /// @nodoc
@@ -62,7 +57,6 @@ class _$PointHistoryCardDataCopyWithImpl<$Res,
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? type = null,
     Object? date = null,
     Object? tickets = null,
     Object? amount = null,
@@ -70,10 +64,6 @@ class _$PointHistoryCardDataCopyWithImpl<$Res,
     Object? prize = freezed,
   }) {
     return _then(_value.copyWith(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as PointCardType,
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
@@ -107,12 +97,7 @@ abstract class _$$PointHistoryCardDataImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {PointCardType type,
-      DateTime date,
-      int tickets,
-      int amount,
-      int points,
-      String? prize});
+      {DateTime date, int tickets, int amount, int points, String? prize});
 }
 
 /// @nodoc
@@ -126,7 +111,6 @@ class __$$PointHistoryCardDataImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? type = null,
     Object? date = null,
     Object? tickets = null,
     Object? amount = null,
@@ -134,10 +118,6 @@ class __$$PointHistoryCardDataImplCopyWithImpl<$Res>
     Object? prize = freezed,
   }) {
     return _then(_$PointHistoryCardDataImpl(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as PointCardType,
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
@@ -166,8 +146,7 @@ class __$$PointHistoryCardDataImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PointHistoryCardDataImpl implements _PointHistoryCardData {
   const _$PointHistoryCardDataImpl(
-      {required this.type,
-      required this.date,
+      {required this.date,
       this.tickets = 1,
       this.amount = 700,
       this.points = 2,
@@ -176,8 +155,7 @@ class _$PointHistoryCardDataImpl implements _PointHistoryCardData {
   factory _$PointHistoryCardDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$PointHistoryCardDataImplFromJson(json);
 
-  @override
-  final PointCardType type;
+// required PointCardType type,
   @override
   final DateTime date;
   @override
@@ -194,7 +172,7 @@ class _$PointHistoryCardDataImpl implements _PointHistoryCardData {
 
   @override
   String toString() {
-    return 'PointHistoryCardData(type: $type, date: $date, tickets: $tickets, amount: $amount, points: $points, prize: $prize)';
+    return 'PointHistoryCardData(date: $date, tickets: $tickets, amount: $amount, points: $points, prize: $prize)';
   }
 
   @override
@@ -202,7 +180,6 @@ class _$PointHistoryCardDataImpl implements _PointHistoryCardData {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PointHistoryCardDataImpl &&
-            (identical(other.type, type) || other.type == type) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.tickets, tickets) || other.tickets == tickets) &&
             (identical(other.amount, amount) || other.amount == amount) &&
@@ -213,7 +190,7 @@ class _$PointHistoryCardDataImpl implements _PointHistoryCardData {
   @JsonKey(ignore: true)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, type, date, tickets, amount, points, prize);
+      Object.hash(runtimeType, date, tickets, amount, points, prize);
 
   @JsonKey(ignore: true)
   @override
@@ -233,8 +210,7 @@ class _$PointHistoryCardDataImpl implements _PointHistoryCardData {
 
 abstract class _PointHistoryCardData implements PointHistoryCardData {
   const factory _PointHistoryCardData(
-      {required final PointCardType type,
-      required final DateTime date,
+      {required final DateTime date,
       final int tickets,
       final int amount,
       final int points,
@@ -243,9 +219,7 @@ abstract class _PointHistoryCardData implements PointHistoryCardData {
   factory _PointHistoryCardData.fromJson(Map<String, dynamic> json) =
       _$PointHistoryCardDataImpl.fromJson;
 
-  @override
-  PointCardType get type;
-  @override
+  @override // required PointCardType type,
   DateTime get date;
   @override
   int get tickets;

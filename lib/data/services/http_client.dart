@@ -1,22 +1,29 @@
 part of 'service.dart';
 
 class RequestInterceptor extends Interceptor {
+  SharedPreferencesAsync get asyncPrefs => SharedPreferencesAsync();
   @override
-  FutureOr<dynamic> onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) {
-        options.headers['Accept'] = 'application/json';
+  Future onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    options.headers['Accept'] = 'application/json';
     options.headers['Content-Type'] = 'application/json';
-    options.headers['Authorization'] =
-        'Bearer ${service<AppPreferencesManager>().currentUserValue?.token}';
-    
+    // Get current token
+    final _authRepository = service<AuthRepository>();
+    final _prefs = service<AppPreferencesManager>();
+    final userData = await asyncPrefs.getStringList("USERDATA");
+    final token = userData != null && userData.length >= 5 ? userData[4] : null;
+
+    if (token != null) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
+
     super.onRequest(options, handler);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401 &&
-        !err.response!.realUri.path.contains("v1/login")) {
-          }
+        !err.response!.realUri.path.contains("v1/login")) {}
     super.onError(err, handler);
   }
 }
@@ -88,7 +95,8 @@ class Http {
     Options? options,
     Deserializer<T>? deserializer,
     Map<String, dynamic>? queryParams,
-        ProgressCallback? progressCallback, Map<String, String> headers = const {},
+    ProgressCallback? progressCallback,
+    Map<String, String> headers = const {},
   }) async {
     try {
       final res = await dio.post(
@@ -99,7 +107,6 @@ class Http {
         onSendProgress: progressCallback,
       );
       return MultipleResult.onSuccess(
-
         data: deserializer != null ? deserializer(res.data) : res.data,
       );
     } on DioException catch (error) {

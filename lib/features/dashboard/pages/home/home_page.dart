@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/buildcontext.dart';
@@ -15,21 +16,24 @@ import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/matches/match_bloc.dart';
 import 'package:sports_app/features/app/blocs/matches/match_schedule/schedule_bloc.dart';
+import 'package:sports_app/features/app/blocs/media/media_bloc.dart';
+import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/stripe/stripe_bloc.dart';
 import 'package:sports_app/features/app/side_menu_cubit.dart';
 import 'package:sports_app/features/auth/login_page.dart';
+import 'package:sports_app/features/dashboard/pages/home/widget/home_media.dart';
 import 'package:sports_app/features/dashboard/pages/pages.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/app_colors.dart';
 import 'package:sports_app/theme/theme.dart';
 import 'package:sports_app/utils/dotted.dart';
+
+import '../../../../data/services/notification_service.dart';
 part 'widget/scheduled_tiles.dart';
+part 'widget/previous_tiles.dart';
 part 'widget/total_quantity.dart';
 part 'widget/ticket_purchase_bottom_sheet.dart';
-
-
-
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -39,11 +43,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  SharedPreferencesAsync get asyncPrefs => SharedPreferencesAsync();
   late StripeBloc _stripeBloc;
   late TextEditingController searchText;
   late HideCubit _hideCubit;
-  Map<String,dynamic>? user;
-  bool loading=false;
+  Map<String, dynamic>? user;
+  bool loading = false;
   User currentUser = service<AppPreferencesManager>().currentUserValue!;
   final FocusNode _focusNode = FocusNode();
 
@@ -52,112 +57,193 @@ class _HomePageState extends State<HomePage> {
     _stripeBloc = StripeBloc();
     searchText = TextEditingController();
 
-    _focusNode.addListener((){
-      if(_focusNode.hasFocus){
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
         context.read<HideCubit>().reveal();
-      }else{
-        if(searchText.text==""){
+      } else {
+        if (searchText.text == "") {
           context.read<HideCubit>().hide();
-        }else{
-        }
+        } else {}
       }
       //context.read<HideCubit>().reveal;
     });
     super.initState();
+    context.read<MatchBloc>().add(const MatchEvent.matchstats());
+    _registerForNotifications();
+  }
+
+  Future<void> _registerForNotifications() async {
+    final userData = await asyncPrefs.getStringList("USERDATA");
+    final uToken =
+        userData != null && userData.length >= 6 ? userData[4] : null;
+    final userID =
+        userData != null && userData.length >= 6 ? userData[6] : null;
+    await WCNotificationService.registerDevice(
+        userID.toString(), uToken.toString());
+    WCNotificationService.listenForTokenRefresh(
+        userID.toString(), uToken.toString());
   }
 
   @override
   void dispose() {
     _stripeBloc.close();
-    _focusNode.removeListener((){});
+    _focusNode.removeListener(() {});
     _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HideCubit,bool>(
-      builder: (context,reveal) {
-        return Scaffold(
-          body: AppBackground(
-            childWidget:SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: kMedium),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: kMedium),
-                      headerSection(context),
-                      const SizedBox(height: kMedium),
-                      searchField(
-                        controller: searchText,
-                        focusNode: _focusNode,
-                        onChanged: (string)=>context.read<MatchBloc>().add(MatchEvent.searchMatch(search: searchText.text))
+    return BlocBuilder<HideCubit, bool>(builder: (context, reveal) {
+      return Scaffold(
+        body: AppBackground(
+          childWidget: SafeArea(
+              child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: kMedium),
+            child: Column(
+              children: [
+                const SizedBox(height: kMedium),
+                headerSection(context),
+                const SizedBox(height: kMedium),
+                searchField(
+                    controller: searchText,
+                    focusNode: _focusNode,
+                    onChanged: (string) => context
+                        .read<MatchBloc>()
+                        .add(MatchEvent.searchMatch(search: searchText.text))),
+                reveal ? Container() : const SizedBox(height: kMedium),
+                reveal
+                    ? Container()
+                    : BlocProvider(
+                        create: (context) =>
+                            MediaBloc()..add(MediaEvent.getHomeMedia()),
+                        child: const HomeMediaBanner(),
                       ),
-                      reveal?Container():const SizedBox(height: kMedium),
-                      reveal?Container():banner(),
-                      reveal?Container():const SizedBox(height: kMedium),
-                      reveal?Container(): Align(alignment:Alignment.centerLeft,child: Text("Schedule",style: context.textTheme.headlineLarge?.copyWith(fontSize: 18,color: AppColors.whiteColor),)),
-                      Expanded(
-                        child: BlocBuilder<MatchBloc, MatchState>(
-                        builder: (context, state) {
+                reveal ? Container() : const SizedBox(height: kMedium),
+                reveal ? Container() : SizedBox(),
+                Expanded(
+                  child: BlocBuilder<MatchBloc, MatchState>(
+                    builder: (context, state) {
+                      switch (state.status) {
+                        case MatchStatus.loading:
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        case MatchStatus.failure:
+                          return Center(
+                            child: Text(state.failure!.error),
+                          );
+                        case MatchStatus.success:
+                          context.read<ScheduleBloc>().add(LoadSchedules(
+                              reveal ? state.searchedMatches : state.matches));
 
-                          switch (state.status) {
-                            case MatchStatus.loading:
+                          return BlocBuilder<ScheduleBloc, ScheduleState>(
+                              builder: (context, scheduledMatches) {
+                            if (scheduledMatches is ScheduleLoading) {
                               return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            case MatchStatus.failure:
-                              return Center(
-                                child: Text(state.failure!.error),
-                              );
-                            case MatchStatus.success:
+                                  child: CircularProgressIndicator());
+                            } else if (scheduledMatches is ScheduleLoaded) {
+                              final categorized =
+                                  scheduledMatches.categorizedSchedulees;
+                              final statsMatches = context
+                                      .read<MatchBloc>()
+                                      .state
+                                      .statsMatches ??
+                                  [];
 
-                              context.read<ScheduleBloc>().add(LoadSchedules(reveal?state.searchedMatches:state.matches));
-
-                              return BlocBuilder<ScheduleBloc,ScheduleState>(
-                                builder: (context,scheduledMatches) {
-                                  if(scheduledMatches is ScheduleLoading){
-                                    return const Center(child:CircularProgressIndicator());
-                                  }
-                                  else if(scheduledMatches is ScheduleLoaded){
-                                    return ListView(
-                                      children: scheduledMatches.categorizedSchedulees.entries.map((entry) {
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(top:8.0,bottom: 12),
-                                              child: Text(
-                                                entry.key.toString().split('.').last.toTitleCase(),
-                                                style: context.textTheme.bodySmall?.copyWith(color: AppColors.whiteColor),
+                              return ListView(
+                                children: [
+                                  // --- Upcoming Schedule ---
+                                  if (categorized.isNotEmpty) ...[
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 1.0),
+                                      child: Text(
+                                        "Upcoming Matches",
+                                        style: context.textTheme.headlineLarge
+                                            ?.copyWith(
+                                          fontSize: 18,
+                                          color: AppColors.whiteColor,
+                                        ),
+                                      ),
+                                    ),
+                                    ...categorized.entries.map((entry) {
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 8.0, bottom: 12),
+                                            child: Text(
+                                              entry.key
+                                                  .toString()
+                                                  .split('.')
+                                                  .last
+                                                  .toTitleCase(),
+                                              style: context.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                color: AppColors.whiteColor,
                                               ),
                                             ),
-                                            ...entry.value.map((match) {
-                                              return ScheduledTiles(match: match);
-                                            }
-                                            ),
-                                          ],
-                                        );
-                                      }).toList(),
-                                    );
-                                  }
-                                  return(Container());
-                                }
-                              );
+                                          ),
+                                          ...entry.value.map((match) =>
+                                              ScheduledTiles(match: match)),
+                                        ],
+                                      );
+                                    }),
+                                  ],
 
-                            default:
-                              return const SizedBox.shrink();
-                          }
-                        },
-                              ),
-                      ),
+                                  // --- Previous Matches ---
+                                  if (statsMatches.isNotEmpty) ...[
+                                    const SizedBox(height: 24),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 12.0),
+                                      child: Text(
+                                        "Previous Matches",
+                                        style: context.textTheme.headlineLarge
+                                            ?.copyWith(
+                                          fontSize: 18,
+                                          color: AppColors.whiteColor,
+                                        ),
+                                      ),
+                                    ),
+                                    ...statsMatches.map(
+                                        (match) => PreviousTiles(match: match)),
+                                  ],
+
+                                  // --- If both are empty ---
+                                  if (categorized.isEmpty &&
+                                      statsMatches.isEmpty)
+                                    const Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top: 40.0),
+                                        child: Text(
+                                          "No matches available",
+                                          style:
+                                              TextStyle(color: Colors.white70),
+                                        ),
+                                      ),
+                                    ),
                                 ],
-                              ),
-                )) ,
-          ),
-        );
-      }
-    );
+                              );
+                            }
+                            return (Container());
+                          });
+
+                        default:
+                          return const SizedBox.shrink();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          )),
+        ),
+      );
+    });
   }
 
   SingleChildScrollView schedules({required List<MatchType> matches}) {
@@ -239,11 +325,11 @@ class _HomePageState extends State<HomePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                             Text(getStringDate(match.matchDate),
+                            Text(getStringDate(match.matchDate),
                                 style: TextStyle(fontSize: 10)),
                             Text(match.matchVenue,
                                 style: const TextStyle(fontSize: 10)),
-                             Text("Amount -ksh ${match.matchPrice}",
+                            Text("Amount -ksh ${match.matchPrice}",
                                 style: TextStyle(fontSize: 10)),
                             const SizedBox(
                               height: kSmall,
@@ -305,11 +391,13 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Text(
                     "30% Off Discount",
-                    style: context.textTheme.bodyLarge?.copyWith(color: AppColors.whiteColor),
+                    style: context.textTheme.bodyLarge
+                        ?.copyWith(color: AppColors.whiteColor),
                   ),
                   Text(
                     "All Merch!",
-                      style: context.textTheme.headlineLarge?.copyWith(fontSize: kLarge,color: AppColors.whiteColor),
+                    style: context.textTheme.headlineLarge?.copyWith(
+                        fontSize: kLarge, color: AppColors.whiteColor),
                   ),
                   Text(
                     "24 Feb - 04 May",
@@ -338,15 +426,16 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
-  TextField searchField({required onChanged, required focusNode,required controller}) {
+  TextField searchField(
+      {required onChanged, required focusNode, required controller}) {
     return TextField(
-      onChanged: onChanged,
-      focusNode: focusNode,
-      controller: controller,
-      onTapOutside: (event){
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      decoration: InputDecoration(
+        onChanged: onChanged,
+        focusNode: focusNode,
+        controller: controller,
+        onTapOutside: (event) {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        decoration: InputDecoration(
           suffixIcon: Container(
               padding: const EdgeInsets.only(right: kSmall),
               child: Icon(LucideIcons.search, color: AppColors.whiteColor)),
@@ -370,8 +459,9 @@ class _HomePageState extends State<HomePage> {
                 color: AppColors.whiteColor,
               )),
           hintText: "Search",
-          hintStyle: context.textTheme.bodyMedium?.copyWith(color:const Color(0xffcfcdcd)),
-    ));
+          hintStyle: context.textTheme.bodyMedium
+              ?.copyWith(color: const Color(0xffcfcdcd)),
+        ));
   }
 
   Row headerSection(BuildContext context) {
@@ -380,7 +470,7 @@ class _HomePageState extends State<HomePage> {
       children: [
         GestureDetector(
           onTap: () {
-          context.read<SideMenuCubit>().openDrawer();
+            context.read<SideMenuCubit>().openDrawer();
           },
           child: Container(
             padding: const EdgeInsets.all(kSmall),
@@ -396,7 +486,7 @@ class _HomePageState extends State<HomePage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Hi ${truncateText(limit:16,currentUser.name)}",
+            Text("Hi ${truncateText(limit: 16, currentUser.name)}",
                 style: TextStyle(
                     color: AppColors.whiteColor,
                     fontSize: 20,
@@ -426,16 +516,20 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
-
-
 }
-RowIconButton(IconData icon,String text){
+
+RowIconButton(IconData icon, String text) {
   return Row(
     mainAxisSize: MainAxisSize.min,
     children: [
       Icon(icon),
-      SizedBox(width: kSMedium,),
-      Text(text,style: TextStyle(fontSize: 14),)
+      SizedBox(
+        width: kSMedium,
+      ),
+      Text(
+        text,
+        style: TextStyle(fontSize: 14),
+      )
     ],
   );
 }

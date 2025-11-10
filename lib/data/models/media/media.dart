@@ -10,7 +10,8 @@ class MediaData with _$MediaData {
     required List<SeasonHighlight> seasonHighlights,
   }) = _MediaData;
 
-  factory MediaData.fromJson(Map<String, dynamic> json) => _$MediaDataFromJson(json);
+  factory MediaData.fromJson(Map<String, dynamic> json) =>
+      _$MediaDataFromJson(json);
 }
 
 @freezed
@@ -18,9 +19,12 @@ class Highlight with _$Highlight {
   const factory Highlight({
     required String title,
     required String image,
+    String? url, // video or YouTube link
+    @Default("image") String type, // "image", "video", "youtube"
   }) = _Highlight;
 
-  factory Highlight.fromJson(Map<String, dynamic> json) => _$HighlightFromJson(json);
+  factory Highlight.fromJson(Map<String, dynamic> json) =>
+      _$HighlightFromJson(json);
 }
 
 @freezed
@@ -28,9 +32,12 @@ class SeasonHighlight with _$SeasonHighlight {
   const factory SeasonHighlight({
     required String title,
     required String image,
-    required String time,
-    required String date,
+    required String? time,
+    required String? date,
+    required String url,
+    required String? type, // must be passed (even if null)
   }) = _SeasonHighlight;
 
-  factory SeasonHighlight.fromJson(Map<String, dynamic> json) => _$SeasonHighlightFromJson(json);
+  factory SeasonHighlight.fromJson(Map<String, dynamic> json) =>
+      _$SeasonHighlightFromJson(json);
 }

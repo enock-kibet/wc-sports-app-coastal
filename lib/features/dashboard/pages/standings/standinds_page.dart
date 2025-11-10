@@ -21,8 +21,7 @@ class _StandingPageState extends State<StandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
-      Container(
+      body: Container(
         padding: const EdgeInsets.only(bottom: kXSmall),
         child: SingleChildScrollView(
           child: Column(
@@ -117,123 +116,122 @@ class _StandingPageState extends State<StandingPage> {
               const SizedBox(
                 height: kMedium,
               ),
-              if(selectedIndex == 0)
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: kMedium),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(10),
+              if (selectedIndex == 0)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.symmetric(horizontal: kMedium),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                        horizontalMargin: 10,
+                        dividerThickness: 0.5,
+                        columnSpacing: 20,
+                        showBottomBorder: false,
+                        border: const TableBorder(
+                            // top: BorderSide(color: Colors.grey, width: 0.5),
+                            // bottom: BorderSide(color: Colors.grey, width: 0.5),
+                            // left: BorderSide(color: Colors.grey, width: 0.5),
+                            // right: BorderSide(color: Colors.grey, width: 0.5),
+                            // horizontalInside:
+                            //     BorderSide(color: Colors.grey, width: 0.5),
+                            // verticalInside:
+                            //     BorderSide(color: Colors.grey, width: 0.5),
+                            ),
+                        columns: const [
+                          DataColumn(
+                              label: Text(
+                            "Pos",
+                          )),
+                          DataColumn(
+                              label: Text(
+                            "Team",
+                          )),
+                          DataColumn(
+                              label: Text(
+                            "Won",
+                          )),
+                          DataColumn(
+                              label: Text(
+                            "Lost",
+                          )),
+                          DataColumn(
+                              label: Text(
+                            "Draw",
+                          )),
+                          DataColumn(
+                              label: Text(
+                            "Points",
+                          )),
+                        ],
+                        rows: List.generate(
+                            standingData.length,
+                            (index) => productDataRow(
+                                standingData[index], index, context))),
+                  ),
                 ),
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                      horizontalMargin: 10,
-                      dividerThickness: 0.5,
-                      columnSpacing: 20,
-                      showBottomBorder: false,
-                      border: const TableBorder(
-                          // top: BorderSide(color: Colors.grey, width: 0.5),
-                          // bottom: BorderSide(color: Colors.grey, width: 0.5),
-                          // left: BorderSide(color: Colors.grey, width: 0.5),
-                          // right: BorderSide(color: Colors.grey, width: 0.5),
-                          // horizontalInside:
-                          //     BorderSide(color: Colors.grey, width: 0.5),
-                          // verticalInside:
-                          //     BorderSide(color: Colors.grey, width: 0.5),
-                          ),
-                      columns: const [
-                        DataColumn(
-                            label: Text(
-                          "Pos",
-                        )),
-                        DataColumn(
-                            label: Text(
-                          "Team",
-                        )),
-                        DataColumn(
-                            label: Text(
-                          "Won",
-                        )),
-                        DataColumn(
-                            label: Text(
-                          "Lost",
-                        )),
-                        DataColumn(
-                            label: Text(
-                          "Draw",
-                        )),
-                        DataColumn(
-                            label: Text(
-                          "Points",
-                        )),
-                      ],
-                      rows: List.generate(
-                          standingData.length,
-                          (index) => productDataRow(
-                              standingData[index], index, context))),
+              if (selectedIndex == 1)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.symmetric(horizontal: kMedium),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                        horizontalMargin: 10,
+                        dividerThickness: 0.5,
+                        columnSpacing: 20,
+                        showBottomBorder: false,
+                        border: const TableBorder(
+                            // top: BorderSide(color: Colors.grey, width: 0.5),
+                            // bottom: BorderSide(color: Colors.grey, width: 0.5),
+                            // left: BorderSide(color: Colors.grey, width: 0.5),
+                            // right: BorderSide(color: Colors.grey, width: 0.5),
+                            // horizontalInside:
+                            //     BorderSide(color: Colors.grey, width: 0.5),
+                            // verticalInside:
+                            //     BorderSide(color: Colors.grey, width: 0.5),
+                            ),
+                        columns: const [
+                          DataColumn(
+                              label: Text(
+                            "Team",
+                          )),
+                          DataColumn(
+                              label: Text(
+                            "Position",
+                          )),
+                          DataColumn(
+                              label: Text(
+                            "Won",
+                          )),
+                          DataColumn(
+                              label: Text(
+                            "Lost",
+                          )),
+                          DataColumn(
+                              label: Text(
+                            "Draw",
+                          )),
+                          DataColumn(
+                              label: Text(
+                            "Points",
+                          )),
+                        ],
+                        rows: List.generate(
+                            standingData.length,
+                            (index) => productDataRow(
+                                standingData[index], index, context))),
+                  ),
                 ),
-              ),
-              if(selectedIndex == 1)
-
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: kMedium),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                      horizontalMargin: 10,
-                      dividerThickness: 0.5,
-                      columnSpacing: 20,
-                      showBottomBorder: false,
-                      border: const TableBorder(
-                          // top: BorderSide(color: Colors.grey, width: 0.5),
-                          // bottom: BorderSide(color: Colors.grey, width: 0.5),
-                          // left: BorderSide(color: Colors.grey, width: 0.5),
-                          // right: BorderSide(color: Colors.grey, width: 0.5),
-                          // horizontalInside:
-                          //     BorderSide(color: Colors.grey, width: 0.5),
-                          // verticalInside:
-                          //     BorderSide(color: Colors.grey, width: 0.5),
-                          ),
-                      columns: const [
-                        DataColumn(
-                            label: Text(
-                          "Team",
-                        )),
-                        DataColumn(
-                            label: Text(
-                          "Position",
-                        )),
-                        DataColumn(
-                            label: Text(
-                          "Won",
-                        )),
-                        DataColumn(
-                            label: Text(
-                          "Lost",
-                        )),
-                        DataColumn(
-                            label: Text(
-                          "Draw",
-                        )),
-                        DataColumn(
-                            label: Text(
-                          "Points",
-                        )),
-                      ],
-                      rows: List.generate(
-                          standingData.length,
-                          (index) => productDataRow(
-                              standingData[index], index, context))),
-                ),
-              ),
             ],
           ),
         ),

@@ -7,7 +7,6 @@ import 'package:flutter_svg/svg.dart';
 
 import 'package:go_router/go_router.dart';
 
-
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
@@ -23,7 +22,6 @@ import 'package:sports_app/theme/theme.dart';
 import 'package:upgrader/upgrader.dart';
 
 import '../../main.dart';
-
 
 class BaseScreen extends StatefulWidget {
   const BaseScreen({super.key, required this.navigationShell});
@@ -44,7 +42,7 @@ class _BaseScreenState extends State<BaseScreen> {
           navigatorKey: router.routerDelegate.navigatorKey,
           child: Scaffold(
             key: state,
-            drawer:  Drawer(
+            drawer: Drawer(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -55,7 +53,8 @@ class _BaseScreenState extends State<BaseScreen> {
                       Stack(
                         alignment: Alignment.topLeft,
                         children: [
-                          Image.asset("assets/images/drawer_bg.png",fit: BoxFit.fitWidth),
+                          Image.asset("assets/images/drawer_bg.png",
+                              fit: BoxFit.fitWidth),
                           Positioned(
                               left: kXLMedium,
                               bottom: kXLMedium,
@@ -65,77 +64,108 @@ class _BaseScreenState extends State<BaseScreen> {
                                   // Image.asset("assets/images/profile_pic.png",height: 72,),
                                   Container(
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: AppColors.whiteColor,
-                                        width: 1.4
-                                      )
-                                    ),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: AppColors.whiteColor,
+                                            width: 1.4)),
                                     child: ClipRRect(
-                                      borderRadius:BorderRadius.circular(72),
-                                      child: BlocBuilder<UserBloc,User?>(
-                                        builder: (context,user) {
-                                          return CachedNetworkImage(
-                                            imageUrl: user?.picture??"",
-                                            errorWidget: (context, url, error) => Icon(Icons.person,size: 48,color: AppColors.whiteColor,),
-                                            width: 72,
-                                            height: 72,
-                                            fit: BoxFit.cover,
-                                          );
-                                        }
-                                      ),
+                                      borderRadius: BorderRadius.circular(72),
+                                      child: BlocBuilder<UserBloc, User?>(
+                                          builder: (context, user) {
+                                        return CachedNetworkImage(
+                                          imageUrl: user?.picture ?? "",
+                                          errorWidget: (context, url, error) =>
+                                              Icon(
+                                            Icons.person,
+                                            size: 48,
+                                            color: AppColors.whiteColor,
+                                          ),
+                                          width: 72,
+                                          height: 72,
+                                          fit: BoxFit.cover,
+                                        );
+                                      }),
                                     ),
                                   ),
-                                  SizedBox(height: 12,),
-                                  Text(currentUser.name,style: TextStyle(color: AppColors.inputFillColor,fontSize: kMedium,fontWeight: FontWeight.bold),),
-                                  Text(currentUser.email,style: TextStyle(color: AppColors.inputFillColor,fontSize: kSMedium,)),
-                                  SizedBox(height: kXXLarge,),
+                                  SizedBox(
+                                    height: 12,
+                                  ),
+                                  Text(
+                                    currentUser.name,
+                                    style: TextStyle(
+                                        color: AppColors.inputFillColor,
+                                        fontSize: kMedium,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(currentUser.email,
+                                      style: TextStyle(
+                                        color: AppColors.inputFillColor,
+                                        fontSize: kSMedium,
+                                      )),
+                                  SizedBox(
+                                    height: kXXLarge,
+                                  ),
                                 ],
                               ))
                         ],
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: kXLMedium,top: kXXXLarge),
+                        padding: const EdgeInsets.only(
+                            left: kXLMedium, top: kXXXLarge),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.max,
                           children: [
                             GestureDetector(
-                              onTap:(){
-                                context.pushNamed(AppRoute.team.name,extra: true );
+                              onTap: () {
+                                context.pushNamed(AppRoute.team.name,
+                                    extra: true);
                                 context.pop();
                               },
-                              child: RowIconButton(Icons.arrow_circle_up_outlined, "Standings"),
+                              child: RowIconButton(
+                                  Icons.arrow_circle_up_outlined, "Standings"),
                             ),
-                            const SizedBox(height: kLarge,),
+                            const SizedBox(
+                              height: kLarge,
+                            ),
                             // RowIconButton(Icons.perm_media_outlined, "Team Media"),
                             GestureDetector(
-                              onTap:(){
-                                context.pushNamed(AppRoute.media.name,extra: true );
+                              onTap: () {
+                                context.pushNamed(AppRoute.media.name,
+                                    extra: true);
                                 context.pop();
                               },
-                              child: RowIconButton(Icons.perm_media_outlined, "Team Media"),
+                              child: RowIconButton(
+                                  Icons.perm_media_outlined, "Team Media"),
                             ),
-                            const SizedBox(height: kLarge,),
-                            RowIconButton(Icons.people, "Membership"),
-
+                            const SizedBox(
+                              height: kLarge,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                context.pushNamed(
+                                    AppRoute.pointsManagement.name,
+                                    extra: true);
+                                context.pop();
+                              },
+                              child: RowIconButton(Icons.people, "Membership"),
+                            ),
                           ],
                         ),
                       ),
-                    ],),
-
+                    ],
+                  ),
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       logoutDialog(context);
                     },
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: kXLMedium,vertical: kXLMedium),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: kXLMedium, vertical: kXLMedium),
                       child: RowIconButton(Icons.logout, "Logout"),
-
                     ),
                   )
-
                 ],
               ),
             ),
@@ -152,7 +182,9 @@ class _BaseScreenState extends State<BaseScreen> {
                 items: [
                   BottomNavigationBarItem(
                     icon: SvgPicture.asset(
-                      widget.navigationShell.currentIndex == 0?"assets/icons/home_b.svg":"assets/icons/home.svg",
+                      widget.navigationShell.currentIndex == 0
+                          ? "assets/icons/home_b.svg"
+                          : "assets/icons/home.svg",
                       color: widget.navigationShell.currentIndex == 0
                           ? AppColors.darkColor
                           : AppColors.greyColor,
@@ -161,7 +193,9 @@ class _BaseScreenState extends State<BaseScreen> {
                   ),
                   BottomNavigationBarItem(
                     icon: SvgPicture.asset(
-                      widget.navigationShell.currentIndex == 1?"assets/icons/date_b.svg":"assets/icons/date.svg",
+                      widget.navigationShell.currentIndex == 1
+                          ? "assets/icons/date_b.svg"
+                          : "assets/icons/date.svg",
                       color: widget.navigationShell.currentIndex == 1
                           ? AppColors.darkColor
                           : AppColors.greyColor,
@@ -171,7 +205,9 @@ class _BaseScreenState extends State<BaseScreen> {
                   ),
                   BottomNavigationBarItem(
                     icon: SvgPicture.asset(
-                      widget.navigationShell.currentIndex == 2?"assets/icons/shop_b.svg":"assets/icons/shop.svg",
+                      widget.navigationShell.currentIndex == 2
+                          ? "assets/icons/shop_b.svg"
+                          : "assets/icons/shop.svg",
                       color: widget.navigationShell.currentIndex == 2
                           ? AppColors.darkColor
                           : AppColors.greyColor,
@@ -180,16 +216,19 @@ class _BaseScreenState extends State<BaseScreen> {
                   ),
                   BottomNavigationBarItem(
                       icon: SvgPicture.asset(
-                        widget.navigationShell.currentIndex == 3?"assets/icons/team_b.svg":"assets/icons/team.svg",
+                        widget.navigationShell.currentIndex == 3
+                            ? "assets/icons/team_b.svg"
+                            : "assets/icons/team.svg",
                         color: widget.navigationShell.currentIndex == 3
                             ? AppColors.darkColor
                             : AppColors.greyColor,
                       ),
-                    label: 'Team'
-                  ),
+                      label: 'Team'),
                   BottomNavigationBarItem(
                     icon: SvgPicture.asset(
-                      widget.navigationShell.currentIndex == 4?"assets/icons/profile_b.svg":"assets/icons/profile.svg",
+                      widget.navigationShell.currentIndex == 4
+                          ? "assets/icons/profile_b.svg"
+                          : "assets/icons/profile.svg",
                       color: widget.navigationShell.currentIndex == 4
                           ? AppColors.darkColor
                           : AppColors.greyColor,

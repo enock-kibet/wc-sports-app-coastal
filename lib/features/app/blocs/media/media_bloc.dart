@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sports_app/data/error/failure.dart';
 import 'package:sports_app/data/models/media/media.dart';
+import 'package:sports_app/data/models/stats/stat.dart';
 
 import 'package:sports_app/data/services/service.dart';
 
@@ -34,6 +35,26 @@ class MediaBloc extends Bloc<MediaEvent, MediaState> {
           failure: null,
         ));
       });
+    });
+
+    on<_HomeMediaFetched>((playerID, emit) async {
+      emit(state.copyWith(status: MediaStatus.loading));
+      final recordResponse = await _mediaService.getHomeMedia();
+      recordResponse.when(
+        onError: (error) {
+          emit(state.copyWith(
+            status: MediaStatus.failure,
+            failure: error,
+          ));
+        },
+        onSuccess: (data) async {
+          emit(state.copyWith(
+            status: MediaStatus.success,
+            homeMedia: data,
+            failure: null,
+          ));
+        },
+      );
     });
   }
 }

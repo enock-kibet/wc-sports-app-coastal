@@ -27,7 +27,7 @@ class TopSellersCard extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: AppColors.whiteColor,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(kSmall),
             ),
             child: Column(
@@ -63,7 +63,9 @@ class TopSellersCard extends StatelessWidget {
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: kSMedium,
-                                    color: AppColors.darkColor)),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface)),
                             const SizedBox(
                               height: kXSmall,
                             ),

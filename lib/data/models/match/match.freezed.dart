@@ -29,6 +29,8 @@ mixin _$MatchType {
   String get matchVenue => throw _privateConstructorUsedError;
   String get matchLocation => throw _privateConstructorUsedError;
   double get matchPrice => throw _privateConstructorUsedError;
+  String? get teamOneScore => throw _privateConstructorUsedError;
+  String? get teamTwoScore => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -50,7 +52,9 @@ abstract class $MatchTypeCopyWith<$Res> {
       DateTime matchDate,
       String matchVenue,
       String matchLocation,
-      double matchPrice});
+      double matchPrice,
+      String? teamOneScore,
+      String? teamTwoScore});
 }
 
 /// @nodoc
@@ -75,6 +79,8 @@ class _$MatchTypeCopyWithImpl<$Res, $Val extends MatchType>
     Object? matchVenue = null,
     Object? matchLocation = null,
     Object? matchPrice = null,
+    Object? teamOneScore = freezed,
+    Object? teamTwoScore = freezed,
   }) {
     return _then(_value.copyWith(
       matchId: null == matchId
@@ -113,6 +119,14 @@ class _$MatchTypeCopyWithImpl<$Res, $Val extends MatchType>
           ? _value.matchPrice
           : matchPrice // ignore: cast_nullable_to_non_nullable
               as double,
+      teamOneScore: freezed == teamOneScore
+          ? _value.teamOneScore
+          : teamOneScore // ignore: cast_nullable_to_non_nullable
+              as String?,
+      teamTwoScore: freezed == teamTwoScore
+          ? _value.teamTwoScore
+          : teamTwoScore // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -134,7 +148,9 @@ abstract class _$$MatchTypeImplCopyWith<$Res>
       DateTime matchDate,
       String matchVenue,
       String matchLocation,
-      double matchPrice});
+      double matchPrice,
+      String? teamOneScore,
+      String? teamTwoScore});
 }
 
 /// @nodoc
@@ -157,6 +173,8 @@ class __$$MatchTypeImplCopyWithImpl<$Res>
     Object? matchVenue = null,
     Object? matchLocation = null,
     Object? matchPrice = null,
+    Object? teamOneScore = freezed,
+    Object? teamTwoScore = freezed,
   }) {
     return _then(_$MatchTypeImpl(
       matchId: null == matchId
@@ -195,6 +213,14 @@ class __$$MatchTypeImplCopyWithImpl<$Res>
           ? _value.matchPrice
           : matchPrice // ignore: cast_nullable_to_non_nullable
               as double,
+      teamOneScore: freezed == teamOneScore
+          ? _value.teamOneScore
+          : teamOneScore // ignore: cast_nullable_to_non_nullable
+              as String?,
+      teamTwoScore: freezed == teamTwoScore
+          ? _value.teamTwoScore
+          : teamTwoScore // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -211,7 +237,9 @@ class _$MatchTypeImpl implements _MatchType {
       required this.matchDate,
       required this.matchVenue,
       required this.matchLocation,
-      required this.matchPrice});
+      required this.matchPrice,
+      this.teamOneScore,
+      this.teamTwoScore});
 
   factory _$MatchTypeImpl.fromJson(Map<String, dynamic> json) =>
       _$$MatchTypeImplFromJson(json);
@@ -234,10 +262,14 @@ class _$MatchTypeImpl implements _MatchType {
   final String matchLocation;
   @override
   final double matchPrice;
+  @override
+  final String? teamOneScore;
+  @override
+  final String? teamTwoScore;
 
   @override
   String toString() {
-    return 'MatchType(matchId: $matchId, teamOne: $teamOne, teamTwo: $teamTwo, matchName: $matchName, matchDescription: $matchDescription, matchDate: $matchDate, matchVenue: $matchVenue, matchLocation: $matchLocation, matchPrice: $matchPrice)';
+    return 'MatchType(matchId: $matchId, teamOne: $teamOne, teamTwo: $teamTwo, matchName: $matchName, matchDescription: $matchDescription, matchDate: $matchDate, matchVenue: $matchVenue, matchLocation: $matchLocation, matchPrice: $matchPrice, teamOneScore: $teamOneScore, teamTwoScore: $teamTwoScore)';
   }
 
   @override
@@ -259,7 +291,11 @@ class _$MatchTypeImpl implements _MatchType {
             (identical(other.matchLocation, matchLocation) ||
                 other.matchLocation == matchLocation) &&
             (identical(other.matchPrice, matchPrice) ||
-                other.matchPrice == matchPrice));
+                other.matchPrice == matchPrice) &&
+            (identical(other.teamOneScore, teamOneScore) ||
+                other.teamOneScore == teamOneScore) &&
+            (identical(other.teamTwoScore, teamTwoScore) ||
+                other.teamTwoScore == teamTwoScore));
   }
 
   @JsonKey(ignore: true)
@@ -274,7 +310,9 @@ class _$MatchTypeImpl implements _MatchType {
       matchDate,
       matchVenue,
       matchLocation,
-      matchPrice);
+      matchPrice,
+      teamOneScore,
+      teamTwoScore);
 
   @JsonKey(ignore: true)
   @override
@@ -300,7 +338,9 @@ abstract class _MatchType implements MatchType {
       required final DateTime matchDate,
       required final String matchVenue,
       required final String matchLocation,
-      required final double matchPrice}) = _$MatchTypeImpl;
+      required final double matchPrice,
+      final String? teamOneScore,
+      final String? teamTwoScore}) = _$MatchTypeImpl;
 
   factory _MatchType.fromJson(Map<String, dynamic> json) =
       _$MatchTypeImpl.fromJson;
@@ -323,6 +363,10 @@ abstract class _MatchType implements MatchType {
   String get matchLocation;
   @override
   double get matchPrice;
+  @override
+  String? get teamOneScore;
+  @override
+  String? get teamTwoScore;
   @override
   @JsonKey(ignore: true)
   _$$MatchTypeImplCopyWith<_$MatchTypeImpl> get copyWith =>

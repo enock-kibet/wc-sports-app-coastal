@@ -1,0 +1,35 @@
+[
+  {
+    "id": "f1716986-0891-46b7-9d2c-100c47afde60",
+    "name": "xtriim gamer3",
+    "locality": "Muratha Road, Nairobi County",
+    "city": "Nairobi",
+    "country": "Kenya",
+    "phone": "4566666",
+    "latitude": -1.2688718171051063,
+    "longitude": 36.75388868898153,
+    "isDefault": true
+  },
+  {
+    "id": "8b40d876-7002-4664-b78d-0e00ccea926c",
+    "name": "xtriim gamer3",
+    "locality": "Your Place",
+    "city": "Nairobi",
+    "country": "Kenya",
+    "phone": "4566666",
+    "latitude": -1.2688718171051063,
+    "longitude": 36.75388868898153,
+    "isDefault": true
+  },
+  {
+    "id": "4bec9826-bd8f-4dfa-932c-3f8683ac6ded",
+    "name": "xtriim gamer3",
+    "locality": "Kanairo",
+    "city": "Nairobi",
+    "country": "Kenya",
+    "phone": "5678888",
+    "latitude": -1.266711156240138,
+    "longitude": 36.749338656663895,
+    "isDefault": true
+  }
+]

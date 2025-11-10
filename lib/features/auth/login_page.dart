@@ -22,7 +22,7 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
+class _LoginPageState extends State<LoginPage> with InputValidationMixin {
   final ValueNotifier<bool> _isHidden = ValueNotifier(true);
   late AuthBloc authBloc;
   final _loginFormKey = GlobalKey<FormState>();
@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
-         bloc: authBloc,
+        bloc: authBloc,
         listener: (context, state) async {
           if (state.status == AuthStatus.success) {
             context.read<UserBloc>().add(UpdateUser(state.data));
@@ -91,7 +91,6 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
               ),
             );
           }
-
         },
         builder: (context, state) {
           return const AppBackground();
@@ -102,175 +101,181 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
           bloc: authBloc,
           builder: (context, state) {
             return Container(
-                  padding: EdgeInsets.all(kMedium),
-                  width: double.infinity,
-                  child: Form(
-                    key: _loginFormKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        LoginSignUpSwitch(context, true),
-                        const SizedBox(
-                          height: kLarge,
-                        ),
-                        const Text(
-                          "Welcome Back!",
-                          style: TextStyle(
-                              fontSize: kMedium,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF696565)),
-                        ),
-                        const SizedBox(
-                          height: kLarge,
-                        ),
-                        const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Email",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF696565)))),
-                        const SizedBox(
-                          height: 9,
-                        ),
-                        CustomTextField(true, "jina@email.com",controller: _emailController,
-                                      validator: combine([
-                                        withMessage('Email is empty', isTextEmpty),
-                                        withMessage('Email is invalid', isInvalidEmail)
-                                      ]),),
-                        const SizedBox(
-                          height: 13,
-                        ),
-                        const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Password",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF696565)))),
-                        const SizedBox(
-                          height: 9,
-                        ),
-                        ValueListenableBuilder(valueListenable: _isHidden, builder: (context,value,child){
-                          return CustomTextField(false, "**********",controller: _passwordController,
+              padding: EdgeInsets.all(kMedium),
+              width: double.infinity,
+              child: Form(
+                key: _loginFormKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LoginSignUpSwitch(context, true),
+                    const SizedBox(
+                      height: kLarge,
+                    ),
+                    const Text(
+                      "Welcome Back!",
+                      style: TextStyle(
+                          fontSize: kMedium,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF696565)),
+                    ),
+                    const SizedBox(
+                      height: kLarge,
+                    ),
+                    const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Email",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF696565)))),
+                    const SizedBox(
+                      height: 9,
+                    ),
+                    CustomTextField(
+                      true,
+                      "jina@email.com",
+                      controller: _emailController,
+                      validator: combine([
+                        withMessage('Email is empty', isTextEmpty),
+                        withMessage('Email is invalid', isInvalidEmail)
+                      ]),
+                    ),
+                    const SizedBox(
+                      height: 13,
+                    ),
+                    const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Password",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF696565)))),
+                    const SizedBox(
+                      height: 9,
+                    ),
+                    ValueListenableBuilder(
+                        valueListenable: _isHidden,
+                        builder: (context, value, child) {
+                          return CustomTextField(false, "**********",
+                              controller: _passwordController,
                               validator: combine([
                                 withMessage('password is empty', isTextEmpty),
-                                withMessage('password is invalid', isPasswordInvalid)
+                                withMessage(
+                                    'password is invalid', isPasswordInvalid)
                               ]),
                               obscureText: _isHidden.value,
-                              obscuringCharacter: "*",
-                              toggleVisibility: (){
-                                _isHidden.value = !_isHidden.value;
-                              }
-                          );
+                              obscuringCharacter: "*", toggleVisibility: () {
+                            _isHidden.value = !_isHidden.value;
+                          });
                         }),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                // Checkbox(value: false, onChanged: (onChanged) {}),
-                                // const Text(
-                                //   'Remember Me',
-                                //   style: TextStyle(fontSize: kSMedium),
-                                // )
-                              ],
-                            ),
-                            TextButton(
-                                onPressed: () {},
-                                child: const Text(
-                                  "Forgot Password",
-                                  style: TextStyle(fontSize: kSMedium),
-                                ))
+                            // Checkbox(value: false, onChanged: (onChanged) {}),
+                            // const Text(
+                            //   'Remember Me',
+                            //   style: TextStyle(fontSize: kSMedium),
+                            // )
                           ],
                         ),
-                        const SizedBox(
-                          height: kLarge,
-                        ),
-                        GestureDetector(
-                            onTap: () {
-                              if (validateSaveLogin()) {
-                                        if (state.status == AuthStatus.loading) {
-                                        } else {
-                                          authBloc.add(AuthEvent.login(
-                                              request: {
-                                            "email": _emailController.text.trim(),
-                                            "password": _passwordController.text.trim(),
-                                        }));
-                                        }
-                                      }
-                            },
-                            child: CustomFilledButton(state.status == AuthStatus.loading
-                                            ? "Loading..."
-                                            : 'Sign In')),
-                        const SizedBox(
-                          height: kSMedium,
-                        ),
-                        OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                                minimumSize: const Size.fromHeight(56),
-                                side: BorderSide(color: Color(0xFF414141)),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(kMedium))),
-                            onPressed: () async{
-                              try {
-                              // Initialize Google Sign-In
-                              final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
-
-                              // Trigger the Google Sign-In flow
-                              final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-
-                              if (googleUser != null) {
-
-                                authBloc.add(AuthEvent.googlelogin(
-                                    request: {
-                                      "name": googleUser.displayName,
-                                      "email":googleUser.email,
-                                      "googleId":googleUser.id,
-                                      "picture":googleUser.photoUrl
-                                    }));
-
-
-                              } else {
-                                print("Google Sign-In canceled by user.");
-                                return null;
-                              }
-                              } catch (e) {
-                                print("Error during Google Sign-In: $e");
-                                return null;
-                              }
-
-
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  "assets/images/googlelogo2.png",
-                                  height: kLarge,
-                                ),
-                                const SizedBox(
-                                  width: kSMedium,
-                                ),
-                                Text(
-                                  state.status == AuthStatus.loading
-                                      ? "Loading..."
-                                      :'Sign In with Google',
-                                  style:
-                                      const TextStyle(color: Color(0xFF525252), fontSize: 13),
-                                )
-                              ],
+                        TextButton(
+                            onPressed: () {},
+                            child: const Text(
+                              "Forgot Password",
+                              style: TextStyle(fontSize: kSMedium),
                             ))
                       ],
                     ),
-                  ),
-                );
+                    const SizedBox(
+                      height: kLarge,
+                    ),
+                    GestureDetector(
+                        onTap: () {
+                          if (validateSaveLogin()) {
+                            if (state.status == AuthStatus.loading) {
+                            } else {
+                              authBloc.add(AuthEvent.login(request: {
+                                "email": _emailController.text.trim(),
+                                "password": _passwordController.text.trim(),
+                              }));
+                            }
+                          }
+                        },
+                        child: CustomFilledButton(
+                            state.status == AuthStatus.loading
+                                ? "Loading..."
+                                : 'Sign In')),
+                    const SizedBox(
+                      height: kSMedium,
+                    ),
+                    OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(56),
+                            side: BorderSide(color: Color(0xFF414141)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(kMedium))),
+                        onPressed: () async {
+                          try {
+                            // Initialize Google Sign-In
+                            final GoogleSignIn googleSignIn =
+                                GoogleSignIn(scopes: ['profile', 'email']);
+
+                            // Trigger the Google Sign-In flow
+                            final GoogleSignInAccount? googleUser =
+                                await googleSignIn.signIn();
+
+                            if (googleUser != null) {
+                              authBloc.add(AuthEvent.googlelogin(request: {
+                                "name": googleUser.displayName,
+                                "email": googleUser.email,
+                                "googleId": googleUser.id,
+                                "picture": googleUser.photoUrl
+                              }));
+                            } else {
+                              print("Google Sign-In canceled by user.");
+                              return null;
+                            }
+                          } catch (e) {
+                            print("Error during Google Sign-In: $e");
+                            return null;
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/googlelogo2.png",
+                              height: kLarge,
+                            ),
+                            const SizedBox(
+                              width: kSMedium,
+                            ),
+                            Text(
+                              state.status == AuthStatus.loading
+                                  ? "Loading..."
+                                  : 'Sign In with Google',
+                              style: const TextStyle(
+                                  color: Color(0xFF525252), fontSize: 13),
+                            )
+                          ],
+                        )),
+                    const SizedBox(
+                      height: kSMedium * 5,
+                    ),
+                  ],
+                ),
+              ),
+            );
           },
         ),
       ),
     );
   }
-   bool validateSaveLogin() {
+
+  bool validateSaveLogin() {
     final form = _loginFormKey.currentState;
     if (form!.validate()) {
       form.save();
@@ -281,7 +286,12 @@ class _LoginPageState extends State<LoginPage>with InputValidationMixin  {
   }
 }
 
-CustomTextField(bool isEmail, String hintText,{final TextEditingController? controller,final String? Function(String?)? validator,bool obscureText = false,String? obscuringCharacter, VoidCallback? toggleVisibility }) {
+CustomTextField(bool isEmail, String hintText,
+    {final TextEditingController? controller,
+    final String? Function(String?)? validator,
+    bool obscureText = false,
+    String? obscuringCharacter,
+    VoidCallback? toggleVisibility}) {
   return TextFormField(
     obscureText: obscureText,
     controller: controller,
@@ -292,20 +302,19 @@ CustomTextField(bool isEmail, String hintText,{final TextEditingController? cont
       FocusManager.instance.primaryFocus?.unfocus();
     },
     decoration: InputDecoration(
-      contentPadding: EdgeInsets.symmetric(horizontal: kMedium,vertical: 14),
-      suffixIcon: !isEmail? IconButton(
-                                  onPressed: () {
-                                      toggleVisibility!();
-                                      obscureText = !obscureText;
-                                   
-                                  },
-                                  icon: Icon(
-                                    obscureText
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                ):const SizedBox(),
+        contentPadding: EdgeInsets.symmetric(horizontal: kMedium, vertical: 14),
+        suffixIcon: !isEmail
+            ? IconButton(
+                onPressed: () {
+                  toggleVisibility!();
+                  obscureText = !obscureText;
+                },
+                icon: Icon(
+                  obscureText ? Icons.visibility : Icons.visibility_off,
+                  color: AppColors.primaryColor,
+                ),
+              )
+            : const SizedBox(),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(kMedium),
             borderSide: const BorderSide(color: Color(0xFFC6C6C6))),
@@ -337,17 +346,23 @@ CustomFilledButton(String buttonText) {
     child: Center(
         child: Text(
       buttonText,
-      style: TextStyle(color: AppColors.inputFillColor, fontSize: 18,fontWeight: FontWeight.w500),
+      style: TextStyle(
+          color: AppColors.inputFillColor,
+          fontSize: 18,
+          fontWeight: FontWeight.w500),
     )),
   );
 }
-CustomisableFilledButton(String buttonText,bool? fullyRounded,double? height,double textSize) {
+
+CustomisableFilledButton(
+    String buttonText, bool? fullyRounded, double? height, double textSize) {
   return Container(
-    height: height??56,
+    height: height ?? 56,
     width: double.infinity,
     clipBehavior: Clip.hardEdge,
     decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(fullyRounded??false?72:kMedium),
+        borderRadius:
+            BorderRadius.circular(fullyRounded ?? false ? 72 : kMedium),
         gradient: LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
@@ -358,27 +373,27 @@ CustomisableFilledButton(String buttonText,bool? fullyRounded,double? height,dou
         )),
     child: Center(
         child: Text(
-          buttonText,
-          style: TextStyle(color: AppColors.inputFillColor, fontSize: textSize),
-        )),
+      buttonText,
+      style: TextStyle(color: AppColors.inputFillColor, fontSize: textSize),
+    )),
   );
 }
+
 CustomOutlinedButton(String buttonText) {
   return Container(
     height: 56,
     width: double.infinity,
     clipBehavior: Clip.hardEdge,
     decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(kMedium),
-        border: Border.all()
-    ),
+        borderRadius: BorderRadius.circular(kMedium), border: Border.all()),
     child: Center(
         child: Text(
-          buttonText,
-          style: TextStyle(color: AppColors.blackColor, fontSize: 18),
-        )),
+      buttonText,
+      style: TextStyle(color: AppColors.blackColor, fontSize: 18),
+    )),
   );
 }
+
 LoginSignUpSwitch(BuildContext context, bool isSignInPage) {
   return Container(
     padding: EdgeInsets.all(6),

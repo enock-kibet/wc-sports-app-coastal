@@ -14,6 +14,7 @@ import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/features/dashboard/pages/profile/components/circular_icon_container.dart';
 import 'package:sports_app/features/dashboard/pages/profile/components/circular_toggle.dart';
+import 'package:sports_app/localization/app_prefs.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/main.dart';
 import 'package:sports_app/router/router.dart';
@@ -26,75 +27,101 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-
 class _ProfilePageState extends State<ProfilePage> {
   late User currentUser;
-  bool loading=false;
-
+  bool loading = false;
+  late final AppPreferences _prefs;
 
   @override
   void initState() {
-    currentUser  = service<AppPreferencesManager>().currentUserValue!;
+    currentUser = service<AppPreferencesManager>().currentUserValue!;
+    _prefs = AppPreferences();
     super.initState();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    setState(() => loading = true);
+
+    try {
+      final user = await _prefs.getUserData();
+
+      if (mounted && user != null) {
+        setState(() {
+          currentUser = user;
+        });
+      }
+    } catch (e) {
+      debugPrint("❌ Failed to load user: $e");
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.only(bottom: kXSmall),
+      body: RefreshIndicator(
+        onRefresh: _loadCurrentUser, // 👈 Pull to refresh manually
         child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(bottom: kXSmall),
           child: Column(
             children: [
               Stack(
                 children: [
                   imageStack(context),
-                   Positioned(
+                  Positioned(
                     bottom: 0,
                     right: 0,
                     left: 0,
                     child: Column(
                       children: [
-
-                          Container(
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                    color: AppColors.whiteColor,
-                                    width: 1.4
-                                )
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.whiteColor,
+                              width: 1.4,
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(88),
-                              child: BlocBuilder<UserBloc,User?>(
-                                builder: (context,user){
-                                  return CachedNetworkImage(
-                                    errorWidget: (context, url, error) => Icon(Icons.person,size: 48,color: AppColors.defaultAppPurple,),
-                                    imageUrl: user?.picture??"",
-                                    width: 88,
-                                    height: 88,
-                                    fit: BoxFit.cover,
-                                  );
-                                }
-
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(88),
+                            child: CachedNetworkImage(
+                              imageUrl: currentUser?.picture ?? "",
+                              width: 88,
+                              height: 88,
+                              fit: BoxFit.cover,
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.person,
+                                size: 48,
+                                color: AppColors.defaultAppPurple,
                               ),
                             ),
                           ),
-                        Text(currentUser.name, style: const TextStyle(fontSize: kMedium, fontWeight: FontWeight.bold)),
-                        Text("0 Points")
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          currentUser?.name ?? "",
+                          style: const TextStyle(
+                            fontSize: kMedium,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Text("0 Points"),
                       ],
                     ),
                   ),
                 ],
               ),
-              SizedBox(
-                height: kMedium,
-              ),
+              const SizedBox(height: kMedium),
+
+              // Menu Cards
               InforCard(
                 image: LucideIcons.edit,
                 title: "Edit Profile",
-                press: () {
-                  context.pushNamed(AppRoute.editProfile.name);
+                press: () async {
+                  await context.pushNamed(AppRoute.editProfile.name);
+                  await _loadCurrentUser(); // 👈 Refresh after edit
                 },
               ),
               InforCard(
@@ -121,14 +148,16 @@ class _ProfilePageState extends State<ProfilePage> {
               InforCard(
                 image: LucideIcons.helpCircle,
                 title: "Help",
-                press: () {context.pushNamed(AppRoute.help.name);},
+                press: () {
+                  context.pushNamed(AppRoute.help.name);
+                },
               ),
               InforCard(
                 image: LucideIcons.logOut,
                 title: "Logout",
                 press: () {
-                   logoutDialog(context);
-                }
+                  logoutDialog(context);
+                },
               ),
             ],
           ),
@@ -162,15 +191,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 context.pop();
               },
               child: Container(
-                padding: const EdgeInsets.all(kSmall),
-                decoration: BoxDecoration(
-                    color: AppColors.whiteColor.withOpacity(0.3),
-                    shape: BoxShape.circle),
-                child: Icon(
-                  LucideIcons.arrowLeft,
-                  color: AppColors.whiteColor,
-                ),
-              ),
+                  padding: const EdgeInsets.all(kSmall),
+                  decoration: BoxDecoration(
+                      color: AppColors.whiteColor.withOpacity(0.3),
+                      shape: BoxShape.circle),
+                  child: GestureDetector(
+                    onTap: () {
+                      context.go('/home');
+                    },
+                    child: Icon(
+                      LucideIcons.arrowLeft,
+                      color: AppColors.whiteColor,
+                    ),
+                  )),
             ),
           ),
         ),
@@ -233,6 +266,7 @@ class InforCard extends StatelessWidget {
     );
   }
 }
+
 Future<void> logoutDialog(BuildContext context) async {
   return showDialog<void>(
     context: context,
@@ -253,7 +287,7 @@ Future<void> logoutDialog(BuildContext context) async {
               foregroundColor: Colors.red,
             ),
             child: const Text('Yes, logout'),
-            onPressed: () async{
+            onPressed: () async {
               await service<AppPreferencesManager>().logOut();
             },
           ),
@@ -268,6 +302,7 @@ Future<void> logoutDialog(BuildContext context) async {
     },
   );
 }
+
 void _showBottomSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
@@ -280,9 +315,13 @@ void _showBottomSheet(BuildContext context) {
     },
   );
 }
+
 class _BottomSheetContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final themeCubit = context.read<ThemeCubit>();
+    final themeMode = context.watch<ThemeCubit>().state;
+
     return SafeArea(
       child: DraggableScrollableSheet(
         expand: false,
@@ -294,7 +333,7 @@ class _BottomSheetContent extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Column(
@@ -309,7 +348,7 @@ class _BottomSheetContent extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-      
+
                 // Sheet Content
                 Expanded(
                   child: ListView(
@@ -324,37 +363,64 @@ class _BottomSheetContent extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 32,),
+                      SizedBox(
+                        height: 32,
+                      ),
+                      // Light Mode
                       Row(
                         children: [
-                          CircularIconButton(icon: Icons.light_mode_outlined),
-                          const SizedBox(width: 16,),
-                          Text("Light Mode"),
-                          Spacer(),
-                          DotToggleButton(isOn: true, onToggle: (){})
+                          const CircularIconButton(
+                              icon: Icons.light_mode_outlined),
+                          const SizedBox(width: 16),
+                          const Text("Light Mode"),
+                          const Spacer(),
+                          DotToggleButton(
+                            isOn: themeMode == ThemeMode.light,
+                            onToggle: () => {
+                              themeCubit.toggleTheme(false),
+                              context.pop(true)
+                            },
+                          ),
                         ],
                       ),
-                      SizedBox(height: 16,),
+                      const SizedBox(height: 16),
+
+                      // Dark Mode
                       Row(
                         children: [
-                          CircularIconButton(icon: Icons.dark_mode_outlined),
-                          const SizedBox(width: 16,),
-                          Text("Dark Mode"),
-                          Spacer(),
-                          DotToggleButton(isOn: false, onToggle: (){})
+                          const CircularIconButton(
+                              icon: Icons.dark_mode_outlined),
+                          const SizedBox(width: 16),
+                          const Text("Dark Mode"),
+                          const Spacer(),
+                          DotToggleButton(
+                            isOn: themeMode == ThemeMode.dark,
+                            onToggle: () => {
+                              themeCubit.toggleTheme(true),
+                              context.pop(true)
+                            },
+                          ),
                         ],
                       ),
-                      SizedBox(height: 16,),Row(
+                      const SizedBox(height: 16),
+
+                      // System Mode
+                      Row(
                         children: [
-                          CircularIconButton(icon: Icons.phone_iphone_rounded),
-                          const SizedBox(width: 16,),
-                          Text("Set to Device Mode"),
-                          Spacer(),
-                          DotToggleButton(isOn: false, onToggle: (){})
+                          const CircularIconButton(
+                              icon: Icons.phone_iphone_rounded),
+                          const SizedBox(width: 16),
+                          const Text("Set to Device Mode"),
+                          const Spacer(),
+                          DotToggleButton(
+                            isOn: themeMode == ThemeMode.system,
+                            onToggle: () => {
+                              themeCubit.emit(ThemeMode.system),
+                              context.pop(true)
+                            },
+                          ),
                         ],
                       ),
-                      SizedBox(height: 36,),
-                      CustomFilledButton("Apply")
                     ],
                   ),
                 ),
@@ -366,4 +432,3 @@ class _BottomSheetContent extends StatelessWidget {
     );
   }
 }
-

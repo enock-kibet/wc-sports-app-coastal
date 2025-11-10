@@ -53,6 +53,43 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       });
     });
 
+    on<_ProductRemoveCart>((event, emit) async {
+      emit(state.copyWith(status: ProductStatus.loading));
+      final recordResponse =
+      await _productService.removeCart(event.request);
+      recordResponse.when(onError: (error) {
+        emit(state.copyWith(
+          status: ProductStatus.failure,
+          failure: error,
+        ));
+      }, onSuccess: (data) async {
+        emit(state.copyWith(
+          status: ProductStatus.success,
+          message: data,
+          failure: null,
+        ));
+      });
+    });
+
+    on<_ProductClearCart>((event, emit) async {
+      emit(state.copyWith(status: ProductStatus.loading));
+      final recordResponse =
+      await _productService.clearCart(event.request);
+      recordResponse.when(onError: (error) {
+        emit(state.copyWith(
+          status: ProductStatus.failure,
+          failure: error,
+        ));
+      }, onSuccess: (data) async {
+        emit(state.copyWith(
+          status: ProductStatus.success,
+          message: data,
+          failure: null,
+        ));
+      });
+    });
+
+
     on<_ProductsBulkPurchase>((event, emit) async {
       emit(state.copyWith(status: ProductStatus.processingPayment));
       final recordResponse =

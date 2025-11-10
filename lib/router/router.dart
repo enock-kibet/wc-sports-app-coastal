@@ -2,12 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/models/player/player.dart';
+import 'package:sports_app/data/models/points/points.dart';
 import 'package:sports_app/data/models/products/product.dart';
+import 'package:sports_app/data/models/roaster/roaster.dart';
 
 import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/features/auth/onboarding.dart';
 import 'package:sports_app/features/auth/otp_page.dart';
@@ -60,7 +64,6 @@ enum AppRoute {
   playerProfile
 }
 
-
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream stream) {
     stream.listen((event) {
@@ -80,19 +83,24 @@ final GlobalKey<NavigatorState> _shellNavigatorCKey =
     GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorDKey =
     GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorEKey = 
+final GlobalKey<NavigatorState> _shellNavigatorEKey =
     GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorFKey =
     GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorGKey =
     GlobalKey<NavigatorState>();
 
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
+
+final RouteObserver<ModalRoute<void>> routeObserverB =
+    RouteObserver<ModalRoute<void>>();
+
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: "/home",
-  observers: [TalkerRouteObserver(service<Talker>())],
+  observers: [TalkerRouteObserver(service<Talker>()), routeObserver],
   routes: [
-
     GoRoute(
       path: "/standing",
       name: AppRoute.standings.name,
@@ -176,7 +184,6 @@ final router = GoRouter(
         StatefulShellBranch(
           navigatorKey: _shellNavigatorAKey,
           routes: [
-
             GoRoute(
                 path: "/home",
                 name: AppRoute.home.name,
@@ -193,19 +200,23 @@ final router = GoRouter(
                     parentNavigatorKey: rootNavigatorKey,
                     name: AppRoute.matchDetails.name,
                     pageBuilder: (context, state) {
+                      final match = state.extra as MatchType;
+
                       return MaterialPage(
-                        child: MatchDetailsPage(
-                          match: state.extra as MatchType,
-                          key: state.pageKey,
+                        key: state.pageKey,
+                        child: BlocProvider(
+                          create: (context) => PointsBloc(),
+                          child: MatchDetailsPage(match: match),
                         ),
                       );
                     },
-                  )
+                  ),
                 ])
           ],
         ),
         StatefulShellBranch(
           navigatorKey: _shellNavigatorBKey,
+          observers: [routeObserverB],
           routes: [
             GoRoute(
               path: "/schedule",
@@ -228,21 +239,19 @@ final router = GoRouter(
                   return const MaterialPage(child: ShopPage());
                 },
                 routes: [
-
                   GoRoute(
-                    path: "shopdetails",
-                    parentNavigatorKey: rootNavigatorKey,
-                    name: AppRoute.shopDetails.name,
-                    pageBuilder: (context, state) {
-                      return  MaterialPage(
-                        child: ShopDetailsPage(
-                          product: state.extra as Product,
-                          key: state.pageKey,
-                        ),
-                      );
-                    },
-                    routes: []
-                  ),
+                      path: "shopdetails",
+                      parentNavigatorKey: rootNavigatorKey,
+                      name: AppRoute.shopDetails.name,
+                      pageBuilder: (context, state) {
+                        return MaterialPage(
+                          child: ShopDetailsPage(
+                            product: state.extra as Product,
+                            key: state.pageKey,
+                          ),
+                        );
+                      },
+                      routes: []),
                   GoRoute(
                     path: "paymentWebView",
                     name: AppRoute.paymentWebView.name,
@@ -259,143 +268,141 @@ final router = GoRouter(
                 ])
           ],
         ),
-        StatefulShellBranch(
-          navigatorKey: _shellNavigatorDKey,
-            
-            routes: [
-              GoRoute(
-                path: "/team",
-                name: AppRoute.team.name,
-                pageBuilder: (context,state){
-                  return  MaterialPage(
-                      child: TeamPage(
-                        showBackNavigation: state.extra==null?false:true ,
-                      )
-                  );
-                },
-                routes: [
-                  GoRoute(
-                    path: "playerProfile",
-                    parentNavigatorKey: rootNavigatorKey,
-                    name: AppRoute.playerProfile.name,
-                    builder: (context, state) {
-                      return  PlayerPage(
-                        player: state.extra as PlayerProfileData,
-                      );
-                    },
-                  ),
-                ]
-              ),
-            ]),
+        StatefulShellBranch(navigatorKey: _shellNavigatorDKey, routes: [
+          GoRoute(
+              path: "/team",
+              name: AppRoute.team.name,
+              pageBuilder: (context, state) {
+                return MaterialPage(
+                    child: TeamPage(
+                  showBackNavigation: state.extra == null ? false : true,
+                ));
+              },
+              routes: [
+                GoRoute(
+                  path: "playerProfile",
+                  parentNavigatorKey: rootNavigatorKey,
+                  name: AppRoute.playerProfile.name,
+                  builder: (context, state) {
+                    return PlayerPage(
+                      player: state.extra as RoasterData,
+                    );
+                  },
+                ),
+              ]),
+        ]),
         StatefulShellBranch(
           navigatorKey: _shellNavigatorEKey,
           routes: [
             GoRoute(
-              path: "/profile",
-              name: AppRoute.profile.name,
-              pageBuilder: (context, state) {
-                return const MaterialPage(
-                  child: ProfilePage(),
-                );
-              },
-              routes: [
-                 GoRoute(
-                  path: "edit",
-                  parentNavigatorKey: rootNavigatorKey,
-                  name: AppRoute.editProfile.name,
-                  builder: (context, state) {
-                    return const EditProfileMain();
-                  },
-                ),
-                GoRoute(
+                path: "/profile",
+                name: AppRoute.profile.name,
+                pageBuilder: (context, state) {
+                  return const MaterialPage(
+                    child: ProfilePage(),
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: "edit",
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: AppRoute.editProfile.name,
+                    builder: (context, state) {
+                      return const EditProfileMain();
+                    },
+                  ),
+                  GoRoute(
                     path: "pointsManagement",
                     parentNavigatorKey: rootNavigatorKey,
                     name: AppRoute.pointsManagement.name,
-                    builder: (context,state){
-                      return const PointsPage();
-                    }
-                ),
-                GoRoute(
-                  path: "help",
-                  parentNavigatorKey: rootNavigatorKey,
-                  name: AppRoute.help.name,
-                  builder: (context,state){
-                    return const Help();
-                  }
-                ),
-                GoRoute(
-                  path: "aboutUs",
-                  parentNavigatorKey:rootNavigatorKey,
-                  name:AppRoute.aboutUs.name,
-                  builder:(context,state){
-                    return const AboutUs();
-                  }
-                ),
-                GoRoute(
-                  path: "details",
-                  parentNavigatorKey: rootNavigatorKey,
-                  name: AppRoute.profileDetails.name,
-                  builder: (context, state) {
-                    return const PersonalDetails();
-                  },
-                ),
-              ]
-            )
+                    pageBuilder: (context, state) {
+                      return MaterialPage(
+                        key: state.pageKey,
+                        child: BlocProvider(
+                          create: (context) => PointsBloc(),
+                          child: PointsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                      path: "help",
+                      parentNavigatorKey: rootNavigatorKey,
+                      name: AppRoute.help.name,
+                      builder: (context, state) {
+                        return const Help();
+                      }),
+                  GoRoute(
+                      path: "aboutUs",
+                      parentNavigatorKey: rootNavigatorKey,
+                      name: AppRoute.aboutUs.name,
+                      builder: (context, state) {
+                        return const AboutUs();
+                      }),
+                  GoRoute(
+                    path: "details",
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: AppRoute.profileDetails.name,
+                    builder: (context, state) {
+                      return const PersonalDetails();
+                    },
+                  ),
+                ])
           ],
         ),
-        StatefulShellBranch(
-          navigatorKey: _shellNavigatorFKey,
-          routes: [
-            GoRoute(
-              path: "/notifications",
-              name: AppRoute.notifications.name,
-              pageBuilder: (context, state) {
-                return const MaterialPage(
-                  child: NotificationPage(),
-                );
-              },
-            ),
-          ]
-        ),
-        StatefulShellBranch(
-            navigatorKey: _shellNavigatorGKey,
-            routes: [
-              GoRoute(
-                path: "/media",
-                name: AppRoute.media.name,
-                pageBuilder: (context, state) {
-                  return const MaterialPage(
-                    child: MediaPage(),
-                  );
-                },
-              ),
-            ]
-        ),
+        StatefulShellBranch(navigatorKey: _shellNavigatorFKey, routes: [
+          GoRoute(
+            path: "/notifications",
+            name: AppRoute.notifications.name,
+            pageBuilder: (context, state) {
+              return const MaterialPage(
+                child: NotificationPage(),
+              );
+            },
+          ),
+        ]),
+        StatefulShellBranch(navigatorKey: _shellNavigatorGKey, routes: [
+          GoRoute(
+            path: "/media",
+            name: AppRoute.media.name,
+            pageBuilder: (context, state) {
+              return const MaterialPage(
+                child: MediaPage(),
+              );
+            },
+          ),
+        ]),
       ],
     ),
   ],
-  refreshListenable: StreamToListenable([service<AppPreferencesManager>().stream]),
-  redirect: (context,state){
-    AuthenticationStatus authenticationStatus = service<AppPreferencesManager>().currentAuthStateValue;
+  refreshListenable:
+      StreamToListenable([service<AppPreferencesManager>().stream]),
+  redirect: (context, state) {
+    AuthenticationStatus authenticationStatus =
+        service<AppPreferencesManager>().currentAuthStateValue;
     debugPrint(state.matchedLocation);
-    if(authenticationStatus==AuthenticationStatus.firstTime){
+    if (authenticationStatus == AuthenticationStatus.firstTime) {
       return "/onboarding";
     }
-    if(authenticationStatus==AuthenticationStatus.notAuthenticated&&state.matchedLocation!="/signUp"){
+    if (authenticationStatus == AuthenticationStatus.notAuthenticated &&
+        state.matchedLocation != "/signUp") {
       return "/signIn";
     }
-    if(authenticationStatus==AuthenticationStatus.notAuthenticated&&state.matchedLocation=="/signUp"){
+    if (authenticationStatus == AuthenticationStatus.notAuthenticated &&
+        state.matchedLocation == "/signUp") {
       return "/signUp";
     }
-    if(authenticationStatus==AuthenticationStatus.notVerified){
+    if (authenticationStatus == AuthenticationStatus.notVerified) {
       return "/otp";
     }
-    if(authenticationStatus==AuthenticationStatus.verified && (state.matchedLocation=="/signUp"||state.matchedLocation=="/signIn" || state.matchedLocation=="/otp")){
+    if (authenticationStatus == AuthenticationStatus.verified &&
+        (state.matchedLocation == "/signUp" ||
+            state.matchedLocation == "/signIn" ||
+            state.matchedLocation == "/otp")) {
       return "/home";
     }
     return null;
   },
-
   errorPageBuilder: (context, state) {
     return CupertinoPage(
         child: Center(
@@ -403,6 +410,7 @@ final router = GoRouter(
     ));
   },
 );
+
 class StreamToListenable extends ChangeNotifier {
   late final List<StreamSubscription> subscriptions;
 

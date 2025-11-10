@@ -9,13 +9,12 @@ class RoundedtopContainer extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: kSMedium),
       decoration: BoxDecoration(
-        color: AppColors.whiteColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(36),
-          topRight: Radius.circular(36),
-         )
-      ),
-      child:child,
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(36),
+            topRight: Radius.circular(36),
+          )),
+      child: child,
     );
   }
 }

@@ -1,14 +1,23 @@
+import 'dart:async';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sports_app/features/app/blocs/address/address_bloc.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:sports_app/features/app/blocs/matches/match_schedule/schedule_bloc.dart';
 import 'package:sports_app/features/app/blocs/media/media_bloc.dart';
 import 'package:sports_app/features/app/blocs/notifications/notification_bloc.dart';
+import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/products/cart_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 
 import 'package:sports_app/features/app/side_menu_cubit.dart';
+import 'package:sports_app/firebase_options.dart';
+import 'package:sports_app/localization/app_prefs.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
 
 import 'data/services/service.dart';
@@ -16,25 +25,53 @@ import 'features/app/blocs/matches/match_bloc.dart';
 import 'features/app/blocs/products/product_bloc.dart';
 import 'router/router.dart';
 import 'theme/light_theme.dart';
+import 'dart:io' show Platform;
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  setUpService();
-  await service<AppPreferencesManager>().init();
-  // Stripe.publishableKey = "pk_test_51O9SmpIPfdPAIvZjlRwm4hFZ6VFixUHEdBHSl8OfNDnY8UrPfDHHjfgAl7eCQSxZkHBp4WDuRpF46Ct184dH6fPm00sTQAWXJH";
-  // Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
-  // Stripe.urlScheme = 'flutterstripe';
-  // await Stripe.instance.applySettings();
-  final runnableApp = _buildRunnableApp(
-    isWeb: kIsWeb,
-    webAppWidth: 560.0,
-    app: const MyApp(),
-  );
-  runApp(
-    runnableApp,
-  );
+
+void main() {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    // ✅ Enable edge-to-edge layout globally
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+    // ✅ Optional: make system bars transparent
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ));
+
+    if (Platform.isAndroid || Platform.isIOS || kIsWeb) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+
+      // 🔹 Capture Flutter framework errors
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
+    }
+
+    setUpService();
+    await service<AppPreferencesManager>().init();
+
+    final runnableApp = _buildRunnableApp(
+      isWeb: kIsWeb,
+      webAppWidth: 560.0,
+      app: const MyApp(),
+    );
+
+    runApp(runnableApp);
+  }, (error, stackTrace) {
+    FirebaseCrashlytics.instance.recordError(
+      error,
+      stackTrace,
+      fatal: true,
+    );
+  });
 }
 
 class MyApp extends StatefulWidget {
@@ -45,6 +82,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final prefs = AppPreferences();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -56,6 +94,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (_) => SideMenuCubit()),
         BlocProvider(create: (_) => HideCubit()),
         BlocProvider(create: (_) => ScheduleBloc()),
+        BlocProvider(create: (_) => ThemeCubit(prefs)),
         BlocProvider<ProductBloc>(
           create: (_) => ProductBloc()
             ..add(
@@ -91,13 +130,30 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
         ),
+        BlocProvider<AddressBloc>(
+          create: (_) => AddressBloc()
+            ..add(
+              const AddressEvent.getAddresses(
+                request: {},
+              ),
+            ),
+        ),
+        BlocProvider<PointsBloc>(
+          create: (_) => PointsBloc(),
+        ),
       ],
-      child: MaterialApp.router(
-        scaffoldMessengerKey: rootScaffoldMessengerKey,
-        title: 'Sports App',
-        debugShowCheckedModeBanner: false,
-        theme: lightMode,
-        routerConfig: router,
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
+          return MaterialApp.router(
+            scaffoldMessengerKey: rootScaffoldMessengerKey,
+            title: 'Sports App',
+            debugShowCheckedModeBanner: false,
+            // theme: systemMode,
+            darkTheme: darkMode,
+            themeMode: themeMode, // 👈 switch dynamically
+            routerConfig: router,
+          );
+        },
       ),
     );
   }
@@ -134,3 +190,31 @@ Widget _buildRunnableApp({
 //       'emailVerified': instance.emailVerified,
 //       'picture': instance.picture,
 //     };
+
+class ThemeCubit extends Cubit<ThemeMode> {
+  final AppPreferences _prefs;
+
+  ThemeCubit(this._prefs) : super(ThemeMode.system) {
+    _loadTheme();
+  }
+
+  Future<void> _loadTheme() async {
+    final savedMode = await _prefs.getThemeMode();
+    emit(savedMode);
+  }
+
+  void toggleTheme(bool darkMode) async {
+    final newMode = darkMode ? ThemeMode.dark : ThemeMode.light;
+    emit(newMode);
+    await _prefs.saveThemeMode(newMode);
+  }
+
+  void useSystemTheme() {
+    emit(ThemeMode.system);
+  }
+
+  void setSystemTheme() async {
+    emit(ThemeMode.system);
+    await _prefs.saveThemeMode(ThemeMode.system);
+  }
+}

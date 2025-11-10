@@ -3,6 +3,8 @@ part of 'auth_bloc.dart';
 enum AuthStatus {
   initial,
   loading,
+  uploading,
+  uploadSuccess,
   success,
   failure;
 
@@ -18,5 +20,6 @@ class AuthState with _$AuthState {
     @Default(AuthStatus.initial) AuthStatus status,
     Failure? failure,
     dynamic data,
+    dynamic pdata,
   }) = _AuthState;
 }

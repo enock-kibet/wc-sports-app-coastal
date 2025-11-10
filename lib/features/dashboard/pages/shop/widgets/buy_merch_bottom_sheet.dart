@@ -40,8 +40,8 @@ class _ShopBottomSheetContent extends StatelessWidget {
           return Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Column(
@@ -51,7 +51,7 @@ class _ShopBottomSheetContent extends StatelessWidget {
                   width: 48,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: const Color(0xffc4c4c4),
+                    color: Theme.of(context).colorScheme.onSurface,
                     borderRadius: BorderRadius.circular(2.5),
                   ),
                 ),
@@ -147,14 +147,14 @@ class DottedContainer extends StatelessWidget {
         radius: const Radius.circular(12),
         dashPattern: [6, 6],
         padding: EdgeInsets.zero,
-        color: const Color(0xffc4c4c4),
+        color: Theme.of(context).colorScheme.onSurface,
         strokeWidth: 1.5,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Container(
             height: height ?? 72,
             width: width ?? double.infinity,
-            color: containerBgColor ?? const Color(0xfff6f6f6),
+            color: containerBgColor ?? Theme.of(context).colorScheme.surface,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -187,11 +187,11 @@ class OrderSummary extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Order Summary",
           style: TextStyle(
               fontWeight: FontWeight.w500,
-              color: Color(0xff292323),
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 14),
         ),
         const Spacer(),
@@ -233,8 +233,10 @@ class TotalAmount extends StatelessWidget {
         const Spacer(),
         RichText(
           text: TextSpan(
-            style: const TextStyle(
-                fontSize: 16, color: Color(0xff585c60)), // Default style
+            style: TextStyle(
+                fontSize: 16,
+                color:
+                    Theme.of(context).colorScheme.onSurface), // Default style
             children: [
               const TextSpan(
                 text: "(Ksh) ",

@@ -16,11 +16,14 @@ class MatchType with _$MatchType {
     required DateTime matchDate,
     required String matchVenue,
     required String matchLocation,
-    required double matchPrice
+    required double matchPrice,
+    String? teamOneScore,
+    String? teamTwoScore,
   }) = _MatchType;
-  factory MatchType.fromJson(Map<String,Object?> json)
-  =>_$MatchTypeFromJson(json);
+  factory MatchType.fromJson(Map<String, Object?> json) =>
+      _$MatchTypeFromJson(json);
 }
+
 int getRandomMultipleOf50() {
   Random random = Random();
   int min = 400;
@@ -32,34 +35,37 @@ int getRandomMultipleOf50() {
   return randomIndex * 50; // Convert back to a multiple of 50
 }
 
-String getStringDate(DateTime date,{bool withoutWeekday = false}){
-  const weekDayMap={
-    7:"Sunday",
-    1:"Monday",
-    2:"Tuesday",
-    3:"Wednesday",
-    4:"Thursday",
-    5:"Friday",
-    6:"Saturday"
+String getStringDate(DateTime date, {bool withoutWeekday = false}) {
+  const weekDayMap = {
+    7: "Sunday",
+    1: "Monday",
+    2: "Tuesday",
+    3: "Wednesday",
+    4: "Thursday",
+    5: "Friday",
+    6: "Saturday"
   };
-  const monthMap ={
-    1:"January",
-    2:"February",
-    3:"March",
-    4:"April",
-    5:"May",
-    6:"June",
-    7:"July",
-    8:"August",
-    9:"September",
-    10:"October",
-    11:"November",
-    12:"December"
+  const monthMap = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December"
   };
 
-  return withoutWeekday?"${date.day} ${monthMap[date.month]} ${date.year}":"${weekDayMap[date.weekday]},${date.day} ${monthMap[date.month]} ${date.year}";
+  return withoutWeekday
+      ? "${date.day} ${monthMap[date.month]} ${date.year}"
+      : "${weekDayMap[date.weekday]},${date.day} ${monthMap[date.month]} ${date.year}";
 }
-const listOfImageUrls=[
+
+const listOfImageUrls = [
   "https://y2tsq5l02b.ufs.sh/f/m2LAP0R1sVFEMO1n0PJzwIpKtOcFxk9NAnBQ2lrmWf6hEb4u",
   "https://y2tsq5l02b.ufs.sh/f/m2LAP0R1sVFEFXOpUtBCTXwaW0LUB6jPE8NQ9IVsoZfG3KMh",
   "https://y2tsq5l02b.ufs.sh/f/m2LAP0R1sVFEeEqxVC65dcszXVnI1bTiSy9tAFfD8oKMBPa3",
@@ -92,11 +98,15 @@ const listOfImageUrls=[
   // "",
   // "",
 ];
-String RandomImageUrl(){
+String RandomImageUrl() {
   int randomValue = Random().nextInt(listOfImageUrls.length);
   return listOfImageUrls[randomValue];
 }
-bool onTheSameDay({required DateTime? requiredDate, required DateTime dateToCompare}){
-  DateTime date = requiredDate??DateTime.now();
-  return date.year == dateToCompare.year && date.month == dateToCompare.month && date.day == dateToCompare.day;
+
+bool onTheSameDay(
+    {required DateTime? requiredDate, required DateTime dateToCompare}) {
+  DateTime date = requiredDate ?? DateTime.now();
+  return date.year == dateToCompare.year &&
+      date.month == dateToCompare.month &&
+      date.day == dateToCompare.day;
 }

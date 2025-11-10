@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "555382788437",
+    "project_id": "wence-sports-d6c49",
+    "storage_bucket": "wence-sports-d6c49.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:555382788437:android:25ff45271d41e8d95fdfdc",
+        "android_client_info": {
+          "package_name": "com.wtl.sportsapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2Hxbck21M_gh4zGKAhSfjsn_Hqnd7hSI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

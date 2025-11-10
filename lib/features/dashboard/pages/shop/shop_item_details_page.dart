@@ -8,7 +8,9 @@ import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/features/app/blocs/address/address_bloc.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
+import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/products/product_bloc.dart';
 import 'package:sports_app/features/dashboard/pages/pages.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
@@ -38,10 +40,11 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
           if (state.status == ProductStatus.processingPayment) {
             rootScaffoldMessengerKey.currentState!.showSnackBar(
               SnackBar(
-                backgroundColor: AppColors.blackColor,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 content: Text(
                   "Securing Payment",
-                  style: TextStyle(color: AppColors.whiteColor),
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ),
             );
@@ -58,7 +61,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                 color: AppColors.defaultAppRed);
           } else if (state.status == ProductStatus.success) {
             AnimatedOverlaySnackbar.show(context, "Added to cart successfully",
-                color: AppColors.blackColor);
+                color: Theme.of(context).colorScheme.surface);
           }
         },
         builder: (context, state) {
@@ -68,9 +71,10 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                 child: Container(
                   margin: const EdgeInsets.symmetric(vertical: 12),
                   height: 64,
-                  decoration: const BoxDecoration(
-                    color:
-                        Colors.white, // Ensure it's the same as the background
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surface, // Ensure it's the same as the background
                     boxShadow: [], // Remove shadow if present
                   ),
                   child: Row(
@@ -99,11 +103,15 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                       rootScaffoldMessengerKey.currentState!
                                           .showSnackBar(
                                         SnackBar(
-                                          backgroundColor: AppColors.blackColor,
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .surface,
                                           content: Text(
                                             "Add an item to proceed",
                                             style: TextStyle(
-                                                color: AppColors.whiteColor),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface),
                                           ),
                                         ),
                                       );
@@ -140,18 +148,22 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                           );
                                     },
                               style: OutlinedButton.styleFrom(
-                                side: const BorderSide(
-                                    color: Colors.black, width: 1),
+                                side: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    width: 1),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 18),
+                                    horizontal: 20, vertical: 13),
                               ),
-                              child: const Text(
+                              child: Text(
                                 "Add to Cart",
                                 style: TextStyle(
-                                    color: Colors.black, fontSize: 16),
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    fontSize: 16),
                               ),
                             );
                           },
@@ -169,11 +181,15 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                       rootScaffoldMessengerKey.currentState!
                                           .showSnackBar(
                                         SnackBar(
-                                          backgroundColor: AppColors.blackColor,
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .surface,
                                           content: Text(
                                             "Add an item to proceed",
                                             style: TextStyle(
-                                                color: AppColors.whiteColor),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface),
                                           ),
                                         ),
                                       );
@@ -215,8 +231,8 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
 
                     Container(
                       height: double.infinity,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(36),
                             topRight: Radius.circular(36)),
@@ -267,7 +283,9 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                           overflow: TextOverflow.ellipsis,
                                           fontSize: 18,
                                           fontWeight: FontWeight.w600,
-                                          color: AppColors.darkColor)),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface)),
                                   const SizedBox(
                                     height: kXSmall,
                                   ),
@@ -280,7 +298,9 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                     style: TextStyle(
                                         fontSize: kSMedium,
                                         fontWeight: FontWeight.w400,
-                                        color: AppColors.darkColor
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
                                             .withOpacity(0.7)),
                                   ),
                                   const SizedBox(height: 8),
@@ -304,7 +324,9 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                     style: TextStyle(
                                       fontSize: kMedium,
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.darkColor,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
                                     ),
                                   ),
                                   const SizedBox(height: kSmall),
@@ -362,24 +384,31 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                     Positioned(
                         right: 20,
                         top: 20,
-                        child: GestureDetector(
-                            onTap: () {
-                              context.read<CartBloc>().add(
-                                const CartEvent.getCartItems(request: {}),
-                              );
-                              final cartItems = context.read<CartBloc>().state.cartItems; // adjust property name if needed
-                              showCartShopBottomSheet(context);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(kSmall),
-                              decoration: BoxDecoration(
-                                  color: AppColors.whiteColor.withOpacity(0.3),
-                                  shape: BoxShape.circle),
-                              child: Icon(
-                                LucideIcons.shoppingCart,
-                                color: AppColors.whiteColor,
-                              ),
-                            )))
+                        child: CustomIconButton(
+                          onButtonPress: () async {
+                            final bloc = context.read<PointsBloc>();
+
+                            // Step 1: Trigger loading of points
+                            bloc.add(const PointsEvent.points());
+
+                            // Step 2: Wait for points to load (listen for success)
+                            await Future.doWhile(() async {
+                              await Future.delayed(
+                                  const Duration(milliseconds: 100));
+                              final state = bloc.state;
+                              return state.status == PointsStatus.loading;
+                            });
+
+                            final pointsState = bloc.state;
+                            showCartShopBottomSheet(context,
+                                pointsState: pointsState);
+                          },
+                          icon: LucideIcons.shoppingCart,
+                          size: 40,
+                          borderColor: const Color(0xff828282),
+                          iconColor: Colors.white,
+                          backgroundColor: const Color(0xff828282),
+                        ))
 
                     //more hortz
                   ]),

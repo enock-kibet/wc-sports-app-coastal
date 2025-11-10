@@ -7,7 +7,6 @@ enum MediaStatus {
   failure,
   ;
 
-
   bool get isInitial => this == MediaStatus.initial;
   bool get isLoading => this == MediaStatus.loading;
   bool get isSuccess => this == MediaStatus.success;
@@ -22,5 +21,6 @@ class MediaState with _$MediaState {
     String? authorizationUrl,
     String? message,
     @Default([]) List<MediaData> media,
+    List<HighlightReel>? homeMedia,
   }) = _MediaState;
 }

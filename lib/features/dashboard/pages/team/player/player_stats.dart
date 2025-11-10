@@ -1,10 +1,15 @@
 part of 'player.dart';
 
 class PlayerStats extends StatelessWidget {
-  const PlayerStats({super.key});
+  final RoasterData player;
+  const PlayerStats({super.key, required this.player});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(child: const PlayerStatsTable());
+    return BlocProvider(
+      create: (_) =>
+          StatBloc()..add(StatEvent.getPlayerStats(playerId: player.playerId)),
+      child: const PlayerStatsTable(),
+    );
   }
 }

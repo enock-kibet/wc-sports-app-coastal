@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sports_app/data/error/failure.dart';
+import 'package:sports_app/data/models/addresses/address.dart';
 import 'package:sports_app/data/models/products/cart.dart';
 
 import 'package:sports_app/data/services/service.dart';
@@ -18,7 +19,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
     on<_CartFetchedCart>((event, emit) async {
       emit(state.copyWith(status: CartStatus.loading));
-      final recordResponse = await _cartService.getCartItems(event.request);
+      final recordResponse = await _cartService.getCartItems();
       recordResponse.when(onError: (error) {
         emit(state.copyWith(
           status: CartStatus.failure,

@@ -6,20 +6,17 @@ part 'schedule_state.dart';
 
 enum ScheduleCategory { today, tomorrow, thisWeek, future }
 
-
 class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
-
   ScheduleBloc() : super(ScheduleLoading()) {
     on<LoadSchedules>((event, emit) {
-      final matches = event.matchList; // Replace with your data source
+      final matches = event.matchList;
       final categorized = _categorizeSchedules(matches);
       emit(ScheduleLoaded(categorized));
     });
   }
 
-
-
-  Map<ScheduleCategory, List<MatchType>> _categorizeSchedules(List<MatchType> matches) {
+  Map<ScheduleCategory, List<MatchType>> _categorizeSchedules(
+      List<MatchType> matches) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(Duration(days: 1));
@@ -33,7 +30,8 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     };
 
     for (var match in matches) {
-      final matchDate = DateTime(match.matchDate.year, match.matchDate.month, match.matchDate.day);
+      final matchDate = DateTime(
+          match.matchDate.year, match.matchDate.month, match.matchDate.day);
       if (matchDate == today) {
         categorized[ScheduleCategory.today]!.add(match);
       } else if (matchDate == tomorrow) {

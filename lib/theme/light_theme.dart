@@ -9,7 +9,7 @@ import 'app_colors.dart';
 ThemeData lightMode = ThemeData(
   brightness: Brightness.light,
   useMaterial3: true,
-  textTheme: createTextTheme(),//.jetBrainsMonoTextTheme(),
+  textTheme: createTextTheme(), //.jetBrainsMonoTextTheme(),
   //fontFamily: 'Inter',
   buttonTheme: ButtonThemeData(
     buttonColor: AppColors.primaryColor,
@@ -67,3 +67,76 @@ ThemeData lightMode = ThemeData(
     tertiary: Colors.white,
   ),
 );
+
+ThemeData darkMode = ThemeData(
+  brightness: Brightness.dark,
+  useMaterial3: true,
+  textTheme: createTextTheme(), // keep same font setup
+  buttonTheme: ButtonThemeData(
+    buttonColor: AppColors.primaryColor,
+    height: 50,
+    minWidth: double.infinity,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(kSmall),
+    ),
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    fillColor: Colors.grey[850], // darker input bg
+    filled: true,
+    border: OutlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(kSmall),
+    ),
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: kMedium,
+      vertical: kXLMedium * 0.9,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(kSmall),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(kSmall),
+      borderSide: BorderSide(
+        color: AppColors.primaryColor,
+      ),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(kSmall),
+      borderSide: BorderSide(
+        color: AppColors.dangerColor,
+      ),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(kSmall),
+      borderSide: BorderSide(
+        color: AppColors.dangerColor,
+      ),
+    ),
+    disabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(kSmall),
+      borderSide: BorderSide.none,
+    ),
+    hintStyle: TextStyle(
+      fontWeight: FontWeight.w500,
+      color: Colors.grey[400], // lighter hint in dark mode
+    ),
+    errorStyle: TextStyle(
+      color: AppColors.dangerColor,
+    ),
+  ),
+  colorScheme: ColorScheme.dark(
+    background:
+        AppColors.blackColor ?? Colors.black, // dark scaffold background
+    primary: AppColors.primaryColor, // keep branding consistent
+    secondary: Colors.grey[600]!,
+    tertiary: Colors.grey[850]!, // darker card bg
+  ),
+);
+
+// system default
+ThemeData systemMode = ThemeMode.system == ThemeMode.light
+    ? lightMode
+    : ThemeMode.dark == ThemeMode.dark
+        ? darkMode
+        : lightMode;

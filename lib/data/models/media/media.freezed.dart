@@ -202,6 +202,9 @@ Highlight _$HighlightFromJson(Map<String, dynamic> json) {
 mixin _$Highlight {
   String get title => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
+  String? get url =>
+      throw _privateConstructorUsedError; // video or YouTube link
+  String get type => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -214,7 +217,7 @@ abstract class $HighlightCopyWith<$Res> {
   factory $HighlightCopyWith(Highlight value, $Res Function(Highlight) then) =
       _$HighlightCopyWithImpl<$Res, Highlight>;
   @useResult
-  $Res call({String title, String image});
+  $Res call({String title, String image, String? url, String type});
 }
 
 /// @nodoc
@@ -232,6 +235,8 @@ class _$HighlightCopyWithImpl<$Res, $Val extends Highlight>
   $Res call({
     Object? title = null,
     Object? image = null,
+    Object? url = freezed,
+    Object? type = null,
   }) {
     return _then(_value.copyWith(
       title: null == title
@@ -241,6 +246,14 @@ class _$HighlightCopyWithImpl<$Res, $Val extends Highlight>
       image: null == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
+              as String,
+      url: freezed == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String?,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
               as String,
     ) as $Val);
   }
@@ -254,7 +267,7 @@ abstract class _$$HighlightImplCopyWith<$Res>
       __$$HighlightImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, String image});
+  $Res call({String title, String image, String? url, String type});
 }
 
 /// @nodoc
@@ -270,6 +283,8 @@ class __$$HighlightImplCopyWithImpl<$Res>
   $Res call({
     Object? title = null,
     Object? image = null,
+    Object? url = freezed,
+    Object? type = null,
   }) {
     return _then(_$HighlightImpl(
       title: null == title
@@ -280,6 +295,14 @@ class __$$HighlightImplCopyWithImpl<$Res>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String,
+      url: freezed == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String?,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -287,7 +310,11 @@ class __$$HighlightImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$HighlightImpl implements _Highlight {
-  const _$HighlightImpl({required this.title, required this.image});
+  const _$HighlightImpl(
+      {required this.title,
+      required this.image,
+      this.url,
+      this.type = "image"});
 
   factory _$HighlightImpl.fromJson(Map<String, dynamic> json) =>
       _$$HighlightImplFromJson(json);
@@ -296,10 +323,16 @@ class _$HighlightImpl implements _Highlight {
   final String title;
   @override
   final String image;
+  @override
+  final String? url;
+// video or YouTube link
+  @override
+  @JsonKey()
+  final String type;
 
   @override
   String toString() {
-    return 'Highlight(title: $title, image: $image)';
+    return 'Highlight(title: $title, image: $image, url: $url, type: $type)';
   }
 
   @override
@@ -308,12 +341,14 @@ class _$HighlightImpl implements _Highlight {
         (other.runtimeType == runtimeType &&
             other is _$HighlightImpl &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.image, image) || other.image == image));
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.url, url) || other.url == url) &&
+            (identical(other.type, type) || other.type == type));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, title, image);
+  int get hashCode => Object.hash(runtimeType, title, image, url, type);
 
   @JsonKey(ignore: true)
   @override
@@ -332,7 +367,9 @@ class _$HighlightImpl implements _Highlight {
 abstract class _Highlight implements Highlight {
   const factory _Highlight(
       {required final String title,
-      required final String image}) = _$HighlightImpl;
+      required final String image,
+      final String? url,
+      final String type}) = _$HighlightImpl;
 
   factory _Highlight.fromJson(Map<String, dynamic> json) =
       _$HighlightImpl.fromJson;
@@ -341,6 +378,10 @@ abstract class _Highlight implements Highlight {
   String get title;
   @override
   String get image;
+  @override
+  String? get url;
+  @override // video or YouTube link
+  String get type;
   @override
   @JsonKey(ignore: true)
   _$$HighlightImplCopyWith<_$HighlightImpl> get copyWith =>
@@ -355,8 +396,10 @@ SeasonHighlight _$SeasonHighlightFromJson(Map<String, dynamic> json) {
 mixin _$SeasonHighlight {
   String get title => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
-  String get time => throw _privateConstructorUsedError;
-  String get date => throw _privateConstructorUsedError;
+  String? get time => throw _privateConstructorUsedError;
+  String? get date => throw _privateConstructorUsedError;
+  String get url => throw _privateConstructorUsedError;
+  String? get type => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -370,7 +413,13 @@ abstract class $SeasonHighlightCopyWith<$Res> {
           SeasonHighlight value, $Res Function(SeasonHighlight) then) =
       _$SeasonHighlightCopyWithImpl<$Res, SeasonHighlight>;
   @useResult
-  $Res call({String title, String image, String time, String date});
+  $Res call(
+      {String title,
+      String image,
+      String? time,
+      String? date,
+      String url,
+      String? type});
 }
 
 /// @nodoc
@@ -388,8 +437,10 @@ class _$SeasonHighlightCopyWithImpl<$Res, $Val extends SeasonHighlight>
   $Res call({
     Object? title = null,
     Object? image = null,
-    Object? time = null,
-    Object? date = null,
+    Object? time = freezed,
+    Object? date = freezed,
+    Object? url = null,
+    Object? type = freezed,
   }) {
     return _then(_value.copyWith(
       title: null == title
@@ -400,14 +451,22 @@ class _$SeasonHighlightCopyWithImpl<$Res, $Val extends SeasonHighlight>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String,
-      time: null == time
+      time: freezed == time
           ? _value.time
           : time // ignore: cast_nullable_to_non_nullable
-              as String,
-      date: null == date
+              as String?,
+      date: freezed == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
+              as String?,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
               as String,
+      type: freezed == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -420,7 +479,13 @@ abstract class _$$SeasonHighlightImplCopyWith<$Res>
       __$$SeasonHighlightImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, String image, String time, String date});
+  $Res call(
+      {String title,
+      String image,
+      String? time,
+      String? date,
+      String url,
+      String? type});
 }
 
 /// @nodoc
@@ -436,8 +501,10 @@ class __$$SeasonHighlightImplCopyWithImpl<$Res>
   $Res call({
     Object? title = null,
     Object? image = null,
-    Object? time = null,
-    Object? date = null,
+    Object? time = freezed,
+    Object? date = freezed,
+    Object? url = null,
+    Object? type = freezed,
   }) {
     return _then(_$SeasonHighlightImpl(
       title: null == title
@@ -448,14 +515,22 @@ class __$$SeasonHighlightImplCopyWithImpl<$Res>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String,
-      time: null == time
+      time: freezed == time
           ? _value.time
           : time // ignore: cast_nullable_to_non_nullable
-              as String,
-      date: null == date
+              as String?,
+      date: freezed == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
+              as String?,
+      url: null == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
               as String,
+      type: freezed == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -467,7 +542,9 @@ class _$SeasonHighlightImpl implements _SeasonHighlight {
       {required this.title,
       required this.image,
       required this.time,
-      required this.date});
+      required this.date,
+      required this.url,
+      required this.type});
 
   factory _$SeasonHighlightImpl.fromJson(Map<String, dynamic> json) =>
       _$$SeasonHighlightImplFromJson(json);
@@ -477,13 +554,17 @@ class _$SeasonHighlightImpl implements _SeasonHighlight {
   @override
   final String image;
   @override
-  final String time;
+  final String? time;
   @override
-  final String date;
+  final String? date;
+  @override
+  final String url;
+  @override
+  final String? type;
 
   @override
   String toString() {
-    return 'SeasonHighlight(title: $title, image: $image, time: $time, date: $date)';
+    return 'SeasonHighlight(title: $title, image: $image, time: $time, date: $date, url: $url, type: $type)';
   }
 
   @override
@@ -494,12 +575,15 @@ class _$SeasonHighlightImpl implements _SeasonHighlight {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.image, image) || other.image == image) &&
             (identical(other.time, time) || other.time == time) &&
-            (identical(other.date, date) || other.date == date));
+            (identical(other.date, date) || other.date == date) &&
+            (identical(other.url, url) || other.url == url) &&
+            (identical(other.type, type) || other.type == type));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, title, image, time, date);
+  int get hashCode =>
+      Object.hash(runtimeType, title, image, time, date, url, type);
 
   @JsonKey(ignore: true)
   @override
@@ -520,8 +604,10 @@ abstract class _SeasonHighlight implements SeasonHighlight {
   const factory _SeasonHighlight(
       {required final String title,
       required final String image,
-      required final String time,
-      required final String date}) = _$SeasonHighlightImpl;
+      required final String? time,
+      required final String? date,
+      required final String url,
+      required final String? type}) = _$SeasonHighlightImpl;
 
   factory _SeasonHighlight.fromJson(Map<String, dynamic> json) =
       _$SeasonHighlightImpl.fromJson;
@@ -531,9 +617,13 @@ abstract class _SeasonHighlight implements SeasonHighlight {
   @override
   String get image;
   @override
-  String get time;
+  String? get time;
   @override
-  String get date;
+  String? get date;
+  @override
+  String get url;
+  @override
+  String? get type;
   @override
   @JsonKey(ignore: true)
   _$$SeasonHighlightImplCopyWith<_$SeasonHighlightImpl> get copyWith =>

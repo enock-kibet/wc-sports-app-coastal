@@ -17,6 +17,8 @@ _$MatchTypeImpl _$$MatchTypeImplFromJson(Map<String, dynamic> json) =>
       matchVenue: json['matchVenue'] as String,
       matchLocation: json['matchLocation'] as String,
       matchPrice: (json['matchPrice'] as num).toDouble(),
+      teamOneScore: json['teamOneScore'] as String?,
+      teamTwoScore: json['teamTwoScore'] as String?,
     );
 
 Map<String, dynamic> _$$MatchTypeImplToJson(_$MatchTypeImpl instance) =>
@@ -30,4 +32,6 @@ Map<String, dynamic> _$$MatchTypeImplToJson(_$MatchTypeImpl instance) =>
       'matchVenue': instance.matchVenue,
       'matchLocation': instance.matchLocation,
       'matchPrice': instance.matchPrice,
+      'teamOneScore': instance.teamOneScore,
+      'teamTwoScore': instance.teamTwoScore,
     };

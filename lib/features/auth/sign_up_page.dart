@@ -137,11 +137,14 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                                         fontWeight: FontWeight.w600,
                                         color: Color(0xFF696565)))),
                             const SizedBox(height: 9),
-                            CustomTextField(true, "Jina Langu",controller: _firstNameController,
-                                      validator: combine([
-                                        withMessage('Name is empty', isTextEmpty),
-                                        
-                                      ]),),
+                            CustomTextField(
+                              true,
+                              "Jina Langu",
+                              controller: _firstNameController,
+                              validator: combine([
+                                withMessage('Name is empty', isTextEmpty),
+                              ]),
+                            ),
                           ],
                         )),
                         SizedBox(
@@ -160,11 +163,14 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                             const SizedBox(
                               height: 9,
                             ),
-                            CustomTextField(true, "",controller: _lastNameController,
-                                      validator: combine([
-                                        withMessage('Name is empty', isTextEmpty),
-                                       
-                                      ]),),
+                            CustomTextField(
+                              true,
+                              "",
+                              controller: _lastNameController,
+                              validator: combine([
+                                withMessage('Name is empty', isTextEmpty),
+                              ]),
+                            ),
                           ],
                         ))
                       ],
@@ -182,11 +188,15 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                     const SizedBox(
                       height: 9,
                     ),
-                    CustomTextField(true, "jina@email.com",controller: _emailController,
-                                      validator: combine([
-                                        withMessage('Email is empty', isTextEmpty),
-                                        withMessage('Email is invalid', isInvalidEmail)
-                                      ]),),
+                    CustomTextField(
+                      true,
+                      "jina@email.com",
+                      controller: _emailController,
+                      validator: combine([
+                        withMessage('Email is empty', isTextEmpty),
+                        withMessage('Email is invalid', isInvalidEmail)
+                      ]),
+                    ),
                     const SizedBox(
                       height: 13,
                     ),
@@ -200,107 +210,110 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                     const SizedBox(
                       height: 9,
                     ),
-                    ValueListenableBuilder(valueListenable: _isHidden, builder: (context,value,child){
-                      return CustomTextField(false, "**********",controller: _passwordController,
-                        validator: combine([
-                          withMessage('password is empty', isTextEmpty),
-                          withMessage('password is invalid', isPasswordInvalid)
-                        ]),
-                        obscureText: _isHidden.value,
-                        obscuringCharacter: "*",
-                        toggleVisibility: (){
-                          _isHidden.value = !_isHidden.value;
-                        }
-                      );
-                    }),
-
-
+                    ValueListenableBuilder(
+                        valueListenable: _isHidden,
+                        builder: (context, value, child) {
+                          return CustomTextField(false, "**********",
+                              controller: _passwordController,
+                              validator: combine([
+                                withMessage('password is empty', isTextEmpty),
+                                withMessage(
+                                    'password is invalid', isPasswordInvalid)
+                              ]),
+                              obscureText: _isHidden.value,
+                              obscuringCharacter: "*", toggleVisibility: () {
+                            _isHidden.value = !_isHidden.value;
+                          });
+                        }),
                     ValueListenableBuilder<bool>(
-                      valueListenable: _isChecked,
-                      builder: (context,value,child) {
-                        return FormField<bool>(
-                          initialValue: value,
-                          validator: (val){
-                            if(!(val??false)){
-                              return "Accept terms to proceed.";
-                            }
-                            return null;
-                          },
-                          builder: (state) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                        valueListenable: _isChecked,
+                        builder: (context, value, child) {
+                          return FormField<bool>(
+                              initialValue: value,
+                              validator: (val) {
+                                if (!(val ?? false)) {
+                                  return "Accept terms to proceed.";
+                                }
+                                return null;
+                              },
+                              builder: (state) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Checkbox(
-                                         value: state.value,
-                                         onChanged: (onChanged) {
-                                           //_isChecked.value = onChanged??false;
-                                           state.didChange(onChanged);
-                                         }),
-                                    RichText(
-                                      text: TextSpan(
-                                        text: 'Agree to ',
-                                        style: const TextStyle(color: Colors.black),
-                                        children: [
-                                          TextSpan(
-                                            text: 'Terms & Conditions',
+                                    Row(
+                                      children: [
+                                        Checkbox(
+                                            value: state.value,
+                                            onChanged: (onChanged) {
+                                              //_isChecked.value = onChanged??false;
+                                              state.didChange(onChanged);
+                                            }),
+                                        RichText(
+                                          text: TextSpan(
+                                            text: 'Agree to ',
                                             style: const TextStyle(
-                                              color: Colors.blue,
-                                              decoration: TextDecoration.underline,
-                                            ),
-                                            recognizer: TapGestureRecognizer()
-                                            ..onTap = () {
-                                            launchURL("https://wencetechnologies.com/SportsApp/Terms%26Conditions.html"); // Call your URL launcher function
-                                            },
+                                                color: Colors.black),
+                                            children: [
+                                              TextSpan(
+                                                text: 'Terms & Conditions',
+                                                style: const TextStyle(
+                                                  color: Colors.blue,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                ),
+                                                recognizer:
+                                                    TapGestureRecognizer()
+                                                      ..onTap = () {
+                                                        launchURL(
+                                                            "https://wencetechnologies.com/SportsApp/Terms%26Conditions.html"); // Call your URL launcher function
+                                                      },
+                                              ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
+                                      ],
+                                    ),
+                                    if (state.hasError)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 12.0),
+                                        child: Text(
+                                          state.errorText ?? '',
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: kSMedium),
+                                        ),
                                       ),
-                                    ),
-
                                   ],
-                                ),
-                                if(state.hasError)
-                                  Padding(
-                                    padding: const EdgeInsets.only(left:12.0),
-                                    child: Text(
-                                      state.errorText ?? '',
-                                      style: TextStyle(color: Colors.red,fontSize: kSMedium),
-                                    ),
-                                  ),
-                              ],
-                            );
-                          }
-                        );
-                      }
-                    ),
-
+                                );
+                              });
+                        }),
                     const SizedBox(
                       height: kLarge,
                     ),
                     GestureDetector(
                         onTap: () {
                           if (validateSaveLogin()) {
-                                        if (state.status == AuthStatus.loading) {
-                                        } else {
-                                          String name = _firstNameController.text.trim() +
-                                              " " +
-                                              _lastNameController.text.trim();
-                                          
-                                          authBloc.add(AuthEvent.registering(
-                                              request: {
-                                            "name":name,
-                                            "email": _emailController.text.trim(),
-                                            "password": _passwordController.text.trim(),
-                                            "confirmpassword":_passwordController.text.trim()
-                                        }
-                                        ));
-                                        }
-                                      }
+                            if (state.status == AuthStatus.loading) {
+                            } else {
+                              String name = _firstNameController.text.trim() +
+                                  " " +
+                                  _lastNameController.text.trim();
+
+                              authBloc.add(AuthEvent.registering(request: {
+                                "name": name,
+                                "email": _emailController.text.trim(),
+                                "password": _passwordController.text.trim(),
+                                "confirmpassword":
+                                    _passwordController.text.trim()
+                              }));
+                            }
+                          }
                         },
-                        child: CustomFilledButton(state.status == AuthStatus.loading
-                                            ? "Loading..."
-                                            :'Sign Up')),
+                        child: CustomFilledButton(
+                            state.status == AuthStatus.loading
+                                ? "Loading..."
+                                : 'Sign Up')),
                     SizedBox(
                       height: 12,
                     ),
@@ -310,25 +323,23 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                             side: BorderSide(color: Color(0xFF414141)),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(kMedium))),
-                        onPressed: () async{
+                        onPressed: () async {
                           try {
                             // Initialize Google Sign-In
-                            final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
+                            final GoogleSignIn googleSignIn =
+                                GoogleSignIn(scopes: ['profile', 'email']);
 
                             // Trigger the Google Sign-In flow
-                            final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+                            final GoogleSignInAccount? googleUser =
+                                await googleSignIn.signIn();
 
                             if (googleUser != null) {
-
-                              authBloc.add(AuthEvent.googlelogin(
-                                  request: {
-                                    "name": googleUser.displayName,
-                                    "email":googleUser.email,
-                                    "googleId":googleUser.id,
-                                    "picture":googleUser.photoUrl
-                                  }));
-
-
+                              authBloc.add(AuthEvent.googlelogin(request: {
+                                "name": googleUser.displayName,
+                                "email": googleUser.email,
+                                "googleId": googleUser.id,
+                                "picture": googleUser.photoUrl
+                              }));
                             } else {
                               print("Google Sign-In canceled by user.");
                               return null;
@@ -354,7 +365,10 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                                   color: Color(0xFF525252), fontSize: 13),
                             )
                           ],
-                        ))
+                        )),
+                    const SizedBox(
+                      height: kSMedium * 5,
+                    ),
                   ],
                 ),
               ),
@@ -364,7 +378,8 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
       ),
     );
   }
-   bool validateSaveLogin() {
+
+  bool validateSaveLogin() {
     final form = _registerFormKey.currentState;
     if (form!.validate()) {
       form.save();
@@ -374,6 +389,7 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
     }
   }
 }
+
 void launchURL(String url) async {
   final Uri uri = Uri.parse(url);
   if (await canLaunchUrl(uri)) {

@@ -1,13 +1,26 @@
 part of "../shop_page.dart";
 
-void showCartShopBottomSheet(BuildContext context) {
+void showCartShopBottomSheet(BuildContext context,
+    {required PointsState pointsState}) {
+  final pointsState = context.read<PointsBloc>().state;
   context.read<CartBloc>().add(
-    CartEvent.getCartItems(
-      request: {
-        "email": service<AppPreferencesManager>().currentUserValue!.email,
-      },
-    ),
-  );
+        CartEvent.getCartItems(
+          request: {
+            "email": service<AppPreferencesManager>().currentUserValue!.email,
+          },
+        ),
+      );
+
+  // Fetch addresses from AddressBloc
+  context.read<AddressBloc>().add(
+        AddressEvent.getAddresses(request: {
+          "email": service<AppPreferencesManager>().currentUserValue!.email,
+        }),
+      );
+
+  context.read<AddressBloc>().add(
+        const AddressEvent.getPickupAddresses(),
+      );
 
   showModalBottomSheet(
     context: context,
@@ -48,13 +61,22 @@ void showCartShopBottomSheet(BuildContext context) {
           final cartItems = state.cartItems ?? [];
           final isLoading = state.status == CartStatus.loading;
 
+          // get addresses from state
+
           if (isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          return _ShopCartBottomSheetContent(
-            isLoading: isLoading,
-            cartItems: cartItems,
+          return BlocBuilder<AddressBloc, AddressState>(
+            builder: (context, addressState) {
+              final addresses = addressState.data ?? [];
+              return _ShopCartBottomSheetContent(
+                isLoading: isLoading,
+                cartItems: cartItems,
+                addresses: addresses,
+                pointsState: pointsState,
+              );
+            },
           );
         },
       );
@@ -62,15 +84,22 @@ void showCartShopBottomSheet(BuildContext context) {
   );
 }
 
+const kGoogleApiKey =
+    "AIzaSyCvhSnZ3edg_8TARHCU4cY4JjyrzcG5Eho#"; // Replace with your actual Google API key
+
 class _ShopCartBottomSheetContent extends StatefulWidget {
   final bool isLoading;
   final List<CartItem> cartItems;
+  final List<Address> addresses;
   final Map<String, double>? priceByProduct;
+  final PointsState pointsState;
 
   const _ShopCartBottomSheetContent({
     super.key,
     required this.isLoading,
     required this.cartItems,
+    required this.addresses,
+    required this.pointsState,
     this.priceByProduct,
   });
 
@@ -82,7 +111,20 @@ class _ShopCartBottomSheetContent extends StatefulWidget {
 class _ShopCartBottomSheetContentState
     extends State<_ShopCartBottomSheetContent> {
   late List<CartItem> _items;
+  late List<Address> _addresses;
+  late ValueNotifier<bool> usePointsController;
   int _selectedTab = 0; // 0 = Delivery, 1 = Pick-Up
+
+  Address? _selectedAddressDropdown;
+
+  PickupAddress? _selectedPickupAddressDropdown;
+
+  String? _selected;
+
+  LatLng? _selectedAddressLatLng;
+
+  String? _selectedAddress;
+  String? _previewImageUrl;
 
   // Constants
   static const double _defaultPrice = 720.0;
@@ -96,6 +138,14 @@ class _ShopCartBottomSheetContentState
   void initState() {
     super.initState();
     _items = List<CartItem>.from(widget.cartItems);
+    _addresses = List<Address>.from(widget.addresses);
+    usePointsController = ValueNotifier<bool>(false);
+  }
+
+  @override
+  void dispose() {
+    usePointsController.dispose();
+    super.dispose();
   }
 
   double _priceForItem(CartItem item) {
@@ -110,6 +160,85 @@ class _ShopCartBottomSheetContentState
       }
     }
     return sum;
+  }
+
+  double get _total {
+    double sum = _subtotal;
+    if (usePointsController.value) {
+      sum -= int.tryParse(widget.pointsState.balance) ?? 0;
+    }
+    return sum;
+  }
+
+  Future<gmf.LatLng?> getCurrentLatLng() async {
+    // Check if location services are enabled
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return null;
+
+    // Check for permissions
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) return null;
+    }
+    if (permission == LocationPermission.deniedForever) return null;
+
+    // Get current position
+    final pos = await Geolocator.getCurrentPosition();
+    return gmf.LatLng(pos.latitude, pos.longitude);
+  }
+
+  Future<void> _handlePressButton() async {
+    // final result = await showModalBottomSheet<Map<String, dynamic>>(
+    //   context: context,
+    //   isScrollControlled: true,
+    //   shape: const RoundedRectangleBorder(
+    //     borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    //   ),
+    //   builder: (context) => MapLocationPickerBottomSheet(
+    //     apiKey: kGoogleApiKey,
+    //   ),
+    // );
+    // if (result != null && result["latLng"] != null) {
+    //   final LatLng latLng = result["latLng"];
+    //   final String? address = result["address"];
+    //   setState(() {
+    //     _selectedAddress = address ?? "${latLng.lat},${latLng.lng}";
+    //     _selectedAddressLatLng = latLng;
+    //     _previewImageUrl =
+    //     "https://maps.googleapis.com/maps/api/staticmap"
+    //         "?center=${latLng.lat},${latLng.lng}"
+    //         "&zoom=16"
+    //         "&size=150x150"
+    //         "&markers=color:purple%7C${latLng.lat},${latLng.lng}"
+    //         "&key=$kGoogleApiKey";
+    //   });
+    // }
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => AddressFormBottomSheet(
+        apiKey: kGoogleApiKey,
+        onAddressSelected: (result) {
+          setState(() {
+            _selectedAddress = result["address"];
+            _selectedAddressDropdown = Address(
+              id: result["id"] ?? "",
+              name: result["name"] ?? "",
+              locality: result["address"] ?? "",
+              city: result["city"] ?? "",
+              country: result["country"] ?? "",
+              phone: result["phone"] ?? "",
+              latitude: null,
+              longitude: null,
+              isDefault: false,
+            );
+            print("Selected20 Address: $_selectedAddress");
+            // You can also store name/phone if needed
+          });
+        },
+      ),
+    );
   }
 
   void _updateQty({
@@ -144,13 +273,50 @@ class _ShopCartBottomSheetContentState
       final newVariants = List<CartVariant>.from(product.variants);
       newVariants[vIndex] = updatedVariant;
 
+      // check differents with original qty and send to removeCart if removed
+      if (newQty != oldVariant.quantity) {
+        // get difference in quantity
+        final difference = oldVariant.quantity - newQty;
+        // convert to absolute value
+        final differenceInt = difference.abs();
+        // check if difference is greater than 0
+        print(difference);
+        if (difference > 0) {
+          context.read<ProductBloc>().add(
+                ProductEvent.removeCart(
+                  request: {
+                    "productID": product.id,
+                    "bundledItems": [
+                      {
+                        "variantID": variantId,
+                        "quantity": differenceInt,
+                      }
+                    ],
+                  },
+                ),
+              );
+        } else if (difference < 0) {
+          // add to cart if difference is less than 0
+          context.read<ProductBloc>().add(
+                ProductEvent.addToCart(
+                  request: {
+                    "productID": product.id,
+                    "bundledItems": [
+                      {
+                        "variantID": variantId,
+                        "quantity": differenceInt,
+                      }
+                    ],
+                  },
+                ),
+              );
+        }
+      }
+
       setState(() {
         _items[pIndex] = product.copyWith(variants: newVariants);
       });
     }
-
-    // Persist change to backend if needed
-    // context.read<CartBloc>().add(CartEvent.updateVariantQuantity(...));
   }
 
   Widget _qtyCircle(IconData icon,
@@ -167,8 +333,11 @@ class _ShopCartBottomSheetContentState
               color: filled ? Colors.transparent : Colors.grey.shade400),
           shape: BoxShape.circle,
         ),
-        child:
-        Icon(icon, size: 18, color: filled ? Colors.white : Colors.black54),
+        child: Icon(icon,
+            size: 18,
+            color: filled
+                ? Theme.of(context).colorScheme.onSurface
+                : Theme.of(context).colorScheme.onSurface),
       ),
     );
   }
@@ -178,9 +347,9 @@ class _ShopCartBottomSheetContentState
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF6F6F6),
-        borderRadius: BorderRadius.circular(12),
-      ),
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface)),
       child: Column(
         children: [
           // Product header
@@ -191,23 +360,23 @@ class _ShopCartBottomSheetContentState
                 borderRadius: BorderRadius.circular(8),
                 child: product.productImage.isNotEmpty
                     ? Image.network(
-                  product.productImage,
-                  width: 64,
-                  height: 64,
-                  fit: BoxFit.cover,
-                  errorBuilder: (c, e, s) => Container(
-                    width: 64,
-                    height: 64,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image_not_supported),
-                  ),
-                )
+                        product.productImage,
+                        width: 64,
+                        height: 64,
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, e, s) => Container(
+                          width: 64,
+                          height: 64,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.image_not_supported),
+                        ),
+                      )
                     : Container(
-                  width: 64,
-                  height: 64,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.image_not_supported),
-                ),
+                        width: 64,
+                        height: 64,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.image_not_supported),
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -218,8 +387,8 @@ class _ShopCartBottomSheetContentState
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 6),
                     Text(product.category,
-                        style: TextStyle(
-                            color: Colors.grey[600], fontSize: 13)),
+                        style:
+                            TextStyle(color: Colors.grey[600], fontSize: 13)),
                   ],
                 ),
               ),
@@ -235,7 +404,7 @@ class _ShopCartBottomSheetContentState
                 margin: const EdgeInsets.only(top: 8),
                 padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -275,7 +444,6 @@ class _ShopCartBottomSheetContentState
     );
   }
 
-
   Widget _summaryRow(String label, String value, {bool bold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -296,6 +464,8 @@ class _ShopCartBottomSheetContentState
   @override
   Widget build(BuildContext context) {
     final double deliveryFee = _selectedTab == 0 ? 0 : 0;
+    final points = int.tryParse(widget.pointsState.balance) ?? 0;
+    final kshValue = points / 3;
 
     return SafeArea(
       child: DraggableScrollableSheet(
@@ -307,9 +477,10 @@ class _ShopCartBottomSheetContentState
           return Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Column(
               children: [
@@ -318,7 +489,7 @@ class _ShopCartBottomSheetContentState
                   width: 48,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: const Color(0xffc4c4c4),
+                    color: Theme.of(context).colorScheme.onSurface,
                     borderRadius: BorderRadius.circular(2.5),
                   ),
                 ),
@@ -329,7 +500,7 @@ class _ShopCartBottomSheetContentState
                   height: 44,
                   margin: const EdgeInsets.symmetric(horizontal: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0F0F0),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Row(
@@ -341,7 +512,7 @@ class _ShopCartBottomSheetContentState
                             margin: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
                               color: _selectedTab == 0
-                                  ? Colors.white
+                                  ? Colors.grey[300]
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -365,7 +536,7 @@ class _ShopCartBottomSheetContentState
                             margin: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
                               color: _selectedTab == 1
-                                  ? Colors.white
+                                  ? Colors.grey[300]
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -402,46 +573,249 @@ class _ShopCartBottomSheetContentState
                       const SizedBox(height: 8),
 
                       // Map / address card
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF6F6F6),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 64,
-                              height: 64,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey[300],
-                                image: const DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(
-                                      'https://placehold.co/150x150?font=roboto&text=Map+Preview'),
+                      if (_selectedTab == 0)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Container(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 64,
+                                  height: 64,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.grey[300],
+                                    image: const DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(
+                                          'https://placehold.co/150x150?font=roboto&text=Map+Preview'),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 12),
+                                BlocBuilder<AddressBloc, AddressState>(
+                                  builder: (context, state) {
+                                    final addresses = state.data ?? [];
+                                    return Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            height: 35,
+                                            child: DropdownSearch<Address>(
+                                              items: (filter,
+                                                      infiniteScrollProps) =>
+                                                  addresses,
+                                              itemAsString: (address) =>
+                                                  address.locality,
+                                              selectedItem:
+                                                  _selectedAddressDropdown ??
+                                                      (addresses.isNotEmpty
+                                                          ? addresses.first
+                                                          : null),
+                                              compareFn: (a, b) =>
+                                                  a?.id == b?.id,
+                                              decoratorProps:
+                                                  DropDownDecoratorProps(
+                                                decoration: InputDecoration(
+                                                  fillColor: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface,
+                                                  labelText: "Select Location",
+                                                  prefixIcon: const Icon(
+                                                      Icons.location_on,
+                                                      size: 18,
+                                                      color: Colors.purple),
+                                                  suffixIcon: const Icon(
+                                                      Icons.arrow_drop_down,
+                                                      size: 28,
+                                                      color: Colors.purple),
+                                                  border:
+                                                      const OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                12)),
+                                                  ),
+                                                  contentPadding:
+                                                      const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 8),
+                                                ),
+                                              ),
+                                              popupProps: const PopupProps.menu(
+                                                showSearchBox: false,
+                                                menuProps: MenuProps(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                12)),
+                                                  ),
+                                                ),
+                                              ),
+                                              onChanged: (selectedAddress) {
+                                                debugPrint(
+                                                    "Selected Address ID: ${selectedAddress?.id}");
+                                                debugPrint(
+                                                    "Selected Address Name: ${selectedAddress?.name}");
+                                                setState(() {
+                                                  _selectedAddressDropdown =
+                                                      selectedAddress;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          GestureDetector(
+                                            onTap: _handlePressButton,
+                                            child: const SizedBox(
+                                              child: Row(
+                                                children: [
+                                                  Icon(Icons.add,
+                                                      color: Colors.purple,
+                                                      size: 15),
+                                                  SizedBox(width: 5),
+                                                  Text(
+                                                    'New delivery address',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w600),
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                )
+                              ],
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Wazito Village',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600)),
-                                  const SizedBox(height: 6),
-                                  Text('Kathonzweni Area, Kitui',
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[600])),
-                                ],
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+
+                      if (_selectedTab == 1)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Container(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 64,
+                                  height: 64,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.grey[300],
+                                    image: const DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(
+                                          'https://placehold.co/150x150?font=roboto&text=Map+Preview'),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                BlocBuilder<AddressBloc, AddressState>(
+                                  builder: (context, state) {
+                                    final pickupAddresses =
+                                        state.pickupAddresses ?? [];
+                                    return Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            height: 35,
+                                            child:
+                                                DropdownSearch<PickupAddress>(
+                                              items: (filter,
+                                                      infiniteScrollProps) =>
+                                                  pickupAddresses,
+                                              itemAsString: (address) =>
+                                                  address.locality,
+                                              selectedItem:
+                                                  _selectedPickupAddressDropdown ??
+                                                      (pickupAddresses
+                                                              .isNotEmpty
+                                                          ? pickupAddresses
+                                                              .first
+                                                          : null),
+                                              compareFn: (a, b) => a.id == b.id,
+                                              decoratorProps:
+                                                  DropDownDecoratorProps(
+                                                decoration: InputDecoration(
+                                                  fillColor: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface,
+                                                  labelText:
+                                                      "Select Pickup Location",
+                                                  prefixIcon: Icon(
+                                                      Icons.location_on,
+                                                      size: 18,
+                                                      color: Colors.purple),
+                                                  suffixIcon: Icon(
+                                                      Icons.arrow_drop_down,
+                                                      size: 28,
+                                                      color: Colors.purple),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                12)),
+                                                  ),
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 8),
+                                                ),
+                                              ),
+                                              popupProps: const PopupProps.menu(
+                                                showSearchBox: false,
+                                                menuProps: MenuProps(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                12)),
+                                                  ),
+                                                ),
+                                              ),
+                                              onChanged: (selectedAddress) {
+                                                debugPrint(
+                                                    "Selected Address ID: ${_selectedPickupAddressDropdown?.id}");
+                                                debugPrint(
+                                                    "Selected Address Name: ${selectedAddress?.name}");
+                                                setState(() {
+                                                  _selectedPickupAddressDropdown =
+                                                      selectedAddress;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
 
                       const SizedBox(height: 18),
 
@@ -459,19 +833,77 @@ class _ShopCartBottomSheetContentState
                       ],
 
                       const SizedBox(height: 12),
+
+                      // if (points < 9999)
+                      Row(
+                        children: [
+                          ValueListenableBuilder<bool>(
+                            valueListenable: usePointsController,
+                            builder: (context, usePoints, _) {
+                              return Checkbox(
+                                value: usePoints,
+                                onChanged: points > 0
+                                    ? (val) =>
+                                        usePointsController.value = val ?? false
+                                    : null,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                activeColor:
+                                    Theme.of(context).colorScheme.primary,
+                              );
+                            },
+                          ),
+                          Expanded(
+                            child: RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                  fontSize: 14,
+                                ),
+                                children: [
+                                  const TextSpan(text: "Use "),
+                                  TextSpan(
+                                    text: "$points ",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const TextSpan(text: "Points "),
+                                  TextSpan(
+                                    text:
+                                        "(Ksh ${kshValue.toStringAsFixed(0)})",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
                       const Divider(),
-                      _summaryRow(
-                          'Subtotal', '$_currency ${_subtotal.toStringAsFixed(0)}'),
+                      _summaryRow('Subtotal',
+                          '$_currency ${_subtotal.toStringAsFixed(0)}'),
                       _summaryRow(
                           'Delivery',
                           _selectedTab == 0
                               ? '$_currency ${deliveryFee.toStringAsFixed(0)}'
                               : '$_currency 0'),
                       const Divider(),
-                      _summaryRow(
-                          'Total',
-                          '$_currency ${(_subtotal + deliveryFee).toStringAsFixed(0)}',
-                          bold: true),
+                      ValueListenableBuilder<bool>(
+                        valueListenable: usePointsController,
+                        builder: (context, usePoints, _) {
+                          final pointsToUse = usePoints ? points : 0;
+                          final totalWithPoints =
+                              _subtotal + deliveryFee - pointsToUse / 3;
+
+                          return _summaryRow('Total',
+                              '$_currency ${totalWithPoints.toStringAsFixed(0)}',
+                              bold: true);
+                        },
+                      ),
 
                       const SizedBox(height: 20),
                     ],
@@ -481,8 +913,9 @@ class _ShopCartBottomSheetContentState
                 // Checkout
                 SizedBox(
                   width: double.infinity,
+                  height: 50,
                   child: GradientFilledButton(
-                    text: 'Checkout',
+                      text: 'Checkout',
                       onPressed: () {
                         context.pop();
 
@@ -490,10 +923,12 @@ class _ShopCartBottomSheetContentState
                         final requestData = _items.expand((product) {
                           return product.variants.map((variant) {
                             return {
-                              "productTypeID": variant.variantID, // or product.typeID if that's what you store
+                              "productTypeID": variant.variantID,
                               "productID": product.id,
                               "amount": variant.variantPrice,
                               "quantity": variant.quantity,
+                              "redeemablePoints":
+                                  usePointsController.value ? points : 0
                             };
                           });
                         }).toList();
@@ -503,12 +938,11 @@ class _ShopCartBottomSheetContentState
                         };
 
                         context.read<ProductBloc>().add(
-                          ProductEvent.buyBulkProducts(
-                            request: wrappedRequest,
-                          ),
-                        );
-                      }
-                  ),
+                              ProductEvent.buyBulkProducts(
+                                request: wrappedRequest,
+                              ),
+                            );
+                      }),
                 ),
               ],
             ),

@@ -10,8 +10,11 @@ import 'package:sports_app/common/huge_icon_button.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 import 'package:sports_app/features/dashboard/pages/profile/widgets/profile_list_item.dart';
+import 'package:sports_app/features/dashboard/pages/profile/widgets/profile_picture.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/app_colors.dart';
+import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/localization/app_prefs_manager.dart';
 
 class EditProfileMain extends StatefulWidget {
   const EditProfileMain({super.key});
@@ -25,16 +28,26 @@ class _EditProfileMainState extends State<EditProfileMain> {
   final _oldPassword = TextEditingController();
   final _newPassword = TextEditingController();
   final _confirmNewPassword = TextEditingController();
+  late User user;
+  String? picture;
 
-  Future<bool> _onBackPressed()async{
+  Future<bool> _onBackPressed() async {
     context.goNamed(AppRoute.profile.name);
     return true;
   }
 
   @override
+  void initState() {
+    user = service<AppPreferencesManager>().currentUserValue!;
+    picture = user.picture;
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final user = null;
-    //context.watch<UserCubit>().state;
+    // final user = null;
+    // context.watch<UserCubit>().state;
     final theme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -69,19 +82,26 @@ class _EditProfileMainState extends State<EditProfileMain> {
                     height: 200,
                     width: 200,
                     child: ClipRRect(
-                      borderRadius:BorderRadius.circular(48),
-                      child: BlocBuilder<UserBloc,User?>(
-                      builder: (context,user) {
-                        return CachedNetworkImage(
-                          imageUrl: user?.picture??"",
-                          errorWidget: (context, url, error) => Icon(Icons.person,size: 48,color: AppColors.greyColor,),
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.fitHeight,
+                      borderRadius: BorderRadius.circular(48),
+                      child: BlocBuilder<UserBloc, User?>(
+                          builder: (context, user) {
+                        return
+                            // CachedNetworkImage(
+                            //   imageUrl: user?.picture ?? "",
+                            //   errorWidget: (context, url, error) => Icon(
+                            //     Icons.person,
+                            //     size: 48,
+                            //     color: AppColors.greyColor,
+                            //   ),
+                            //   width: 120,
+                            //   height: 120,
+                            //   fit: BoxFit.fitHeight,
+                            // );
+                            ProfilePicture(
+                          picture: picture,
                         );
-                      }
-                  ),
-                ),
+                      }),
+                    ),
                   ),
                 ),
               ),
@@ -105,7 +125,11 @@ class _EditProfileMainState extends State<EditProfileMain> {
                       iconData: HugeIcons.strokeRoundedUserAccount,
                       onTap: () {
                         // Navigate to the personal details page
-                        context.pushNamed(AppRoute.profileDetails.name);
+                        context.pushNamed(
+                          AppRoute.profileDetails.name,
+                          extra:
+                              service<AppPreferencesManager>().currentUserValue,
+                        );
                       },
                     ),
                     ProfileListItem(

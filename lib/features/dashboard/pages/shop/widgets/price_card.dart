@@ -1,6 +1,5 @@
 part of '../shop_page.dart';
 
-
 class PriceCard extends StatelessWidget {
   final Product product;
   final Map<String, int> variantCounts;
@@ -41,9 +40,6 @@ class PriceCard extends StatelessWidget {
   }
 }
 
-
-
-
 class SizeGuideRow extends StatelessWidget {
   final Product product;
   final String size;
@@ -51,13 +47,19 @@ class SizeGuideRow extends StatelessWidget {
   final VoidCallback add;
   final VoidCallback subtract;
 
-  const SizeGuideRow({required this.size,required this.product,super.key, required this.add, required this.subtract, required this.value});
+  const SizeGuideRow(
+      {required this.size,
+      required this.product,
+      super.key,
+      required this.add,
+      required this.subtract,
+      required this.value});
 
   @override
   Widget build(BuildContext context) {
     // Find variant matching this size
     final variant = product.variants?.firstWhere(
-          (v) => v.productTypeName == size,
+      (v) => v.productTypeName == size,
       orElse: () => Variant(
         variantId: '',
         productTypeName: size,
@@ -76,24 +78,24 @@ class SizeGuideRow extends StatelessWidget {
             children: [
               Text(
                 size,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w500,
-                  color: Color(0xff292323),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const Spacer(),
-              const Text(
+              Text(
                 '(Ksh) ',
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
-                  color: Color(0xff292323),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               Text(
                 "${variant?.typePrice}", // <-- now using variant price
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Color(0xff292323),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(width: 16),
@@ -125,11 +127,6 @@ class SizeGuideRow extends StatelessWidget {
   }
 }
 
-
-
-
-
-
 class CustomIconButton extends StatelessWidget {
   final VoidCallback onButtonPress;
   final Color borderColor;
@@ -139,28 +136,31 @@ class CustomIconButton extends StatelessWidget {
   final Color iconColor;
   final bool isRoundedRectBorder;
   const CustomIconButton(
-      {
-        this.isRoundedRectBorder=false,
-        this.borderColor=Colors.black26,
-        this.iconColor=Colors.black54,
-        this.size=32,
-        this.backgroundColor=Colors.transparent,
-        required this.onButtonPress ,
-        super.key,
-        required this.icon
-      });
+      {this.isRoundedRectBorder = false,
+      this.borderColor = Colors.black26,
+      this.iconColor = Colors.black54,
+      this.size = 32,
+      this.backgroundColor = Colors.transparent,
+      required this.onButtonPress,
+      super.key,
+      required this.icon});
 
   @override
   Widget build(BuildContext context) {
     return IconButton.outlined(
-
       onPressed: onButtonPress,
       splashColor: Colors.white,
-      icon: Icon(icon,color: iconColor,size: size/2,weight: 3,),
+      icon: Icon(
+        icon,
+        color: iconColor,
+        size: size / 2,
+        weight: 3,
+      ),
       style: ButtonStyle(
-
-        fixedSize: WidgetStateProperty.all(Size(size * 2, size)), // Ensure it's not forced into a square
-        minimumSize: WidgetStateProperty.all(Size(size, size)), // Ensure it does not shrink
+        fixedSize: WidgetStateProperty.all(
+            Size(size * 2, size)), // Ensure it's not forced into a square
+        minimumSize: WidgetStateProperty.all(
+            Size(size, size)), // Ensure it does not shrink
         maximumSize: WidgetStateProperty.all(Size(size, size)),
         padding: WidgetStateProperty.all(EdgeInsets.zero), // Remove padding
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -173,24 +173,24 @@ class CustomIconButton extends StatelessWidget {
         side: WidgetStateProperty.all(
           BorderSide(
             color: borderColor, // Outline color
-            width: 1.5,         // Outline width
+            width: 1.5, // Outline width
           ),
         ),
         overlayColor: WidgetStateProperty.resolveWith(
-              (states) {
+          (states) {
             if (states.contains(WidgetState.pressed)) {
-              return iconColor.withOpacity(0.3); // Custom overlay color on press
+              return iconColor
+                  .withOpacity(0.3); // Custom overlay color on press
             }
             return null;
           },
         ),
         splashFactory: InkSparkle.splashFactory,
       ),
-
-
     );
   }
 }
+
 class GradientFilledButton extends StatelessWidget {
   final String text;
   final double radius;
@@ -198,7 +198,7 @@ class GradientFilledButton extends StatelessWidget {
 
   const GradientFilledButton({
     super.key,
-    this.radius=8,
+    this.radius = 8,
     required this.text,
     required this.onPressed,
   });
@@ -207,7 +207,7 @@ class GradientFilledButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient:  LinearGradient(
+        gradient: LinearGradient(
           colors: [AppColors.defaultAppRed, AppColors.defaultAppPurple],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -217,20 +217,24 @@ class GradientFilledButton extends StatelessWidget {
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
-          shape: RoundedRectangleBorder(        borderRadius: BorderRadius.circular(8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
-          backgroundColor: Colors.transparent, // Needed for gradient to be visible
-          minimumSize: const Size(double.infinity, 60),
+          backgroundColor:
+              Colors.transparent, // Needed for gradient to be visible
+          minimumSize: const Size(double.infinity, 30),
           overlayColor: Colors.white.withOpacity(1),
           splashFactory: InkSparkle.splashFactory,
           shadowColor: Colors.transparent, // Removes unwanted shadow
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         ),
-        child: Text(text, style: const TextStyle(fontSize: 16)),
+        child: Text(text,
+            style: const TextStyle(fontSize: 16, color: Colors.white)),
       ),
     );
   }
 }
+
 class CustomOutlinedButton extends StatelessWidget {
   final String text;
   final double radius;
@@ -238,7 +242,7 @@ class CustomOutlinedButton extends StatelessWidget {
 
   const CustomOutlinedButton({
     super.key,
-    this.radius=8,
+    this.radius = 8,
     required this.text,
     required this.onPressed,
   });
@@ -257,16 +261,20 @@ class CustomOutlinedButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(        borderRadius: BorderRadius.circular(radius),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radius),
           ),
-          backgroundColor: Colors.transparent, // Needed for gradient to be visible
-          minimumSize: const Size(double.infinity, 60),
+          backgroundColor:
+              Colors.transparent, // Needed for gradient to be visible
+          minimumSize: const Size(double.infinity, 50),
           overlayColor: AppColors.defaultAppPurple.withOpacity(1),
           splashFactory: InkSparkle.splashFactory,
           shadowColor: Colors.transparent, // Removes unwanted shadow
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         ),
-        child: Text(text, style: const TextStyle(fontSize: 16,color: Colors.black)),
+        child: Text(text,
+            style: TextStyle(
+                fontSize: 16, color: Theme.of(context).colorScheme.onSurface)),
       ),
     );
   }

@@ -1,20 +1,30 @@
 import 'package:dotted_border/dotted_border.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as gmf;
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart'
+    as google_maps_flutter;
+import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
+import 'package:sports_app/data/models/addresses/pickupaddress.dart';
 import 'package:sports_app/data/models/products/cart.dart';
 import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/products/cart_bloc.dart';
 import 'package:sports_app/features/app/blocs/products/product_bloc.dart';
 import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/features/dashboard/pages/profile/components/circular_toggle.dart';
 import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
+import 'package:sports_app/features/dashboard/pages/shop/widgets/address_bottom_sheet.dart';
+import 'package:sports_app/features/dashboard/pages/shop/widgets/cart_location_picker.dart';
 import 'package:sports_app/features/dashboard/pages/shop/widgets/top_sellers_card.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/theme/app_colors.dart';
@@ -22,8 +32,10 @@ import 'package:sports_app/theme/theme.dart';
 import 'package:auto_height_grid_view/auto_height_grid_view.dart';
 import 'package:sports_app/utils/dotted.dart';
 
+import '../../../../data/models/addresses/address.dart';
 import '../../../../main.dart';
 import '../../../../router/router.dart';
+import '../../../app/blocs/address/address_bloc.dart';
 import '../profile/components/circular_icon_container.dart';
 
 part 'widgets/price_card.dart';
@@ -48,7 +60,8 @@ class _ShopPageState extends State<ShopPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: AppBackground(
+    return Scaffold(
+        body: AppBackground(
       childWidget: BlocConsumer<ProductBloc, ProductState>(
         listener: (context, state) {
           if (state.status == ProductStatus.processingPayment) {
@@ -173,15 +186,19 @@ class _ShopPageState extends State<ShopPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Container(
-          padding: const EdgeInsets.all(kSmall),
-          decoration: BoxDecoration(
-              color: AppColors.whiteColor.withOpacity(0.3),
-              shape: BoxShape.circle),
-          child: Icon(
-            LucideIcons.arrowLeft,
-            color: AppColors.whiteColor,
-          ),
-        ),
+            padding: const EdgeInsets.all(kSmall),
+            decoration: BoxDecoration(
+                color: AppColors.whiteColor.withOpacity(0.3),
+                shape: BoxShape.circle),
+            child: GestureDetector(
+              onTap: () {
+                context.go('/home');
+              },
+              child: Icon(
+                LucideIcons.arrowLeft,
+                color: AppColors.whiteColor,
+              ),
+            )),
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -198,12 +215,36 @@ class _ShopPageState extends State<ShopPage> {
           ],
         ),
         GestureDetector(
-            onTap: () {
+            onTap: () async {
+              final bloc = context.read<PointsBloc>();
+
+              // Step 1: Trigger loading of points
+              bloc.add(const PointsEvent.points());
+
+              // Step 2: Wait for points to load (listen for success)
+              await Future.doWhile(() async {
+                await Future.delayed(const Duration(milliseconds: 100));
+                final state = bloc.state;
+                return state.status == PointsStatus.loading;
+              });
+
+              final pointsState = bloc.state;
+
               context.read<CartBloc>().add(
-                const CartEvent.getCartItems(request: {}),
-              );
-              final cartItems = context.read<CartBloc>().state.cartItems; // adjust property name if needed
-              showCartShopBottomSheet(context);
+                    const CartEvent.getCartItems(request: {}),
+                  );
+              context.read<AddressBloc>().add(
+                    const AddressEvent.getAddresses(request: {}),
+                  );
+              final cartItems = context
+                  .read<CartBloc>()
+                  .state
+                  .cartItems; // adjust property name if needed
+              final addressItems = context
+                  .read<AddressBloc>()
+                  .state
+                  .data; // adjust property name if needed
+              showCartShopBottomSheet(context, pointsState: pointsState);
             },
             child: Container(
               padding: const EdgeInsets.all(kSmall),

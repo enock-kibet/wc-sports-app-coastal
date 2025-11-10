@@ -1,24 +1,56 @@
 {
   "recentHighlights": [
-    { "title": "Buckets", "image": "https://placehold.co/200x200/000000/FFFFFF/png" },
-    { "title": "Game 1", "image": "https://placehold.co/200x200/000000/FFFFFF/png" },
-    { "title": "Layups", "image": "https://placehold.co/200x200/000000/FFFFFF/png" },
-    { "title": "Fans", "image": "https://placehold.co/200x200/000000/FFFFFF/png" },
-    { "title": "Giveaways", "image": "https://placehold.co/200x200/000000/FFFFFF/png" },
-    { "title": "Dunks", "image": "https://placehold.co/200x200/000000/FFFFFF/png" }
-  ],
-  "seasonHighlights": [
     {
-      "title": "Afro Pacers Vs Mamluki Game 1 Recap",
-      "image": "https://placehold.co/600x400/000000/FFFFFF/png",
-      "time": "10mins",
-      "date": "4th June 2024"
+      "title": "Match Recap",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&auto=format&fit=crop"
     },
     {
-      "title": "Clutch 3-Pointer Highlights",
-      "image": "https://placehold.co/600x400/000000/FFFFFF/png",
-      "time": "25mins",
-      "date": "3rd June 2024"
+      "title": "Goal of the Week",
+      "type": "video",
+      "url": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
+      "image": "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400&auto=format&fit=crop"
+    },
+    {
+      "title": "Training Day",
+      "type": "image",
+      "url": null,
+      "image": "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?w=400&auto=format&fit=crop"
+    },
+    {
+      "title": "Buckets",
+      "image": "https://images.pexels.com/photos/3580425/pexels-photo-3580425.jpeg",
+      "type": "image"
+    },
+    {
+      "title": "Game 1",
+      "image": "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
+      "type": "image"
+    },
+    {
+      "title": "Layups",
+      "image": "https://images.pexels.com/photos/3756041/pexels-photo-3756041.jpeg",
+      "type": "image"
+    },
+    {
+      "title": "Fans",
+      "url": "https://player.vimeo.com/external/320012367.sd.mp4?s=8e7cfd9a20c13f9e2d99f91c8b5cde0bdb9153f2&profile_id=165&oauth2_token_id=57447761",
+      "image": "https://images.pexels.com/photos/3026321/pexels-photo-3026321.jpeg",
+      "type": "video"
+    },
+    {
+      "title": "Giveaways",
+      "url": "https://player.vimeo.com/external/394922620.sd.mp4?s=6201b5f3f6d28cbe35b6a6d4921a4b43c25c27bc&profile_id=164&oauth2_token_id=57447761",
+      "image": "https://images.pexels.com/photos/2923156/pexels-photo-2923156.jpeg",
+      "type": "video"
+    },
+    {
+      "title": "Dunks",
+      "url": "https://cdn.pixabay.com/video/2020/03/18/33326-401528736_large.mp4",
+      "image": "https://images.pexels.com/photos/1103829/pexels-photo-1103829.jpeg",
+      "type": "video"
     }
-  ]
+  ],
+  "seasonHighlights": []
 }

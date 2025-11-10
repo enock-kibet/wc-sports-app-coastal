@@ -65,7 +65,7 @@ class ErrorHandler {
               return Failure(error: 'Error: $statusCode');
           }
         default:
-          return Failure(error: 'Network error');
+          return Failure(error: 'An unexpected error occurred (${error.type})');
       }
     }
   }

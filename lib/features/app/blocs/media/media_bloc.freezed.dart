@@ -19,32 +19,38 @@ mixin _$MediaEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() media,
+    required TResult Function() getHomeMedia,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? media,
+    TResult? Function()? getHomeMedia,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? media,
+    TResult Function()? getHomeMedia,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_MediaFetched value) media,
+    required TResult Function(_HomeMediaFetched value) getHomeMedia,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_MediaFetched value)? media,
+    TResult? Function(_HomeMediaFetched value)? getHomeMedia,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_MediaFetched value)? media,
+    TResult Function(_HomeMediaFetched value)? getHomeMedia,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -107,6 +113,7 @@ class _$MediaFetchedImpl implements _MediaFetched {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() media,
+    required TResult Function() getHomeMedia,
   }) {
     return media();
   }
@@ -115,6 +122,7 @@ class _$MediaFetchedImpl implements _MediaFetched {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? media,
+    TResult? Function()? getHomeMedia,
   }) {
     return media?.call();
   }
@@ -123,6 +131,7 @@ class _$MediaFetchedImpl implements _MediaFetched {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? media,
+    TResult Function()? getHomeMedia,
     required TResult orElse(),
   }) {
     if (media != null) {
@@ -135,6 +144,7 @@ class _$MediaFetchedImpl implements _MediaFetched {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_MediaFetched value) media,
+    required TResult Function(_HomeMediaFetched value) getHomeMedia,
   }) {
     return media(this);
   }
@@ -143,6 +153,7 @@ class _$MediaFetchedImpl implements _MediaFetched {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_MediaFetched value)? media,
+    TResult? Function(_HomeMediaFetched value)? getHomeMedia,
   }) {
     return media?.call(this);
   }
@@ -151,6 +162,7 @@ class _$MediaFetchedImpl implements _MediaFetched {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_MediaFetched value)? media,
+    TResult Function(_HomeMediaFetched value)? getHomeMedia,
     required TResult orElse(),
   }) {
     if (media != null) {
@@ -165,12 +177,115 @@ abstract class _MediaFetched implements MediaEvent {
 }
 
 /// @nodoc
+abstract class _$$HomeMediaFetchedImplCopyWith<$Res> {
+  factory _$$HomeMediaFetchedImplCopyWith(_$HomeMediaFetchedImpl value,
+          $Res Function(_$HomeMediaFetchedImpl) then) =
+      __$$HomeMediaFetchedImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$HomeMediaFetchedImplCopyWithImpl<$Res>
+    extends _$MediaEventCopyWithImpl<$Res, _$HomeMediaFetchedImpl>
+    implements _$$HomeMediaFetchedImplCopyWith<$Res> {
+  __$$HomeMediaFetchedImplCopyWithImpl(_$HomeMediaFetchedImpl _value,
+      $Res Function(_$HomeMediaFetchedImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$HomeMediaFetchedImpl implements _HomeMediaFetched {
+  const _$HomeMediaFetchedImpl();
+
+  @override
+  String toString() {
+    return 'MediaEvent.getHomeMedia()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$HomeMediaFetchedImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() media,
+    required TResult Function() getHomeMedia,
+  }) {
+    return getHomeMedia();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? media,
+    TResult? Function()? getHomeMedia,
+  }) {
+    return getHomeMedia?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? media,
+    TResult Function()? getHomeMedia,
+    required TResult orElse(),
+  }) {
+    if (getHomeMedia != null) {
+      return getHomeMedia();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_MediaFetched value) media,
+    required TResult Function(_HomeMediaFetched value) getHomeMedia,
+  }) {
+    return getHomeMedia(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_MediaFetched value)? media,
+    TResult? Function(_HomeMediaFetched value)? getHomeMedia,
+  }) {
+    return getHomeMedia?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_MediaFetched value)? media,
+    TResult Function(_HomeMediaFetched value)? getHomeMedia,
+    required TResult orElse(),
+  }) {
+    if (getHomeMedia != null) {
+      return getHomeMedia(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _HomeMediaFetched implements MediaEvent {
+  const factory _HomeMediaFetched() = _$HomeMediaFetchedImpl;
+}
+
+/// @nodoc
 mixin _$MediaState {
   MediaStatus get status => throw _privateConstructorUsedError;
   Failure? get failure => throw _privateConstructorUsedError;
   String? get authorizationUrl => throw _privateConstructorUsedError;
   String? get message => throw _privateConstructorUsedError;
   List<MediaData> get media => throw _privateConstructorUsedError;
+  List<HighlightReel>? get homeMedia => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $MediaStateCopyWith<MediaState> get copyWith =>
@@ -188,7 +303,8 @@ abstract class $MediaStateCopyWith<$Res> {
       Failure? failure,
       String? authorizationUrl,
       String? message,
-      List<MediaData> media});
+      List<MediaData> media,
+      List<HighlightReel>? homeMedia});
 }
 
 /// @nodoc
@@ -209,6 +325,7 @@ class _$MediaStateCopyWithImpl<$Res, $Val extends MediaState>
     Object? authorizationUrl = freezed,
     Object? message = freezed,
     Object? media = null,
+    Object? homeMedia = freezed,
   }) {
     return _then(_value.copyWith(
       status: null == status
@@ -231,6 +348,10 @@ class _$MediaStateCopyWithImpl<$Res, $Val extends MediaState>
           ? _value.media
           : media // ignore: cast_nullable_to_non_nullable
               as List<MediaData>,
+      homeMedia: freezed == homeMedia
+          ? _value.homeMedia
+          : homeMedia // ignore: cast_nullable_to_non_nullable
+              as List<HighlightReel>?,
     ) as $Val);
   }
 }
@@ -248,7 +369,8 @@ abstract class _$$MediaStateImplCopyWith<$Res>
       Failure? failure,
       String? authorizationUrl,
       String? message,
-      List<MediaData> media});
+      List<MediaData> media,
+      List<HighlightReel>? homeMedia});
 }
 
 /// @nodoc
@@ -267,6 +389,7 @@ class __$$MediaStateImplCopyWithImpl<$Res>
     Object? authorizationUrl = freezed,
     Object? message = freezed,
     Object? media = null,
+    Object? homeMedia = freezed,
   }) {
     return _then(_$MediaStateImpl(
       status: null == status
@@ -289,6 +412,10 @@ class __$$MediaStateImplCopyWithImpl<$Res>
           ? _value._media
           : media // ignore: cast_nullable_to_non_nullable
               as List<MediaData>,
+      homeMedia: freezed == homeMedia
+          ? _value._homeMedia
+          : homeMedia // ignore: cast_nullable_to_non_nullable
+              as List<HighlightReel>?,
     ));
   }
 }
@@ -301,8 +428,10 @@ class _$MediaStateImpl implements _MediaState {
       this.failure,
       this.authorizationUrl,
       this.message,
-      final List<MediaData> media = const []})
-      : _media = media;
+      final List<MediaData> media = const [],
+      final List<HighlightReel>? homeMedia})
+      : _media = media,
+        _homeMedia = homeMedia;
 
   @override
   @JsonKey()
@@ -322,9 +451,19 @@ class _$MediaStateImpl implements _MediaState {
     return EqualUnmodifiableListView(_media);
   }
 
+  final List<HighlightReel>? _homeMedia;
+  @override
+  List<HighlightReel>? get homeMedia {
+    final value = _homeMedia;
+    if (value == null) return null;
+    if (_homeMedia is EqualUnmodifiableListView) return _homeMedia;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   String toString() {
-    return 'MediaState(status: $status, failure: $failure, authorizationUrl: $authorizationUrl, message: $message, media: $media)';
+    return 'MediaState(status: $status, failure: $failure, authorizationUrl: $authorizationUrl, message: $message, media: $media, homeMedia: $homeMedia)';
   }
 
   @override
@@ -337,12 +476,20 @@ class _$MediaStateImpl implements _MediaState {
             (identical(other.authorizationUrl, authorizationUrl) ||
                 other.authorizationUrl == authorizationUrl) &&
             (identical(other.message, message) || other.message == message) &&
-            const DeepCollectionEquality().equals(other._media, _media));
+            const DeepCollectionEquality().equals(other._media, _media) &&
+            const DeepCollectionEquality()
+                .equals(other._homeMedia, _homeMedia));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, status, failure,
-      authorizationUrl, message, const DeepCollectionEquality().hash(_media));
+  int get hashCode => Object.hash(
+      runtimeType,
+      status,
+      failure,
+      authorizationUrl,
+      message,
+      const DeepCollectionEquality().hash(_media),
+      const DeepCollectionEquality().hash(_homeMedia));
 
   @JsonKey(ignore: true)
   @override
@@ -357,7 +504,8 @@ abstract class _MediaState implements MediaState {
       final Failure? failure,
       final String? authorizationUrl,
       final String? message,
-      final List<MediaData> media}) = _$MediaStateImpl;
+      final List<MediaData> media,
+      final List<HighlightReel>? homeMedia}) = _$MediaStateImpl;
 
   @override
   MediaStatus get status;
@@ -369,6 +517,8 @@ abstract class _MediaState implements MediaState {
   String? get message;
   @override
   List<MediaData> get media;
+  @override
+  List<HighlightReel>? get homeMedia;
   @override
   @JsonKey(ignore: true)
   _$$MediaStateImplCopyWith<_$MediaStateImpl> get copyWith =>

@@ -9,4 +9,8 @@ class ProductEvent with _$ProductEvent {
   _ProductsBulkPurchase;
   const factory ProductEvent.addToCart({required dynamic request}) =
       _ProductToCart;
+  const factory ProductEvent.removeCart({required dynamic request}) =
+  _ProductRemoveCart;
+  const factory ProductEvent.clearCart({required dynamic request}) =
+  _ProductClearCart;
 }

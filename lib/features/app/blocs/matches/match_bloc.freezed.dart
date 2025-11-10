@@ -19,44 +19,56 @@ mixin _$MatchEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() matches,
+    required TResult Function() matchstats,
     required TResult Function(String search) searchMatch,
     required TResult Function(DateTime date) datedMatch,
+    required TResult Function(DateTime month) monthMatches,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? matches,
+    TResult? Function()? matchstats,
     TResult? Function(String search)? searchMatch,
     TResult? Function(DateTime date)? datedMatch,
+    TResult? Function(DateTime month)? monthMatches,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? matches,
+    TResult Function()? matchstats,
     TResult Function(String search)? searchMatch,
     TResult Function(DateTime date)? datedMatch,
+    TResult Function(DateTime month)? monthMatches,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_MatchesFetched value) matches,
+    required TResult Function(_MatchStats value) matchstats,
     required TResult Function(_MatchesSearched value) searchMatch,
     required TResult Function(_MatchesDated value) datedMatch,
+    required TResult Function(_MatchesMonth value) monthMatches,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_MatchesFetched value)? matches,
+    TResult? Function(_MatchStats value)? matchstats,
     TResult? Function(_MatchesSearched value)? searchMatch,
     TResult? Function(_MatchesDated value)? datedMatch,
+    TResult? Function(_MatchesMonth value)? monthMatches,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_MatchesFetched value)? matches,
+    TResult Function(_MatchStats value)? matchstats,
     TResult Function(_MatchesSearched value)? searchMatch,
     TResult Function(_MatchesDated value)? datedMatch,
+    TResult Function(_MatchesMonth value)? monthMatches,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -119,8 +131,10 @@ class _$MatchesFetchedImpl implements _MatchesFetched {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() matches,
+    required TResult Function() matchstats,
     required TResult Function(String search) searchMatch,
     required TResult Function(DateTime date) datedMatch,
+    required TResult Function(DateTime month) monthMatches,
   }) {
     return matches();
   }
@@ -129,8 +143,10 @@ class _$MatchesFetchedImpl implements _MatchesFetched {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? matches,
+    TResult? Function()? matchstats,
     TResult? Function(String search)? searchMatch,
     TResult? Function(DateTime date)? datedMatch,
+    TResult? Function(DateTime month)? monthMatches,
   }) {
     return matches?.call();
   }
@@ -139,8 +155,10 @@ class _$MatchesFetchedImpl implements _MatchesFetched {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? matches,
+    TResult Function()? matchstats,
     TResult Function(String search)? searchMatch,
     TResult Function(DateTime date)? datedMatch,
+    TResult Function(DateTime month)? monthMatches,
     required TResult orElse(),
   }) {
     if (matches != null) {
@@ -153,8 +171,10 @@ class _$MatchesFetchedImpl implements _MatchesFetched {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_MatchesFetched value) matches,
+    required TResult Function(_MatchStats value) matchstats,
     required TResult Function(_MatchesSearched value) searchMatch,
     required TResult Function(_MatchesDated value) datedMatch,
+    required TResult Function(_MatchesMonth value) monthMatches,
   }) {
     return matches(this);
   }
@@ -163,8 +183,10 @@ class _$MatchesFetchedImpl implements _MatchesFetched {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_MatchesFetched value)? matches,
+    TResult? Function(_MatchStats value)? matchstats,
     TResult? Function(_MatchesSearched value)? searchMatch,
     TResult? Function(_MatchesDated value)? datedMatch,
+    TResult? Function(_MatchesMonth value)? monthMatches,
   }) {
     return matches?.call(this);
   }
@@ -173,8 +195,10 @@ class _$MatchesFetchedImpl implements _MatchesFetched {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_MatchesFetched value)? matches,
+    TResult Function(_MatchStats value)? matchstats,
     TResult Function(_MatchesSearched value)? searchMatch,
     TResult Function(_MatchesDated value)? datedMatch,
+    TResult Function(_MatchesMonth value)? monthMatches,
     required TResult orElse(),
   }) {
     if (matches != null) {
@@ -186,6 +210,126 @@ class _$MatchesFetchedImpl implements _MatchesFetched {
 
 abstract class _MatchesFetched implements MatchEvent {
   const factory _MatchesFetched() = _$MatchesFetchedImpl;
+}
+
+/// @nodoc
+abstract class _$$MatchStatsImplCopyWith<$Res> {
+  factory _$$MatchStatsImplCopyWith(
+          _$MatchStatsImpl value, $Res Function(_$MatchStatsImpl) then) =
+      __$$MatchStatsImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$MatchStatsImplCopyWithImpl<$Res>
+    extends _$MatchEventCopyWithImpl<$Res, _$MatchStatsImpl>
+    implements _$$MatchStatsImplCopyWith<$Res> {
+  __$$MatchStatsImplCopyWithImpl(
+      _$MatchStatsImpl _value, $Res Function(_$MatchStatsImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$MatchStatsImpl implements _MatchStats {
+  const _$MatchStatsImpl();
+
+  @override
+  String toString() {
+    return 'MatchEvent.matchstats()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$MatchStatsImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() matches,
+    required TResult Function() matchstats,
+    required TResult Function(String search) searchMatch,
+    required TResult Function(DateTime date) datedMatch,
+    required TResult Function(DateTime month) monthMatches,
+  }) {
+    return matchstats();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? matches,
+    TResult? Function()? matchstats,
+    TResult? Function(String search)? searchMatch,
+    TResult? Function(DateTime date)? datedMatch,
+    TResult? Function(DateTime month)? monthMatches,
+  }) {
+    return matchstats?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? matches,
+    TResult Function()? matchstats,
+    TResult Function(String search)? searchMatch,
+    TResult Function(DateTime date)? datedMatch,
+    TResult Function(DateTime month)? monthMatches,
+    required TResult orElse(),
+  }) {
+    if (matchstats != null) {
+      return matchstats();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_MatchesFetched value) matches,
+    required TResult Function(_MatchStats value) matchstats,
+    required TResult Function(_MatchesSearched value) searchMatch,
+    required TResult Function(_MatchesDated value) datedMatch,
+    required TResult Function(_MatchesMonth value) monthMatches,
+  }) {
+    return matchstats(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_MatchesFetched value)? matches,
+    TResult? Function(_MatchStats value)? matchstats,
+    TResult? Function(_MatchesSearched value)? searchMatch,
+    TResult? Function(_MatchesDated value)? datedMatch,
+    TResult? Function(_MatchesMonth value)? monthMatches,
+  }) {
+    return matchstats?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_MatchesFetched value)? matches,
+    TResult Function(_MatchStats value)? matchstats,
+    TResult Function(_MatchesSearched value)? searchMatch,
+    TResult Function(_MatchesDated value)? datedMatch,
+    TResult Function(_MatchesMonth value)? monthMatches,
+    required TResult orElse(),
+  }) {
+    if (matchstats != null) {
+      return matchstats(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _MatchStats implements MatchEvent {
+  const factory _MatchStats() = _$MatchStatsImpl;
 }
 
 /// @nodoc
@@ -254,8 +398,10 @@ class _$MatchesSearchedImpl implements _MatchesSearched {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() matches,
+    required TResult Function() matchstats,
     required TResult Function(String search) searchMatch,
     required TResult Function(DateTime date) datedMatch,
+    required TResult Function(DateTime month) monthMatches,
   }) {
     return searchMatch(search);
   }
@@ -264,8 +410,10 @@ class _$MatchesSearchedImpl implements _MatchesSearched {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? matches,
+    TResult? Function()? matchstats,
     TResult? Function(String search)? searchMatch,
     TResult? Function(DateTime date)? datedMatch,
+    TResult? Function(DateTime month)? monthMatches,
   }) {
     return searchMatch?.call(search);
   }
@@ -274,8 +422,10 @@ class _$MatchesSearchedImpl implements _MatchesSearched {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? matches,
+    TResult Function()? matchstats,
     TResult Function(String search)? searchMatch,
     TResult Function(DateTime date)? datedMatch,
+    TResult Function(DateTime month)? monthMatches,
     required TResult orElse(),
   }) {
     if (searchMatch != null) {
@@ -288,8 +438,10 @@ class _$MatchesSearchedImpl implements _MatchesSearched {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_MatchesFetched value) matches,
+    required TResult Function(_MatchStats value) matchstats,
     required TResult Function(_MatchesSearched value) searchMatch,
     required TResult Function(_MatchesDated value) datedMatch,
+    required TResult Function(_MatchesMonth value) monthMatches,
   }) {
     return searchMatch(this);
   }
@@ -298,8 +450,10 @@ class _$MatchesSearchedImpl implements _MatchesSearched {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_MatchesFetched value)? matches,
+    TResult? Function(_MatchStats value)? matchstats,
     TResult? Function(_MatchesSearched value)? searchMatch,
     TResult? Function(_MatchesDated value)? datedMatch,
+    TResult? Function(_MatchesMonth value)? monthMatches,
   }) {
     return searchMatch?.call(this);
   }
@@ -308,8 +462,10 @@ class _$MatchesSearchedImpl implements _MatchesSearched {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_MatchesFetched value)? matches,
+    TResult Function(_MatchStats value)? matchstats,
     TResult Function(_MatchesSearched value)? searchMatch,
     TResult Function(_MatchesDated value)? datedMatch,
+    TResult Function(_MatchesMonth value)? monthMatches,
     required TResult orElse(),
   }) {
     if (searchMatch != null) {
@@ -394,8 +550,10 @@ class _$MatchesDatedImpl implements _MatchesDated {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() matches,
+    required TResult Function() matchstats,
     required TResult Function(String search) searchMatch,
     required TResult Function(DateTime date) datedMatch,
+    required TResult Function(DateTime month) monthMatches,
   }) {
     return datedMatch(date);
   }
@@ -404,8 +562,10 @@ class _$MatchesDatedImpl implements _MatchesDated {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? matches,
+    TResult? Function()? matchstats,
     TResult? Function(String search)? searchMatch,
     TResult? Function(DateTime date)? datedMatch,
+    TResult? Function(DateTime month)? monthMatches,
   }) {
     return datedMatch?.call(date);
   }
@@ -414,8 +574,10 @@ class _$MatchesDatedImpl implements _MatchesDated {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? matches,
+    TResult Function()? matchstats,
     TResult Function(String search)? searchMatch,
     TResult Function(DateTime date)? datedMatch,
+    TResult Function(DateTime month)? monthMatches,
     required TResult orElse(),
   }) {
     if (datedMatch != null) {
@@ -428,8 +590,10 @@ class _$MatchesDatedImpl implements _MatchesDated {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_MatchesFetched value) matches,
+    required TResult Function(_MatchStats value) matchstats,
     required TResult Function(_MatchesSearched value) searchMatch,
     required TResult Function(_MatchesDated value) datedMatch,
+    required TResult Function(_MatchesMonth value) monthMatches,
   }) {
     return datedMatch(this);
   }
@@ -438,8 +602,10 @@ class _$MatchesDatedImpl implements _MatchesDated {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_MatchesFetched value)? matches,
+    TResult? Function(_MatchStats value)? matchstats,
     TResult? Function(_MatchesSearched value)? searchMatch,
     TResult? Function(_MatchesDated value)? datedMatch,
+    TResult? Function(_MatchesMonth value)? monthMatches,
   }) {
     return datedMatch?.call(this);
   }
@@ -448,8 +614,10 @@ class _$MatchesDatedImpl implements _MatchesDated {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_MatchesFetched value)? matches,
+    TResult Function(_MatchStats value)? matchstats,
     TResult Function(_MatchesSearched value)? searchMatch,
     TResult Function(_MatchesDated value)? datedMatch,
+    TResult Function(_MatchesMonth value)? monthMatches,
     required TResult orElse(),
   }) {
     if (datedMatch != null) {
@@ -470,11 +638,165 @@ abstract class _MatchesDated implements MatchEvent {
 }
 
 /// @nodoc
+abstract class _$$MatchesMonthImplCopyWith<$Res> {
+  factory _$$MatchesMonthImplCopyWith(
+          _$MatchesMonthImpl value, $Res Function(_$MatchesMonthImpl) then) =
+      __$$MatchesMonthImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({DateTime month});
+}
+
+/// @nodoc
+class __$$MatchesMonthImplCopyWithImpl<$Res>
+    extends _$MatchEventCopyWithImpl<$Res, _$MatchesMonthImpl>
+    implements _$$MatchesMonthImplCopyWith<$Res> {
+  __$$MatchesMonthImplCopyWithImpl(
+      _$MatchesMonthImpl _value, $Res Function(_$MatchesMonthImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? month = null,
+  }) {
+    return _then(_$MatchesMonthImpl(
+      month: null == month
+          ? _value.month
+          : month // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$MatchesMonthImpl implements _MatchesMonth {
+  const _$MatchesMonthImpl({required this.month});
+
+  @override
+  final DateTime month;
+
+  @override
+  String toString() {
+    return 'MatchEvent.monthMatches(month: $month)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$MatchesMonthImpl &&
+            (identical(other.month, month) || other.month == month));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, month);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MatchesMonthImplCopyWith<_$MatchesMonthImpl> get copyWith =>
+      __$$MatchesMonthImplCopyWithImpl<_$MatchesMonthImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() matches,
+    required TResult Function() matchstats,
+    required TResult Function(String search) searchMatch,
+    required TResult Function(DateTime date) datedMatch,
+    required TResult Function(DateTime month) monthMatches,
+  }) {
+    return monthMatches(month);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? matches,
+    TResult? Function()? matchstats,
+    TResult? Function(String search)? searchMatch,
+    TResult? Function(DateTime date)? datedMatch,
+    TResult? Function(DateTime month)? monthMatches,
+  }) {
+    return monthMatches?.call(month);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? matches,
+    TResult Function()? matchstats,
+    TResult Function(String search)? searchMatch,
+    TResult Function(DateTime date)? datedMatch,
+    TResult Function(DateTime month)? monthMatches,
+    required TResult orElse(),
+  }) {
+    if (monthMatches != null) {
+      return monthMatches(month);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_MatchesFetched value) matches,
+    required TResult Function(_MatchStats value) matchstats,
+    required TResult Function(_MatchesSearched value) searchMatch,
+    required TResult Function(_MatchesDated value) datedMatch,
+    required TResult Function(_MatchesMonth value) monthMatches,
+  }) {
+    return monthMatches(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_MatchesFetched value)? matches,
+    TResult? Function(_MatchStats value)? matchstats,
+    TResult? Function(_MatchesSearched value)? searchMatch,
+    TResult? Function(_MatchesDated value)? datedMatch,
+    TResult? Function(_MatchesMonth value)? monthMatches,
+  }) {
+    return monthMatches?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_MatchesFetched value)? matches,
+    TResult Function(_MatchStats value)? matchstats,
+    TResult Function(_MatchesSearched value)? searchMatch,
+    TResult Function(_MatchesDated value)? datedMatch,
+    TResult Function(_MatchesMonth value)? monthMatches,
+    required TResult orElse(),
+  }) {
+    if (monthMatches != null) {
+      return monthMatches(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _MatchesMonth implements MatchEvent {
+  const factory _MatchesMonth({required final DateTime month}) =
+      _$MatchesMonthImpl;
+
+  DateTime get month;
+  @JsonKey(ignore: true)
+  _$$MatchesMonthImplCopyWith<_$MatchesMonthImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
 mixin _$MatchState {
   MatchStatus get status => throw _privateConstructorUsedError;
   Failure? get failure => throw _privateConstructorUsedError;
   List<MatchType> get matches => throw _privateConstructorUsedError;
   List<MatchType> get datedMatches => throw _privateConstructorUsedError;
+  List<MatchType> get monthMatches => throw _privateConstructorUsedError;
+  List<MatchType> get statsMatches => throw _privateConstructorUsedError;
   List<MatchType> get searchedMatches => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -493,6 +815,8 @@ abstract class $MatchStateCopyWith<$Res> {
       Failure? failure,
       List<MatchType> matches,
       List<MatchType> datedMatches,
+      List<MatchType> monthMatches,
+      List<MatchType> statsMatches,
       List<MatchType> searchedMatches});
 }
 
@@ -513,6 +837,8 @@ class _$MatchStateCopyWithImpl<$Res, $Val extends MatchState>
     Object? failure = freezed,
     Object? matches = null,
     Object? datedMatches = null,
+    Object? monthMatches = null,
+    Object? statsMatches = null,
     Object? searchedMatches = null,
   }) {
     return _then(_value.copyWith(
@@ -531,6 +857,14 @@ class _$MatchStateCopyWithImpl<$Res, $Val extends MatchState>
       datedMatches: null == datedMatches
           ? _value.datedMatches
           : datedMatches // ignore: cast_nullable_to_non_nullable
+              as List<MatchType>,
+      monthMatches: null == monthMatches
+          ? _value.monthMatches
+          : monthMatches // ignore: cast_nullable_to_non_nullable
+              as List<MatchType>,
+      statsMatches: null == statsMatches
+          ? _value.statsMatches
+          : statsMatches // ignore: cast_nullable_to_non_nullable
               as List<MatchType>,
       searchedMatches: null == searchedMatches
           ? _value.searchedMatches
@@ -553,6 +887,8 @@ abstract class _$$MatchStateImplCopyWith<$Res>
       Failure? failure,
       List<MatchType> matches,
       List<MatchType> datedMatches,
+      List<MatchType> monthMatches,
+      List<MatchType> statsMatches,
       List<MatchType> searchedMatches});
 }
 
@@ -571,6 +907,8 @@ class __$$MatchStateImplCopyWithImpl<$Res>
     Object? failure = freezed,
     Object? matches = null,
     Object? datedMatches = null,
+    Object? monthMatches = null,
+    Object? statsMatches = null,
     Object? searchedMatches = null,
   }) {
     return _then(_$MatchStateImpl(
@@ -590,6 +928,14 @@ class __$$MatchStateImplCopyWithImpl<$Res>
           ? _value._datedMatches
           : datedMatches // ignore: cast_nullable_to_non_nullable
               as List<MatchType>,
+      monthMatches: null == monthMatches
+          ? _value._monthMatches
+          : monthMatches // ignore: cast_nullable_to_non_nullable
+              as List<MatchType>,
+      statsMatches: null == statsMatches
+          ? _value._statsMatches
+          : statsMatches // ignore: cast_nullable_to_non_nullable
+              as List<MatchType>,
       searchedMatches: null == searchedMatches
           ? _value._searchedMatches
           : searchedMatches // ignore: cast_nullable_to_non_nullable
@@ -606,9 +952,13 @@ class _$MatchStateImpl implements _MatchState {
       this.failure,
       final List<MatchType> matches = const [],
       final List<MatchType> datedMatches = const [],
+      final List<MatchType> monthMatches = const [],
+      final List<MatchType> statsMatches = const [],
       final List<MatchType> searchedMatches = const []})
       : _matches = matches,
         _datedMatches = datedMatches,
+        _monthMatches = monthMatches,
+        _statsMatches = statsMatches,
         _searchedMatches = searchedMatches;
 
   @override
@@ -634,6 +984,24 @@ class _$MatchStateImpl implements _MatchState {
     return EqualUnmodifiableListView(_datedMatches);
   }
 
+  final List<MatchType> _monthMatches;
+  @override
+  @JsonKey()
+  List<MatchType> get monthMatches {
+    if (_monthMatches is EqualUnmodifiableListView) return _monthMatches;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_monthMatches);
+  }
+
+  final List<MatchType> _statsMatches;
+  @override
+  @JsonKey()
+  List<MatchType> get statsMatches {
+    if (_statsMatches is EqualUnmodifiableListView) return _statsMatches;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_statsMatches);
+  }
+
   final List<MatchType> _searchedMatches;
   @override
   @JsonKey()
@@ -645,7 +1013,7 @@ class _$MatchStateImpl implements _MatchState {
 
   @override
   String toString() {
-    return 'MatchState(status: $status, failure: $failure, matches: $matches, datedMatches: $datedMatches, searchedMatches: $searchedMatches)';
+    return 'MatchState(status: $status, failure: $failure, matches: $matches, datedMatches: $datedMatches, monthMatches: $monthMatches, statsMatches: $statsMatches, searchedMatches: $searchedMatches)';
   }
 
   @override
@@ -659,6 +1027,10 @@ class _$MatchStateImpl implements _MatchState {
             const DeepCollectionEquality()
                 .equals(other._datedMatches, _datedMatches) &&
             const DeepCollectionEquality()
+                .equals(other._monthMatches, _monthMatches) &&
+            const DeepCollectionEquality()
+                .equals(other._statsMatches, _statsMatches) &&
+            const DeepCollectionEquality()
                 .equals(other._searchedMatches, _searchedMatches));
   }
 
@@ -669,6 +1041,8 @@ class _$MatchStateImpl implements _MatchState {
       failure,
       const DeepCollectionEquality().hash(_matches),
       const DeepCollectionEquality().hash(_datedMatches),
+      const DeepCollectionEquality().hash(_monthMatches),
+      const DeepCollectionEquality().hash(_statsMatches),
       const DeepCollectionEquality().hash(_searchedMatches));
 
   @JsonKey(ignore: true)
@@ -684,6 +1058,8 @@ abstract class _MatchState implements MatchState {
       final Failure? failure,
       final List<MatchType> matches,
       final List<MatchType> datedMatches,
+      final List<MatchType> monthMatches,
+      final List<MatchType> statsMatches,
       final List<MatchType> searchedMatches}) = _$MatchStateImpl;
 
   @override
@@ -694,6 +1070,10 @@ abstract class _MatchState implements MatchState {
   List<MatchType> get matches;
   @override
   List<MatchType> get datedMatches;
+  @override
+  List<MatchType> get monthMatches;
+  @override
+  List<MatchType> get statsMatches;
   @override
   List<MatchType> get searchedMatches;
   @override

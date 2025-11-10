@@ -22,6 +22,8 @@ mixin _$ProductEvent {
     required TResult Function(dynamic request) buyProducts,
     required TResult Function(dynamic request) buyBulkProducts,
     required TResult Function(dynamic request) addToCart,
+    required TResult Function(dynamic request) removeCart,
+    required TResult Function(dynamic request) clearCart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -30,6 +32,8 @@ mixin _$ProductEvent {
     TResult? Function(dynamic request)? buyProducts,
     TResult? Function(dynamic request)? buyBulkProducts,
     TResult? Function(dynamic request)? addToCart,
+    TResult? Function(dynamic request)? removeCart,
+    TResult? Function(dynamic request)? clearCart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -38,6 +42,8 @@ mixin _$ProductEvent {
     TResult Function(dynamic request)? buyProducts,
     TResult Function(dynamic request)? buyBulkProducts,
     TResult Function(dynamic request)? addToCart,
+    TResult Function(dynamic request)? removeCart,
+    TResult Function(dynamic request)? clearCart,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -47,6 +53,8 @@ mixin _$ProductEvent {
     required TResult Function(_ProductsPurchase value) buyProducts,
     required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
     required TResult Function(_ProductToCart value) addToCart,
+    required TResult Function(_ProductRemoveCart value) removeCart,
+    required TResult Function(_ProductClearCart value) clearCart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -55,6 +63,8 @@ mixin _$ProductEvent {
     TResult? Function(_ProductsPurchase value)? buyProducts,
     TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
     TResult? Function(_ProductToCart value)? addToCart,
+    TResult? Function(_ProductRemoveCart value)? removeCart,
+    TResult? Function(_ProductClearCart value)? clearCart,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -63,6 +73,8 @@ mixin _$ProductEvent {
     TResult Function(_ProductsPurchase value)? buyProducts,
     TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
     TResult Function(_ProductToCart value)? addToCart,
+    TResult Function(_ProductRemoveCart value)? removeCart,
+    TResult Function(_ProductClearCart value)? clearCart,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -128,6 +140,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
     required TResult Function(dynamic request) buyProducts,
     required TResult Function(dynamic request) buyBulkProducts,
     required TResult Function(dynamic request) addToCart,
+    required TResult Function(dynamic request) removeCart,
+    required TResult Function(dynamic request) clearCart,
   }) {
     return products();
   }
@@ -139,6 +153,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
     TResult? Function(dynamic request)? buyProducts,
     TResult? Function(dynamic request)? buyBulkProducts,
     TResult? Function(dynamic request)? addToCart,
+    TResult? Function(dynamic request)? removeCart,
+    TResult? Function(dynamic request)? clearCart,
   }) {
     return products?.call();
   }
@@ -150,6 +166,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
     TResult Function(dynamic request)? buyProducts,
     TResult Function(dynamic request)? buyBulkProducts,
     TResult Function(dynamic request)? addToCart,
+    TResult Function(dynamic request)? removeCart,
+    TResult Function(dynamic request)? clearCart,
     required TResult orElse(),
   }) {
     if (products != null) {
@@ -165,6 +183,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
     required TResult Function(_ProductsPurchase value) buyProducts,
     required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
     required TResult Function(_ProductToCart value) addToCart,
+    required TResult Function(_ProductRemoveCart value) removeCart,
+    required TResult Function(_ProductClearCart value) clearCart,
   }) {
     return products(this);
   }
@@ -176,6 +196,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
     TResult? Function(_ProductsPurchase value)? buyProducts,
     TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
     TResult? Function(_ProductToCart value)? addToCart,
+    TResult? Function(_ProductRemoveCart value)? removeCart,
+    TResult? Function(_ProductClearCart value)? clearCart,
   }) {
     return products?.call(this);
   }
@@ -187,6 +209,8 @@ class _$ProductsFetchedImpl implements _ProductsFetched {
     TResult Function(_ProductsPurchase value)? buyProducts,
     TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
     TResult Function(_ProductToCart value)? addToCart,
+    TResult Function(_ProductRemoveCart value)? removeCart,
+    TResult Function(_ProductClearCart value)? clearCart,
     required TResult orElse(),
   }) {
     if (products != null) {
@@ -270,6 +294,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
     required TResult Function(dynamic request) buyProducts,
     required TResult Function(dynamic request) buyBulkProducts,
     required TResult Function(dynamic request) addToCart,
+    required TResult Function(dynamic request) removeCart,
+    required TResult Function(dynamic request) clearCart,
   }) {
     return buyProducts(request);
   }
@@ -281,6 +307,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
     TResult? Function(dynamic request)? buyProducts,
     TResult? Function(dynamic request)? buyBulkProducts,
     TResult? Function(dynamic request)? addToCart,
+    TResult? Function(dynamic request)? removeCart,
+    TResult? Function(dynamic request)? clearCart,
   }) {
     return buyProducts?.call(request);
   }
@@ -292,6 +320,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
     TResult Function(dynamic request)? buyProducts,
     TResult Function(dynamic request)? buyBulkProducts,
     TResult Function(dynamic request)? addToCart,
+    TResult Function(dynamic request)? removeCart,
+    TResult Function(dynamic request)? clearCart,
     required TResult orElse(),
   }) {
     if (buyProducts != null) {
@@ -307,6 +337,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
     required TResult Function(_ProductsPurchase value) buyProducts,
     required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
     required TResult Function(_ProductToCart value) addToCart,
+    required TResult Function(_ProductRemoveCart value) removeCart,
+    required TResult Function(_ProductClearCart value) clearCart,
   }) {
     return buyProducts(this);
   }
@@ -318,6 +350,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
     TResult? Function(_ProductsPurchase value)? buyProducts,
     TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
     TResult? Function(_ProductToCart value)? addToCart,
+    TResult? Function(_ProductRemoveCart value)? removeCart,
+    TResult? Function(_ProductClearCart value)? clearCart,
   }) {
     return buyProducts?.call(this);
   }
@@ -329,6 +363,8 @@ class _$ProductsPurchaseImpl implements _ProductsPurchase {
     TResult Function(_ProductsPurchase value)? buyProducts,
     TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
     TResult Function(_ProductToCart value)? addToCart,
+    TResult Function(_ProductRemoveCart value)? removeCart,
+    TResult Function(_ProductClearCart value)? clearCart,
     required TResult orElse(),
   }) {
     if (buyProducts != null) {
@@ -419,6 +455,8 @@ class _$ProductsBulkPurchaseImpl implements _ProductsBulkPurchase {
     required TResult Function(dynamic request) buyProducts,
     required TResult Function(dynamic request) buyBulkProducts,
     required TResult Function(dynamic request) addToCart,
+    required TResult Function(dynamic request) removeCart,
+    required TResult Function(dynamic request) clearCart,
   }) {
     return buyBulkProducts(request);
   }
@@ -430,6 +468,8 @@ class _$ProductsBulkPurchaseImpl implements _ProductsBulkPurchase {
     TResult? Function(dynamic request)? buyProducts,
     TResult? Function(dynamic request)? buyBulkProducts,
     TResult? Function(dynamic request)? addToCart,
+    TResult? Function(dynamic request)? removeCart,
+    TResult? Function(dynamic request)? clearCart,
   }) {
     return buyBulkProducts?.call(request);
   }
@@ -441,6 +481,8 @@ class _$ProductsBulkPurchaseImpl implements _ProductsBulkPurchase {
     TResult Function(dynamic request)? buyProducts,
     TResult Function(dynamic request)? buyBulkProducts,
     TResult Function(dynamic request)? addToCart,
+    TResult Function(dynamic request)? removeCart,
+    TResult Function(dynamic request)? clearCart,
     required TResult orElse(),
   }) {
     if (buyBulkProducts != null) {
@@ -456,6 +498,8 @@ class _$ProductsBulkPurchaseImpl implements _ProductsBulkPurchase {
     required TResult Function(_ProductsPurchase value) buyProducts,
     required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
     required TResult Function(_ProductToCart value) addToCart,
+    required TResult Function(_ProductRemoveCart value) removeCart,
+    required TResult Function(_ProductClearCart value) clearCart,
   }) {
     return buyBulkProducts(this);
   }
@@ -467,6 +511,8 @@ class _$ProductsBulkPurchaseImpl implements _ProductsBulkPurchase {
     TResult? Function(_ProductsPurchase value)? buyProducts,
     TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
     TResult? Function(_ProductToCart value)? addToCart,
+    TResult? Function(_ProductRemoveCart value)? removeCart,
+    TResult? Function(_ProductClearCart value)? clearCart,
   }) {
     return buyBulkProducts?.call(this);
   }
@@ -478,6 +524,8 @@ class _$ProductsBulkPurchaseImpl implements _ProductsBulkPurchase {
     TResult Function(_ProductsPurchase value)? buyProducts,
     TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
     TResult Function(_ProductToCart value)? addToCart,
+    TResult Function(_ProductRemoveCart value)? removeCart,
+    TResult Function(_ProductClearCart value)? clearCart,
     required TResult orElse(),
   }) {
     if (buyBulkProducts != null) {
@@ -566,6 +614,8 @@ class _$ProductToCartImpl implements _ProductToCart {
     required TResult Function(dynamic request) buyProducts,
     required TResult Function(dynamic request) buyBulkProducts,
     required TResult Function(dynamic request) addToCart,
+    required TResult Function(dynamic request) removeCart,
+    required TResult Function(dynamic request) clearCart,
   }) {
     return addToCart(request);
   }
@@ -577,6 +627,8 @@ class _$ProductToCartImpl implements _ProductToCart {
     TResult? Function(dynamic request)? buyProducts,
     TResult? Function(dynamic request)? buyBulkProducts,
     TResult? Function(dynamic request)? addToCart,
+    TResult? Function(dynamic request)? removeCart,
+    TResult? Function(dynamic request)? clearCart,
   }) {
     return addToCart?.call(request);
   }
@@ -588,6 +640,8 @@ class _$ProductToCartImpl implements _ProductToCart {
     TResult Function(dynamic request)? buyProducts,
     TResult Function(dynamic request)? buyBulkProducts,
     TResult Function(dynamic request)? addToCart,
+    TResult Function(dynamic request)? removeCart,
+    TResult Function(dynamic request)? clearCart,
     required TResult orElse(),
   }) {
     if (addToCart != null) {
@@ -603,6 +657,8 @@ class _$ProductToCartImpl implements _ProductToCart {
     required TResult Function(_ProductsPurchase value) buyProducts,
     required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
     required TResult Function(_ProductToCart value) addToCart,
+    required TResult Function(_ProductRemoveCart value) removeCart,
+    required TResult Function(_ProductClearCart value) clearCart,
   }) {
     return addToCart(this);
   }
@@ -614,6 +670,8 @@ class _$ProductToCartImpl implements _ProductToCart {
     TResult? Function(_ProductsPurchase value)? buyProducts,
     TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
     TResult? Function(_ProductToCart value)? addToCart,
+    TResult? Function(_ProductRemoveCart value)? removeCart,
+    TResult? Function(_ProductClearCart value)? clearCart,
   }) {
     return addToCart?.call(this);
   }
@@ -625,6 +683,8 @@ class _$ProductToCartImpl implements _ProductToCart {
     TResult Function(_ProductsPurchase value)? buyProducts,
     TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
     TResult Function(_ProductToCart value)? addToCart,
+    TResult Function(_ProductRemoveCart value)? removeCart,
+    TResult Function(_ProductClearCart value)? clearCart,
     required TResult orElse(),
   }) {
     if (addToCart != null) {
@@ -641,6 +701,326 @@ abstract class _ProductToCart implements ProductEvent {
   dynamic get request;
   @JsonKey(ignore: true)
   _$$ProductToCartImplCopyWith<_$ProductToCartImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ProductRemoveCartImplCopyWith<$Res> {
+  factory _$$ProductRemoveCartImplCopyWith(_$ProductRemoveCartImpl value,
+          $Res Function(_$ProductRemoveCartImpl) then) =
+      __$$ProductRemoveCartImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({dynamic request});
+}
+
+/// @nodoc
+class __$$ProductRemoveCartImplCopyWithImpl<$Res>
+    extends _$ProductEventCopyWithImpl<$Res, _$ProductRemoveCartImpl>
+    implements _$$ProductRemoveCartImplCopyWith<$Res> {
+  __$$ProductRemoveCartImplCopyWithImpl(_$ProductRemoveCartImpl _value,
+      $Res Function(_$ProductRemoveCartImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? request = freezed,
+  }) {
+    return _then(_$ProductRemoveCartImpl(
+      request: freezed == request
+          ? _value.request
+          : request // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ProductRemoveCartImpl implements _ProductRemoveCart {
+  const _$ProductRemoveCartImpl({required this.request});
+
+  @override
+  final dynamic request;
+
+  @override
+  String toString() {
+    return 'ProductEvent.removeCart(request: $request)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ProductRemoveCartImpl &&
+            const DeepCollectionEquality().equals(other.request, request));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(request));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ProductRemoveCartImplCopyWith<_$ProductRemoveCartImpl> get copyWith =>
+      __$$ProductRemoveCartImplCopyWithImpl<_$ProductRemoveCartImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() products,
+    required TResult Function(dynamic request) buyProducts,
+    required TResult Function(dynamic request) buyBulkProducts,
+    required TResult Function(dynamic request) addToCart,
+    required TResult Function(dynamic request) removeCart,
+    required TResult Function(dynamic request) clearCart,
+  }) {
+    return removeCart(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? products,
+    TResult? Function(dynamic request)? buyProducts,
+    TResult? Function(dynamic request)? buyBulkProducts,
+    TResult? Function(dynamic request)? addToCart,
+    TResult? Function(dynamic request)? removeCart,
+    TResult? Function(dynamic request)? clearCart,
+  }) {
+    return removeCart?.call(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? products,
+    TResult Function(dynamic request)? buyProducts,
+    TResult Function(dynamic request)? buyBulkProducts,
+    TResult Function(dynamic request)? addToCart,
+    TResult Function(dynamic request)? removeCart,
+    TResult Function(dynamic request)? clearCart,
+    required TResult orElse(),
+  }) {
+    if (removeCart != null) {
+      return removeCart(request);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_ProductsFetched value) products,
+    required TResult Function(_ProductsPurchase value) buyProducts,
+    required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
+    required TResult Function(_ProductToCart value) addToCart,
+    required TResult Function(_ProductRemoveCart value) removeCart,
+    required TResult Function(_ProductClearCart value) clearCart,
+  }) {
+    return removeCart(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_ProductsFetched value)? products,
+    TResult? Function(_ProductsPurchase value)? buyProducts,
+    TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult? Function(_ProductToCart value)? addToCart,
+    TResult? Function(_ProductRemoveCart value)? removeCart,
+    TResult? Function(_ProductClearCart value)? clearCart,
+  }) {
+    return removeCart?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_ProductsFetched value)? products,
+    TResult Function(_ProductsPurchase value)? buyProducts,
+    TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult Function(_ProductToCart value)? addToCart,
+    TResult Function(_ProductRemoveCart value)? removeCart,
+    TResult Function(_ProductClearCart value)? clearCart,
+    required TResult orElse(),
+  }) {
+    if (removeCart != null) {
+      return removeCart(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ProductRemoveCart implements ProductEvent {
+  const factory _ProductRemoveCart({required final dynamic request}) =
+      _$ProductRemoveCartImpl;
+
+  dynamic get request;
+  @JsonKey(ignore: true)
+  _$$ProductRemoveCartImplCopyWith<_$ProductRemoveCartImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ProductClearCartImplCopyWith<$Res> {
+  factory _$$ProductClearCartImplCopyWith(_$ProductClearCartImpl value,
+          $Res Function(_$ProductClearCartImpl) then) =
+      __$$ProductClearCartImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({dynamic request});
+}
+
+/// @nodoc
+class __$$ProductClearCartImplCopyWithImpl<$Res>
+    extends _$ProductEventCopyWithImpl<$Res, _$ProductClearCartImpl>
+    implements _$$ProductClearCartImplCopyWith<$Res> {
+  __$$ProductClearCartImplCopyWithImpl(_$ProductClearCartImpl _value,
+      $Res Function(_$ProductClearCartImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? request = freezed,
+  }) {
+    return _then(_$ProductClearCartImpl(
+      request: freezed == request
+          ? _value.request
+          : request // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ProductClearCartImpl implements _ProductClearCart {
+  const _$ProductClearCartImpl({required this.request});
+
+  @override
+  final dynamic request;
+
+  @override
+  String toString() {
+    return 'ProductEvent.clearCart(request: $request)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ProductClearCartImpl &&
+            const DeepCollectionEquality().equals(other.request, request));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(request));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ProductClearCartImplCopyWith<_$ProductClearCartImpl> get copyWith =>
+      __$$ProductClearCartImplCopyWithImpl<_$ProductClearCartImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() products,
+    required TResult Function(dynamic request) buyProducts,
+    required TResult Function(dynamic request) buyBulkProducts,
+    required TResult Function(dynamic request) addToCart,
+    required TResult Function(dynamic request) removeCart,
+    required TResult Function(dynamic request) clearCart,
+  }) {
+    return clearCart(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? products,
+    TResult? Function(dynamic request)? buyProducts,
+    TResult? Function(dynamic request)? buyBulkProducts,
+    TResult? Function(dynamic request)? addToCart,
+    TResult? Function(dynamic request)? removeCart,
+    TResult? Function(dynamic request)? clearCart,
+  }) {
+    return clearCart?.call(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? products,
+    TResult Function(dynamic request)? buyProducts,
+    TResult Function(dynamic request)? buyBulkProducts,
+    TResult Function(dynamic request)? addToCart,
+    TResult Function(dynamic request)? removeCart,
+    TResult Function(dynamic request)? clearCart,
+    required TResult orElse(),
+  }) {
+    if (clearCart != null) {
+      return clearCart(request);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_ProductsFetched value) products,
+    required TResult Function(_ProductsPurchase value) buyProducts,
+    required TResult Function(_ProductsBulkPurchase value) buyBulkProducts,
+    required TResult Function(_ProductToCart value) addToCart,
+    required TResult Function(_ProductRemoveCart value) removeCart,
+    required TResult Function(_ProductClearCart value) clearCart,
+  }) {
+    return clearCart(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_ProductsFetched value)? products,
+    TResult? Function(_ProductsPurchase value)? buyProducts,
+    TResult? Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult? Function(_ProductToCart value)? addToCart,
+    TResult? Function(_ProductRemoveCart value)? removeCart,
+    TResult? Function(_ProductClearCart value)? clearCart,
+  }) {
+    return clearCart?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_ProductsFetched value)? products,
+    TResult Function(_ProductsPurchase value)? buyProducts,
+    TResult Function(_ProductsBulkPurchase value)? buyBulkProducts,
+    TResult Function(_ProductToCart value)? addToCart,
+    TResult Function(_ProductRemoveCart value)? removeCart,
+    TResult Function(_ProductClearCart value)? clearCart,
+    required TResult orElse(),
+  }) {
+    if (clearCart != null) {
+      return clearCart(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ProductClearCart implements ProductEvent {
+  const factory _ProductClearCart({required final dynamic request}) =
+      _$ProductClearCartImpl;
+
+  dynamic get request;
+  @JsonKey(ignore: true)
+  _$$ProductClearCartImplCopyWith<_$ProductClearCartImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
