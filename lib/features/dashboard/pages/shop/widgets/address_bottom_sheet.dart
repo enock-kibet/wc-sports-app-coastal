@@ -156,11 +156,7 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Color(0xFFFFFFFF),
-                border: Border.all(
-                  color: const Color(0xFFBABABA),
-                  width: 0.5, // Set border width
-                ),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
               ),
               height: 40,
@@ -178,11 +174,7 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: Color(0xFFFFFFFF),
-                border: Border.all(
-                  color: const Color(0xFFBABABA),
-                  width: 0.5, // Set border width
-                ),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
               ),
               height: 40,
@@ -201,11 +193,7 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: Color(0xFFFFFFFF),
-                border: Border.all(
-                  color: const Color(0xFFBABABA),
-                  width: 0.5, // Set border width
-                ),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
               ),
               height: 40,
@@ -224,11 +212,7 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: Color(0xFFFFFFFF),
-                border: Border.all(
-                  color: const Color(0xFFBABABA),
-                  width: 0.5, // Set border width
-                ),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
               ),
               height: 40,
@@ -248,10 +232,6 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
             Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  width: 0.5, // Set border width
-                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               height: 55,
