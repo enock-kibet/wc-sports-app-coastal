@@ -8,8 +8,6 @@ import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/services/service.dart';
-import 'package:sports_app/features/app/blocs/address/address_bloc.dart';
-import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/products/product_bloc.dart';
 import 'package:sports_app/features/dashboard/pages/pages.dart';
@@ -17,8 +15,6 @@ import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/main.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/theme.dart';
-
-import '../../../app/blocs/products/cart_bloc.dart';
 
 class ShopDetailsPage extends StatefulWidget {
   final Product product;
@@ -66,11 +62,12 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
         },
         builder: (context, state) {
           return Scaffold(
-              bottomNavigationBar: Padding(
+              bottomNavigationBar: SafeArea(
+                  child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: kMedium),
                 child: Container(
                   margin: const EdgeInsets.symmetric(vertical: 12),
-                  height: 64,
+                  height: 50,
                   decoration: BoxDecoration(
                     color: Theme.of(context)
                         .colorScheme
@@ -223,7 +220,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                     ],
                   ),
                 ),
-              ),
+              )),
               body: AppBackground(
                 childWidget: SafeArea(
                   child: Stack(children: [

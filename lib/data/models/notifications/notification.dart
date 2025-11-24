@@ -16,7 +16,7 @@ class Notifications with _$Notifications {
     required String notificationKey,
     required String createdUtc,
     required String updatedUtc,
-    String? notificationText,
+    required String notificationText,
   }) = _Notifications;
 
   factory Notifications.fromJson(Map<String, dynamic> json) =>

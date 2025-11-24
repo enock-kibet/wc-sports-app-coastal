@@ -18,7 +18,7 @@ _$NotificationsImpl _$$NotificationsImplFromJson(Map<String, dynamic> json) =>
       notificationKey: json['notificationKey'] as String,
       createdUtc: json['createdUtc'] as String,
       updatedUtc: json['updatedUtc'] as String,
-      notificationText: json['notificationText'] as String?,
+      notificationText: json['notificationText'] as String,
     );
 
 Map<String, dynamic> _$$NotificationsImplToJson(_$NotificationsImpl instance) =>

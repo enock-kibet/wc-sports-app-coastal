@@ -176,7 +176,10 @@ class _BaseScreenState extends State<BaseScreen> {
                 unselectedFontSize: kSMedium,
                 selectedFontSize: kSMedium,
                 onTap: _onTap,
-                selectedItemColor: AppColors.darkColor,
+                selectedItemColor: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withOpacity(1),
                 unselectedItemColor: const Color(0xff919191),
                 type: BottomNavigationBarType.fixed,
                 items: [
@@ -186,7 +189,10 @@ class _BaseScreenState extends State<BaseScreen> {
                           ? "assets/icons/home_b.svg"
                           : "assets/icons/home.svg",
                       color: widget.navigationShell.currentIndex == 0
-                          ? AppColors.darkColor
+                          ? Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant
+                              .withOpacity(1)
                           : AppColors.greyColor,
                     ),
                     label: 'Home',
@@ -197,7 +203,10 @@ class _BaseScreenState extends State<BaseScreen> {
                           ? "assets/icons/date_b.svg"
                           : "assets/icons/date.svg",
                       color: widget.navigationShell.currentIndex == 1
-                          ? AppColors.darkColor
+                          ? Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant
+                              .withOpacity(1)
                           : AppColors.greyColor,
                     ),
                     //Icon(LucideIcons.beer),
@@ -209,7 +218,10 @@ class _BaseScreenState extends State<BaseScreen> {
                           ? "assets/icons/shop_b.svg"
                           : "assets/icons/shop.svg",
                       color: widget.navigationShell.currentIndex == 2
-                          ? AppColors.darkColor
+                          ? Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant
+                              .withOpacity(1)
                           : AppColors.greyColor,
                     ),
                     label: 'Shop',
@@ -220,7 +232,10 @@ class _BaseScreenState extends State<BaseScreen> {
                             ? "assets/icons/team_b.svg"
                             : "assets/icons/team.svg",
                         color: widget.navigationShell.currentIndex == 3
-                            ? AppColors.darkColor
+                            ? Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant
+                                .withOpacity(1)
                             : AppColors.greyColor,
                       ),
                       label: 'Team'),
@@ -230,7 +245,10 @@ class _BaseScreenState extends State<BaseScreen> {
                           ? "assets/icons/profile_b.svg"
                           : "assets/icons/profile.svg",
                       color: widget.navigationShell.currentIndex == 4
-                          ? AppColors.darkColor
+                          ? Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant
+                              .withOpacity(1)
                           : AppColors.greyColor,
                     ),
                     label: 'Profile',

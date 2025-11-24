@@ -34,16 +34,18 @@ void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // ✅ Enable edge-to-edge layout globally
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+    );
 
-    // ✅ Optional: make system bars transparent
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarIconBrightness: Brightness.dark,
+        systemStatusBarContrastEnforced: false,
+        systemNavigationBarContrastEnforced: false,
+      ),
+    );
 
     if (Platform.isAndroid || Platform.isIOS || kIsWeb) {
       await Firebase.initializeApp(
@@ -61,7 +63,7 @@ void main() {
     final runnableApp = _buildRunnableApp(
       isWeb: kIsWeb,
       webAppWidth: 560.0,
-      app: const MyApp(),
+      app: MyApp(),
     );
 
     runApp(runnableApp);

@@ -57,7 +57,7 @@ class WCNotificationService {
     final token = await getFcmToken();
     final deviceInfo = await getDeviceInfo();
 
-    print('`sstesst $uToken');
+    // print('`sstesst $uToken');
 
     if (token == null) {
       print("No FCM token available");

@@ -42,40 +42,49 @@ class PreviousTiles extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    _buildDateBox(match, textColor, isDark),
-                    const SizedBox(width: 13),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          getStringDate(match.matchDate, withoutWeekday: true),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: secondaryTextColor,
-                            fontSize: 10,
-                          ),
-                        ),
-                        const SizedBox(height: 7),
-                        RichText(
-                          text: TextSpan(
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: textColor,
-                              fontSize: 10,
-                            ),
-                            children: [
-                              TextSpan(text: "${match.matchLocation} - "),
-                              TextSpan(
-                                text: truncateText(match.matchVenue),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
+                Expanded(
+                  // ← This is the critical fix
+                  child: Row(
+                    children: [
+                      _buildDateBox(match, textColor, isDark),
+                      const SizedBox(width: 13),
+                      Expanded(
+                        // ← Also expand the Column inside
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              getStringDate(match.matchDate,
+                                  withoutWeekday: true),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: secondaryTextColor,
+                                fontSize: 10,
                               ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 7),
+                            Text.rich(
+                              TextSpan(
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: textColor,
+                                  fontSize: 10,
+                                ),
+                                children: [
+                                  TextSpan(text: "${match.matchLocation} - "),
+                                  TextSpan(
+                                    text: match.matchVenue,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
                 Text(
                   "Ksh ${match.matchPrice}",
@@ -87,7 +96,6 @@ class PreviousTiles extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 11),
             const DottedDivider(),
             const SizedBox(height: 11),

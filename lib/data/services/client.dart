@@ -609,7 +609,7 @@ class PointsService {
     String token,
   ) async {
     final result = await Http.post(
-      "https://backend.eetechnologies.com/sportapp/api/Point/loyalty/trasfer",
+      "https://backend.wencetechnologies.com/sportapp/api/Point/loyalty/transfer",
       data,
       headers: {
         'Authorization': 'Bearer $token',

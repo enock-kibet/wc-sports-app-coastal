@@ -97,111 +97,114 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
       builder: (context, state) {
         return Scaffold(
           resizeToAvoidBottomInset: true,
-          bottomNavigationBar: Container(
-            width: double.infinity,
-            height: 80,
-            color: Theme.of(context).colorScheme.surface,
-            padding: const EdgeInsets.symmetric(
-                horizontal: kLarge, vertical: kSmall),
-            child: Row(
-              children: [
-                CustomIconButton(
-                  size: 50,
-                  isRoundedRectBorder: true,
-                  iconColor: Theme.of(context).colorScheme.onSurface,
-                  borderColor: Theme.of(context).colorScheme.onSurface,
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  onButtonPress: () {
-                    final match = widget.match;
+          bottomNavigationBar: SafeArea(
+            child: Container(
+              width: double.infinity,
+              height: 80,
+              color: Theme.of(context).colorScheme.surface,
+              padding: const EdgeInsets.symmetric(
+                  horizontal: kLarge, vertical: kSmall),
+              child: Row(
+                children: [
+                  CustomIconButton(
+                    size: 50,
+                    isRoundedRectBorder: true,
+                    iconColor: Theme.of(context).colorScheme.onSurface,
+                    borderColor: Theme.of(context).colorScheme.onSurface,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    onButtonPress: () {
+                      final match = widget.match;
 
-                    if (userID != null) {
-                      final payload = {
-                        "userId": userID ?? "",
-                        "actionCode": "SHARED_TICKET",
-                        "externalRef": match.matchId,
-                      };
-                      _pointsBloc.add(
-                        PointsEvent.addPoints(request: payload),
-                      );
-                    }
+                      if (userID != null) {
+                        final payload = {
+                          "userId": userID ?? "",
+                          "actionCode": "SHARED_TICKET",
+                          "externalRef": match.matchId,
+                        };
+                        _pointsBloc.add(
+                          PointsEvent.addPoints(request: payload),
+                        );
+                      }
 
-                    final shareText = '''
-🎟️ ${match.matchName}
-📅 ${getStringDate(match.matchDate)} at ${formatTime(match.matchDate)}
-💸 Ticket Price: ${match.matchPrice}
-📍 Location: ${match.matchVenue}
-Get your tickets now from the Wence Sports app!
-https://play.google.com/store/apps/details?id=com.wtl.sportsapp''';
+                      final shareText = '''
+          🎟️ ${match.matchName}
+          📅 ${getStringDate(match.matchDate)} at ${formatTime(match.matchDate)}
+          💸 Ticket Price: ${match.matchPrice}
+          📍 Location: ${match.matchVenue}
+          Get your tickets now from the Wence Sports app!
+          https://play.google.com/store/apps/details?id=com.wtl.sportsapp''';
 
-                    Share.share(shareText, subject: 'Check out this event!');
-                  },
-                  icon: Icons.share_outlined,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: GradientFilledButton(
-                    radius: 16,
-                    onPressed: () async {
-                      final bloc = context.read<PointsBloc>();
-
-                      // Step 1: Trigger loading of points
-                      bloc.add(const PointsEvent.points());
-
-                      // Step 2: Wait for points to load (listen for success)
-                      await Future.doWhile(() async {
-                        await Future.delayed(const Duration(milliseconds: 100));
-                        final state = bloc.state;
-                        return state.status == PointsStatus.loading;
-                      });
-
-                      final pointsState = bloc.state;
-
-                      // Step 3: Show bottom sheet when ready
-                      showTicketBottomSheet(
-                        context,
-                        (
-                          TotalAmount:
-                              widget.match.matchPrice * numberOfTickets.value,
-                          quantity: numberOfTickets.value,
-                        ),
-                        buyMerch: (userPoints) {
-                          if (userPoints) {
-                            context.read<ProductBloc>().add(
-                                  ProductEvent.buyProducts(request: {
-                                    "amount": widget.match.matchPrice *
-                                        numberOfTickets.value,
-                                    "email": service<AppPreferencesManager>()
-                                        .currentUserValue!
-                                        .email,
-                                    "productID":
-                                        "20d802f0-1557-49a5-9fcf-7de02e570c57",
-                                    "category": "",
-                                    "redeemablePoints": pointsState.balance
-                                  }),
-                                );
-                          } else {
-                            context.read<ProductBloc>().add(
-                                  ProductEvent.buyProducts(request: {
-                                    "amount": widget.match.matchPrice *
-                                        numberOfTickets.value,
-                                    "email": service<AppPreferencesManager>()
-                                        .currentUserValue!
-                                        .email,
-                                    "productID":
-                                        "20d802f0-1557-49a5-9fcf-7de02e570c57",
-                                    "category": ""
-                                  }),
-                                );
-                          }
-                        },
-                        match: widget.match,
-                        pointsState: pointsState, // ✅ Pass loaded state here
-                      );
+                      Share.share(shareText, subject: 'Check out this event!');
                     },
-                    text: "Buy Ticket",
+                    icon: Icons.share_outlined,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: GradientFilledButton(
+                      radius: 16,
+                      onPressed: () async {
+                        final bloc = context.read<PointsBloc>();
+
+                        // Step 1: Trigger loading of points
+                        bloc.add(const PointsEvent.points());
+
+                        // Step 2: Wait for points to load (listen for success)
+                        await Future.doWhile(() async {
+                          await Future.delayed(
+                              const Duration(milliseconds: 100));
+                          final state = bloc.state;
+                          return state.status == PointsStatus.loading;
+                        });
+
+                        final pointsState = bloc.state;
+
+                        // Step 3: Show bottom sheet when ready
+                        showTicketBottomSheet(
+                          context,
+                          (
+                            TotalAmount:
+                                widget.match.matchPrice * numberOfTickets.value,
+                            quantity: numberOfTickets.value,
+                          ),
+                          buyMerch: (userPoints) {
+                            if (userPoints) {
+                              context.read<ProductBloc>().add(
+                                    ProductEvent.buyProducts(request: {
+                                      "amount": widget.match.matchPrice *
+                                          numberOfTickets.value,
+                                      "email": service<AppPreferencesManager>()
+                                          .currentUserValue!
+                                          .email,
+                                      "productID":
+                                          "20d802f0-1557-49a5-9fcf-7de02e570c57",
+                                      "category": "",
+                                      "redeemablePoints": pointsState.balance
+                                    }),
+                                  );
+                            } else {
+                              context.read<ProductBloc>().add(
+                                    ProductEvent.buyProducts(request: {
+                                      "amount": widget.match.matchPrice *
+                                          numberOfTickets.value,
+                                      "email": service<AppPreferencesManager>()
+                                          .currentUserValue!
+                                          .email,
+                                      "productID":
+                                          "20d802f0-1557-49a5-9fcf-7de02e570c57",
+                                      "category": ""
+                                    }),
+                                  );
+                            }
+                          },
+                          match: widget.match,
+                          pointsState: pointsState, // ✅ Pass loaded state here
+                        );
+                      },
+                      text: "Buy Ticket",
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           body: AppBackground(

@@ -30,7 +30,7 @@ mixin _$Notifications {
   String get notificationKey => throw _privateConstructorUsedError;
   String get createdUtc => throw _privateConstructorUsedError;
   String get updatedUtc => throw _privateConstructorUsedError;
-  String? get notificationText => throw _privateConstructorUsedError;
+  String get notificationText => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -55,7 +55,7 @@ abstract class $NotificationsCopyWith<$Res> {
       String notificationKey,
       String createdUtc,
       String updatedUtc,
-      String? notificationText});
+      String notificationText});
 }
 
 /// @nodoc
@@ -81,7 +81,7 @@ class _$NotificationsCopyWithImpl<$Res, $Val extends Notifications>
     Object? notificationKey = null,
     Object? createdUtc = null,
     Object? updatedUtc = null,
-    Object? notificationText = freezed,
+    Object? notificationText = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -124,10 +124,10 @@ class _$NotificationsCopyWithImpl<$Res, $Val extends Notifications>
           ? _value.updatedUtc
           : updatedUtc // ignore: cast_nullable_to_non_nullable
               as String,
-      notificationText: freezed == notificationText
+      notificationText: null == notificationText
           ? _value.notificationText
           : notificationText // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
     ) as $Val);
   }
 }
@@ -151,7 +151,7 @@ abstract class _$$NotificationsImplCopyWith<$Res>
       String notificationKey,
       String createdUtc,
       String updatedUtc,
-      String? notificationText});
+      String notificationText});
 }
 
 /// @nodoc
@@ -175,7 +175,7 @@ class __$$NotificationsImplCopyWithImpl<$Res>
     Object? notificationKey = null,
     Object? createdUtc = null,
     Object? updatedUtc = null,
-    Object? notificationText = freezed,
+    Object? notificationText = null,
   }) {
     return _then(_$NotificationsImpl(
       id: null == id
@@ -218,10 +218,10 @@ class __$$NotificationsImplCopyWithImpl<$Res>
           ? _value.updatedUtc
           : updatedUtc // ignore: cast_nullable_to_non_nullable
               as String,
-      notificationText: freezed == notificationText
+      notificationText: null == notificationText
           ? _value.notificationText
           : notificationText // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
     ));
   }
 }
@@ -240,7 +240,7 @@ class _$NotificationsImpl implements _Notifications {
       required this.notificationKey,
       required this.createdUtc,
       required this.updatedUtc,
-      this.notificationText});
+      required this.notificationText});
 
   factory _$NotificationsImpl.fromJson(Map<String, dynamic> json) =>
       _$$NotificationsImplFromJson(json);
@@ -266,7 +266,7 @@ class _$NotificationsImpl implements _Notifications {
   @override
   final String updatedUtc;
   @override
-  final String? notificationText;
+  final String notificationText;
 
   @override
   String toString() {
@@ -340,7 +340,7 @@ abstract class _Notifications implements Notifications {
       required final String notificationKey,
       required final String createdUtc,
       required final String updatedUtc,
-      final String? notificationText}) = _$NotificationsImpl;
+      required final String notificationText}) = _$NotificationsImpl;
 
   factory _Notifications.fromJson(Map<String, dynamic> json) =
       _$NotificationsImpl.fromJson;
@@ -366,7 +366,7 @@ abstract class _Notifications implements Notifications {
   @override
   String get updatedUtc;
   @override
-  String? get notificationText;
+  String get notificationText;
   @override
   @JsonKey(ignore: true)
   _$$NotificationsImplCopyWith<_$NotificationsImpl> get copyWith =>

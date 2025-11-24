@@ -615,9 +615,7 @@ class _ShopCartBottomSheetContentState
                                                   address.locality,
                                               selectedItem:
                                                   _selectedAddressDropdown ??
-                                                      (addresses.isNotEmpty
-                                                          ? addresses.first
-                                                          : null),
+                                                      null,
                                               compareFn: (a, b) =>
                                                   a?.id == b?.id,
                                               decoratorProps:
@@ -626,7 +624,7 @@ class _ShopCartBottomSheetContentState
                                                   fillColor: Theme.of(context)
                                                       .colorScheme
                                                       .surface,
-                                                  labelText: "Select Location",
+                                                  labelText: "Select Address",
                                                   prefixIcon: const Icon(
                                                       Icons.location_on,
                                                       size: 18,
@@ -748,12 +746,7 @@ class _ShopCartBottomSheetContentState
                                               itemAsString: (address) =>
                                                   address.locality,
                                               selectedItem:
-                                                  _selectedPickupAddressDropdown ??
-                                                      (pickupAddresses
-                                                              .isNotEmpty
-                                                          ? pickupAddresses
-                                                              .first
-                                                          : null),
+                                                  _selectedPickupAddressDropdown,
                                               compareFn: (a, b) => a.id == b.id,
                                               decoratorProps:
                                                   DropDownDecoratorProps(
@@ -763,22 +756,24 @@ class _ShopCartBottomSheetContentState
                                                       .surface,
                                                   labelText:
                                                       "Select Pickup Location",
-                                                  prefixIcon: Icon(
+                                                  prefixIcon: const Icon(
                                                       Icons.location_on,
                                                       size: 18,
                                                       color: Colors.purple),
-                                                  suffixIcon: Icon(
+                                                  suffixIcon: const Icon(
                                                       Icons.arrow_drop_down,
                                                       size: 28,
                                                       color: Colors.purple),
-                                                  border: OutlineInputBorder(
+                                                  border:
+                                                      const OutlineInputBorder(
                                                     borderRadius:
                                                         BorderRadius.all(
                                                             Radius.circular(
                                                                 12)),
                                                   ),
                                                   contentPadding:
-                                                      EdgeInsets.symmetric(
+                                                      const EdgeInsets
+                                                          .symmetric(
                                                           horizontal: 12,
                                                           vertical: 8),
                                                 ),
@@ -917,24 +912,48 @@ class _ShopCartBottomSheetContentState
                   child: GradientFilledButton(
                       text: 'Checkout',
                       onPressed: () {
+                        if (_selectedTab == 0 &&
+                            _selectedAddressDropdown == null) {
+                          rootScaffoldMessengerKey.currentState?.showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text('Please select a delivery address.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (_selectedTab == 1 &&
+                            _selectedPickupAddressDropdown == null) {
+                          rootScaffoldMessengerKey.currentState?.showSnackBar(
+                            const SnackBar(
+                              content: Text('Please select a pickup location.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+
                         context.pop();
 
                         // Build array from cart items
                         final requestData = _items.expand((product) {
                           return product.variants.map((variant) {
                             return {
+                              "deliveryAddressId": _selectedAddressDropdown?.id,
                               "productTypeID": variant.variantID,
                               "productID": product.id,
                               "amount": variant.variantPrice,
                               "quantity": variant.quantity,
-                              "redeemablePoints":
-                                  usePointsController.value ? points : 0
                             };
                           });
                         }).toList();
 
                         final wrappedRequest = {
                           "bundledOrders": requestData,
+                          "redeemablePoints":
+                              usePointsController.value ? points : 0
                         };
 
                         context.read<ProductBloc>().add(

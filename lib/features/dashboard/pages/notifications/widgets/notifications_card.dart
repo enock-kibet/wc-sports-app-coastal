@@ -96,8 +96,7 @@ class NotificationsCard extends StatelessWidget {
                             color: titleColor,
                           ),
                         ),
-                        if (notification.notificationText != null &&
-                            notification.notificationText!.isNotEmpty)
+                        if (notification.notificationText.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0),
                             child: Text(
