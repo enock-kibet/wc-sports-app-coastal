@@ -67,5 +67,7 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need access to your location to provide personalized content and services.</string>
 </dict>
 </plist>
