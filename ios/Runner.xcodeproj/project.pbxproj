@@ -193,8 +193,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
 			buildPhases = (
+				FA5704492ED4FC89007461CF /* ShellScript */,
 				108C689512CD0F1F11BF2ACF /* [CP] Check Pods Manifest.lock */,
-				FAEA81182ED4F8790086A484 /* ShellScript */,
 				9740EEB61CF901F6004384FC /* Run Script */,
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
@@ -392,7 +392,7 @@
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build\n";
 		};
-		FAEA81182ED4F8790086A484 /* ShellScript */ = {
+		FA5704492ED4FC89007461CF /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 8;
 			files = (
@@ -407,7 +407,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/bin/sh \"${PROJECT_DIR}/ios/Runner/ci_scripts/ci_post_clone.sh\"\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/bin/sh \"${PROJECT_DIR}/Runner/ci_scripts/ci_post_clone.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
