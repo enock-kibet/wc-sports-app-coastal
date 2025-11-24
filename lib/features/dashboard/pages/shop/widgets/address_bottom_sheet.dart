@@ -37,7 +37,8 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _nameController.text = service<AppPreferencesManager>().currentUserValue!.name;
+    _nameController.text =
+        service<AppPreferencesManager>().currentUserValue!.name;
   }
 
   Future<gmf.LatLng?> getCurrentLatLng() async {
@@ -58,11 +59,7 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
     return gmf.LatLng(pos.latitude, pos.longitude);
   }
 
-
-
   void _pickLocation() async {
-
-
     final userLocation = await getCurrentLatLng();
 
     final result = await showModalBottomSheet<Map<String, dynamic>>(
@@ -87,23 +84,20 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
     if (_locationResult != null &&
         _nameController.text.isNotEmpty &&
         _phoneController.text.isNotEmpty) {
-
       // check if fields are filled
       if (_nameController.text.isEmpty ||
           _phoneController.text.isEmpty ||
           _countryController.text.isEmpty ||
           _cityController.text.isEmpty ||
           _locationResult!["address"].isEmpty) {
-        AnimatedOverlaySnackbar.show(
-            context, "Please fill all fields",
+        AnimatedOverlaySnackbar.show(context, "Please fill all fields",
             color: AppColors.defaultAppRed);
         return;
       }
 
       // submit the address details
       context.read<AddressBloc>().add(
-        AddressEvent.addAddress(
-            request: {
+            AddressEvent.addAddress(request: {
               "fullName": _nameController.text,
               "line1": _locationResult!["address"],
               "city": _cityController.text,
@@ -113,7 +107,7 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
               "longitude": _locationResult!["latLng"].longitude,
               "isDefault": _isDefaultAddress,
             }),
-      );
+          );
 
       // get address id from the state
       final addressState = context.read<AddressBloc>().state;
@@ -134,8 +128,7 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
         });
 
         print("Address8 States: ${_locationResult!["address"]}");
-        AnimatedOverlaySnackbar.show(
-            context, "Address added successfully",
+        AnimatedOverlaySnackbar.show(context, "Address added successfully",
             color: AppColors.darkColor);
       } else {
         AnimatedOverlaySnackbar.show(
@@ -254,9 +247,9 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: Color(0xFFFFFFFF),
+                color: Theme.of(context).colorScheme.surface,
                 border: Border.all(
-                  color: const Color(0xFFBABABA),
+                  color: Theme.of(context).colorScheme.onSurface,
                   width: 0.5, // Set border width
                 ),
                 borderRadius: BorderRadius.circular(8),
