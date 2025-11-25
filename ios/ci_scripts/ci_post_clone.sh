@@ -1,25 +1,18 @@
-#!/bin/sh
+#!/bin/bash
+set -e
 
-# Install CocoaPods using Homebrew
-HOMEBREW_NO_AUTO_UPDATE=1
-brew install cocoapods
+echo "💙 Setting up Flutter..."
+git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
+export PATH="$HOME/flutter/bin:$PATH"
 
-# Install Flutter
-brew install --cask flutter
-
-# Run Flutter doctor
-flutter doctor
-
-# Precache iOS dependencies
-flutter precache --ios
-
-# Get packages
+echo "💙 Getting Flutter dependencies..."
 flutter pub get
 
-# Install pods
-cd ios
-pod install --repo-update
-cd ..
+echo "💙 Building iOS release..."
+flutter build ios --release --no-codesign
 
-# Build iOS app
-flutter build ios --no-codesign
+echo "💙 Installing CocoaPods..."
+cd ios
+pod install
+
+echo "💙 Done!"
