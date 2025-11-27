@@ -27,6 +27,7 @@ import 'package:sports_app/features/dashboard/pages/profile/components/personal_
 import 'package:sports_app/features/dashboard/pages/profile/profile_page.dart';
 import 'package:sports_app/features/dashboard/pages/schedule/schedule_page.dart';
 import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
+import 'package:sports_app/features/dashboard/pages/splash_screen.dart';
 import 'package:sports_app/features/dashboard/pages/standings/standinds_page.dart';
 import 'package:sports_app/features/dashboard/pages/team/player/player.dart';
 import 'package:sports_app/features/dashboard/pages/team/team.dart';
@@ -98,7 +99,7 @@ final RouteObserver<ModalRoute<void>> routeObserverB =
 
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: "/home",
+  initialLocation: "/splash",
   observers: [TalkerRouteObserver(service<Talker>()), routeObserver],
   routes: [
     GoRoute(
@@ -170,6 +171,15 @@ final router = GoRouter(
           child: TeamMediaPage(
             key: state.pageKey,
           ),
+        );
+      },
+    ),
+    GoRoute(
+      path: "/splash",
+      name: AppRoute.splash.name,
+      pageBuilder: (context, state) {
+        return MaterialPage(
+          child: const SplashScreen(),
         );
       },
     ),

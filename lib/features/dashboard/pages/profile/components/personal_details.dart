@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 import 'package:mime/mime.dart';
 import 'package:sports_app/common/dimens.dart';
@@ -374,99 +375,44 @@ class _PersonalDetailsState extends State<PersonalDetails> {
           context.read<UserBloc>().add(UpdateUser(state.data));
           service<Talker>().info('Profile updated');
           //show success snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Profile updated'),
-              backgroundColor: AppColors.primaryColor,
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 3),
-              action: SnackBarAction(
-                label: 'Dismiss',
-                textColor: AppColors.whiteColor,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                },
-              ),
-            ),
+          SnackbarService.show(
+            'Profile updated',
+            backgroundColor: AppColors.blackColor,
           );
         }
         if (state.status == AuthStatus.uploadSuccess) {
           context.read<UserBloc>().add(UpdateUser(state.data));
           service<Talker>().info('Profile updated');
           //show success snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Profile photo uploaded'),
-              backgroundColor: AppColors.primaryColor,
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 3),
-              action: SnackBarAction(
-                label: 'Dismiss',
-                textColor: AppColors.whiteColor,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                },
-              ),
-            ),
+          SnackbarService.show(
+            'Profile photo uploaded',
+            backgroundColor: AppColors.primaryColor,
           );
         }
         if (state.status == AuthStatus.failure) {
           service<Talker>().error('Profile update failed');
           service<Talker>().error(state.failure!.error);
           //show snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.failure!.error),
-              backgroundColor: AppColors.dangerColor,
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 3),
-              action: SnackBarAction(
-                label: 'Dismiss',
-                textColor: AppColors.whiteColor,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                },
-              ),
-            ),
+          SnackbarService.show(
+            state.failure!.error,
+            backgroundColor: AppColors.primaryColor,
           );
         }
         if (state.status == AuthStatus.loading) {
           service<Talker>().info('Loading');
           picture = state.data.picture;
           //show snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Loading..."),
-              backgroundColor: AppColors.dangerColor,
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 3),
-              action: SnackBarAction(
-                label: 'Dismiss',
-                textColor: AppColors.whiteColor,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                },
-              ),
-            ),
+          SnackbarService.show(
+            'Loading...',
+            backgroundColor: AppColors.primaryColor,
           );
         }
         if (state.status == AuthStatus.uploading) {
           service<Talker>().info('Loading');
           //show snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Uploading..."),
-              backgroundColor: AppColors.dangerColor,
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 3),
-              action: SnackBarAction(
-                label: 'Dismiss',
-                textColor: AppColors.whiteColor,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                },
-              ),
-            ),
+          SnackbarService.show(
+            'Uploading...',
+            backgroundColor: AppColors.primaryColor,
           );
         }
       },

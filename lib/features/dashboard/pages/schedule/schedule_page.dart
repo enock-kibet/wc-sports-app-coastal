@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/features/app/blocs/stripe/stripe_bloc.dart';
 import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/router/router.dart';
@@ -33,6 +34,8 @@ class _SchedulePageState extends State<SchedulePage> {
 
   final FocusNode _focusNode = FocusNode();
   final TextEditingController searchText = TextEditingController();
+
+  bool _usedFutureFallback = false;
 
   String getStringDate(dynamic value) {
     late final DateTime dt;
@@ -286,11 +289,31 @@ class _SchedulePageState extends State<SchedulePage> {
                     return Center(child: Text(state.failure!.error));
                   }
                   if (state.status == MatchStatus.success) {
-                    final matchesToShow = _selectedDay == null
-                        ? state.monthMatches
-                        : state.datedMatches;
+                    List<MatchType> matchesToShow;
 
-                    print(_selectedDay);
+                    if (_selectedDay == null) {
+                      final isCurrentMonth =
+                          _focusedDay.month == DateTime.now().month &&
+                              _focusedDay.year == DateTime.now().year;
+
+                      print(_usedFutureFallback);
+                      // print(state.matches);
+
+                      if (state.monthMatches.isEmpty) {
+                        if (isCurrentMonth && !_usedFutureFallback) {
+                          // ⭐ EDIT: Use fallback only once
+                          matchesToShow = state.matches;
+                        } else {
+                          // ⭐ EDIT: No fallback on other months
+                          matchesToShow = [];
+                        }
+                      } else {
+                        matchesToShow = state.monthMatches;
+                      }
+                    } else {
+                      // Day view (never fallback)
+                      matchesToShow = state.datedMatches;
+                    }
 
                     if (matchesToShow.isEmpty) {
                       final message = _selectedDay == null
@@ -310,115 +333,142 @@ class _SchedulePageState extends State<SchedulePage> {
                     }
 
                     return Expanded(
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        itemCount: matchesToShow.length,
-                        itemBuilder: (context, index) {
-                          final match = matchesToShow[index];
-                          return Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: kSmall, vertical: kSmall),
-                            padding: const EdgeInsets.all(kMedium),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(kMedium),
-                              color: Theme.of(context).colorScheme.surface,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: const Text(
+                              "Upcoming Matches",
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(match.matchName,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: kSmall),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.location_on,
-                                        size: kSMedium),
-                                    const SizedBox(width: kXSmall),
-                                    Text(match.matchVenue,
-                                        style: const TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w300)),
-                                  ],
-                                ),
-                                const SizedBox(height: kMedium),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(kSmall),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.greyColor
-                                            .withOpacity(0.3),
-                                        borderRadius:
-                                            BorderRadius.circular(kMedium),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              itemCount: matchesToShow.length,
+                              itemBuilder: (context, index) {
+                                final match = matchesToShow[index];
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: kSmall, vertical: kSmall),
+                                  padding: const EdgeInsets.all(kMedium),
+                                  decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.circular(kMedium),
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(match.matchName,
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold)),
+                                      const SizedBox(height: kSmall),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.location_on,
+                                              size: kSMedium),
+                                          const SizedBox(width: kXSmall),
+                                          Text(match.matchVenue,
+                                              style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w300)),
+                                        ],
                                       ),
-                                      child: Text(
-                                          getStringDate(match.matchDate),
-                                          style: context.textTheme.bodySmall
-                                              ?.copyWith(
-                                                  fontWeight: FontWeight.w700)),
-                                    ),
-                                    Text("Ksh ${match.matchPrice}",
-                                        style: context.textTheme.titleLarge
-                                            ?.copyWith(
-                                                fontWeight: FontWeight.w700)),
-                                  ],
-                                ),
-                                const SizedBox(height: kLarge),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {
-                                        context.pushNamed(
-                                            AppRoute.matchDetails.name,
-                                            extra: match);
-                                      },
-                                      icon: Icon(LucideIcons.bookmark,
-                                          color: AppColors.purpleColor),
-                                    ),
-                                    const SizedBox(width: kLarge * 3),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          context.pushNamed(
-                                              AppRoute.matchDetails.name,
-                                              extra: match);
-                                        },
-                                        child: Container(
-                                          width: double.infinity,
-                                          alignment: Alignment.center,
-                                          height: 50,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: kMedium,
-                                              vertical: kXSmall),
-                                          decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  AppColors.pinkColor,
-                                                  AppColors.purpleColor
-                                                ],
-                                              ),
+                                      const SizedBox(height: kMedium),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            padding:
+                                                const EdgeInsets.all(kSmall),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.greyColor
+                                                  .withOpacity(0.3),
                                               borderRadius:
                                                   BorderRadius.circular(
-                                                      kMedium)),
-                                          child: Text("Buy Ticket",
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface)),
-                                        ),
+                                                      kMedium),
+                                            ),
+                                            child: Text(
+                                                getStringDate(match.matchDate),
+                                                style: context
+                                                    .textTheme.bodySmall
+                                                    ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w700)),
+                                          ),
+                                          Text("Ksh ${match.matchPrice}",
+                                              style: context
+                                                  .textTheme.titleLarge
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w700)),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      const SizedBox(height: kLarge),
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              context.pushNamed(
+                                                  AppRoute.matchDetails.name,
+                                                  extra: match);
+                                            },
+                                            icon: Icon(LucideIcons.bookmark,
+                                                color: AppColors.purpleColor),
+                                          ),
+                                          const SizedBox(width: kLarge * 3),
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                context.pushNamed(
+                                                    AppRoute.matchDetails.name,
+                                                    extra: match);
+                                              },
+                                              child: Container(
+                                                width: double.infinity,
+                                                alignment: Alignment.center,
+                                                height: 50,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: kMedium,
+                                                        vertical: kXSmall),
+                                                decoration: BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                      colors: [
+                                                        AppColors.pinkColor,
+                                                        AppColors.purpleColor
+                                                      ],
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            kMedium)),
+                                                child: Text("Buy Ticket",
+                                                    style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurface)),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
+                          ),
+                        ],
                       ),
                     );
                   }
@@ -444,13 +494,13 @@ class _SchedulePageState extends State<SchedulePage> {
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.3), shape: BoxShape.circle),
-            child: Icon(
+            child: const Icon(
               LucideIcons.menu,
               color: Colors.white,
             ),
           ),
         ),
-        Column(
+        const Column(
           children: [
             Text(
               'Team Schedule',
@@ -474,7 +524,7 @@ class _SchedulePageState extends State<SchedulePage> {
               color: Colors.white.withOpacity(0.3),
               shape: BoxShape.circle,
             ),
-            child: Icon(LucideIcons.bell, color: Colors.white),
+            child: const Icon(LucideIcons.bell, color: Colors.white),
           ),
         )
       ],

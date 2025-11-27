@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/features/app/blocs/address/address_bloc.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:sports_app/features/app/blocs/matches/match_schedule/schedule_bloc.dart';
@@ -147,7 +148,7 @@ class _MyAppState extends State<MyApp> {
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
           return MaterialApp.router(
-            scaffoldMessengerKey: rootScaffoldMessengerKey,
+            scaffoldMessengerKey: SnackbarService.messengerKey,
             title: 'Sports App',
             debugShowCheckedModeBanner: false,
             // theme: systemMode,

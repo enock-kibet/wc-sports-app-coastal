@@ -3,7 +3,7 @@ part of "../home_page.dart";
 void showTicketBottomSheet(
   BuildContext context,
   ({double TotalAmount, int quantity}) values, {
-  required void Function(bool usePoints) buyMerch,
+  required void Function(int usedPoints) buyMerch,
   required MatchType match,
   required PointsState pointsState,
 }) {
@@ -28,7 +28,7 @@ void showTicketBottomSheet(
 }
 
 class _TicketBottomSheetContent extends StatefulWidget {
-  final void Function(bool usePoints) buyMerch;
+  final void Function(int usedPoints) buyMerch;
   final MatchType match;
   final ({double TotalAmount, int quantity}) values;
   final PointsState pointsState;
@@ -48,11 +48,21 @@ class _TicketBottomSheetContent extends StatefulWidget {
 
 class _TicketBottomSheetContentState extends State<_TicketBottomSheetContent> {
   bool usePoints = false;
+  final TextEditingController _pointsController = TextEditingController();
+  int usedPoints = 0;
+
+  String? pointsError;
+
+  @override
+  void dispose() {
+    _pointsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final points = int.tryParse(widget.pointsState.balance ?? '0') ?? 0;
-    final kshValue = points / 3;
+    final kshValue = usedPoints / 3;
 
     final displayedTotal = usePoints
         ? (widget.values.TotalAmount - kshValue).clamp(0, double.infinity)
@@ -117,6 +127,134 @@ class _TicketBottomSheetContentState extends State<_TicketBottomSheetContent> {
                         match: widget.match,
                       ),
                       const SizedBox(height: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// ✅ Consent Toggle
+                          Row(
+                            children: [
+                              Switch(
+                                value: usePoints,
+                                onChanged: points > 0
+                                    ? (val) {
+                                        setState(() {
+                                          usePoints = val;
+                                          if (!val) {
+                                            _pointsController.clear();
+                                            usedPoints = 0;
+                                            pointsError = null;
+                                          }
+                                        });
+                                      }
+                                    : null,
+                                activeColor:
+                                    Theme.of(context).colorScheme.primary,
+                              ),
+                              Expanded(
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      const TextSpan(text: "Use Points "),
+                                      TextSpan(
+                                        text: "(Available: $points)",
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          /// ✅ Points Input Section
+                          if (usePoints) ...[
+                            const SizedBox(height: 8),
+
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: SizedBox(
+                                    child: TextFormField(
+                                      controller: _pointsController,
+                                      keyboardType: TextInputType.number,
+
+                                      // ✅ REDUCED HEIGHT SETTINGS
+                                      style: const TextStyle(fontSize: 14),
+                                      textAlignVertical:
+                                          TextAlignVertical.center,
+
+                                      decoration: InputDecoration(
+                                        labelText: "Enter points to use",
+                                        hintText: "e.g. 300",
+                                        border: const OutlineInputBorder(),
+
+                                        // ✅ THIS CONTROLS HEIGHT
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical:
+                                              10, // 👈 reduce this further if needed
+                                        ),
+
+                                        errorText: pointsError,
+                                      ),
+
+                                      onChanged: (value) {
+                                        final entered =
+                                            int.tryParse(value) ?? 0;
+
+                                        setState(() {
+                                          if (entered <= 0) {
+                                            usedPoints = 0;
+                                            pointsError =
+                                                "Enter points greater than 0";
+                                          } else if (entered > points) {
+                                            usedPoints = 0;
+                                            pointsError =
+                                                "You only have $points points available";
+                                          } else {
+                                            usedPoints = entered;
+                                            pointsError = null;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 8),
+
+                                /// ✅ Auto-fill MAX button
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      usedPoints = points;
+                                      _pointsController.text =
+                                          points.toString();
+                                      pointsError = null;
+                                    });
+                                  },
+                                  child: const Text("MAX"),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 6),
+
+                            /// ✅ Exact Conversion Hint
+                            Text(
+                              usedPoints > 0
+                                  ? "$usedPoints points = Ksh ${(usedPoints / 3).toStringAsFixed(2)}"
+                                  : "3 Points = Ksh 1",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ],
+                      ),
+
+                      const SizedBox(height: 10),
                       Row(
                         children: [
                           const Text("Total Amount",
@@ -146,53 +284,12 @@ class _TicketBottomSheetContentState extends State<_TicketBottomSheetContent> {
                       const SizedBox(height: 8),
                       const Divider(color: Color(0xffdfdfdf)),
                       // if (points < 9999)
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: usePoints,
-                            onChanged: points > 0
-                                ? (val) =>
-                                    setState(() => usePoints = val ?? false)
-                                : null,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            activeColor: Theme.of(context).colorScheme.primary,
-                          ),
-                          Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  fontSize: 14,
-                                ),
-                                children: [
-                                  const TextSpan(text: "Use "),
-                                  TextSpan(
-                                    text: "$points ",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const TextSpan(text: "Points "),
-                                  TextSpan(
-                                    text:
-                                        "(Ksh ${kshValue.toStringAsFixed(0)})",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                       const SizedBox(height: 10),
                       GradientFilledButton(
                         text: 'Checkout',
                         onPressed: () {
                           Navigator.of(context).pop();
-                          widget.buyMerch(usePoints);
+                          widget.buyMerch(usePoints ? usedPoints : 0);
                         },
                       )
                     ],

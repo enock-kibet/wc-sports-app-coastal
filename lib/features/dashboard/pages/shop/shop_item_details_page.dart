@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
@@ -34,15 +35,9 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
         bloc: context.read<ProductBloc>(),
         listener: (context, state) {
           if (state.status == ProductStatus.processingPayment) {
-            rootScaffoldMessengerKey.currentState!.showSnackBar(
-              SnackBar(
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                content: Text(
-                  "Securing Payment",
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                ),
-              ),
+            SnackbarService.show(
+              'Securing Payment',
+              backgroundColor: AppColors.blackColor,
             );
             //AnimatedOverlaySnackbar.show(context, "Loading",color:const Color(0xff1976D2));
           } else if (state.status == ProductStatus.successfulPayment) {
@@ -52,12 +47,15 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
             );
             //AnimatedOverlaySnackbar.show(context, "Success: ${state.authorizationUrl??"didn't get"}",color:const Color(0xff2E7D32));
           } else if (state.status == ProductStatus.failure) {
-            AnimatedOverlaySnackbar.show(
-                context, "failed: ${state.failure?.error ?? "failed"}",
-                color: AppColors.defaultAppRed);
+            SnackbarService.show(
+              "failed: ${state.failure?.error ?? "failed"}",
+              backgroundColor: AppColors.dangerColor,
+            );
           } else if (state.status == ProductStatus.success) {
-            AnimatedOverlaySnackbar.show(context, "Added to cart successfully",
-                color: Theme.of(context).colorScheme.surface);
+            SnackbarService.show(
+              'Added to cart successfully',
+              backgroundColor: AppColors.blackColor,
+            );
           }
         },
         builder: (context, state) {
@@ -97,20 +95,9 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                             return OutlinedButton(
                               onPressed: value.$1 == 0
                                   ? () {
-                                      rootScaffoldMessengerKey.currentState!
-                                          .showSnackBar(
-                                        SnackBar(
-                                          backgroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .surface,
-                                          content: Text(
-                                            "Add an item to proceed",
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface),
-                                          ),
-                                        ),
+                                      SnackbarService.show(
+                                        'Add an item to proceed',
+                                        backgroundColor: AppColors.blackColor,
                                       );
                                     }
                                   : () async {
@@ -175,20 +162,9 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                               text: "Buy Now",
                               onPressed: value.$1 == 0
                                   ? () {
-                                      rootScaffoldMessengerKey.currentState!
-                                          .showSnackBar(
-                                        SnackBar(
-                                          backgroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .surface,
-                                          content: Text(
-                                            "Add an item to proceed",
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface),
-                                          ),
-                                        ),
+                                      SnackbarService.show(
+                                        'Add an item to proceed',
+                                        backgroundColor: AppColors.blackColor,
                                       );
                                     }
                                   : () async {

@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
@@ -72,14 +73,9 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
       bloc: context.read<ProductBloc>(),
       listener: (context, state) {
         if (state.status == ProductStatus.processingPayment) {
-          rootScaffoldMessengerKey.currentState!.showSnackBar(
-            SnackBar(
-              backgroundColor: AppColors.blackColor,
-              content: const Text(
-                "Securing Payment",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+          SnackbarService.show(
+            'Securing Payment',
+            backgroundColor: AppColors.blackColor,
           );
         } else if (state.status == ProductStatus.successfulPayment) {
           context.goNamed(
@@ -158,7 +154,6 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
 
                         final pointsState = bloc.state;
 
-                        // Step 3: Show bottom sheet when ready
                         showTicketBottomSheet(
                           context,
                           (
@@ -166,38 +161,27 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                                 widget.match.matchPrice * numberOfTickets.value,
                             quantity: numberOfTickets.value,
                           ),
-                          buyMerch: (userPoints) {
-                            if (userPoints) {
-                              context.read<ProductBloc>().add(
-                                    ProductEvent.buyProducts(request: {
-                                      "amount": widget.match.matchPrice *
-                                          numberOfTickets.value,
-                                      "email": service<AppPreferencesManager>()
-                                          .currentUserValue!
-                                          .email,
-                                      "productID":
-                                          "20d802f0-1557-49a5-9fcf-7de02e570c57",
-                                      "category": "",
-                                      "redeemablePoints": pointsState.balance
-                                    }),
-                                  );
-                            } else {
-                              context.read<ProductBloc>().add(
-                                    ProductEvent.buyProducts(request: {
-                                      "amount": widget.match.matchPrice *
-                                          numberOfTickets.value,
-                                      "email": service<AppPreferencesManager>()
-                                          .currentUserValue!
-                                          .email,
-                                      "productID":
-                                          "20d802f0-1557-49a5-9fcf-7de02e570c57",
-                                      "category": ""
-                                    }),
-                                  );
-                            }
+                          buyMerch: (usedPoints) {
+                            final int redeemablePoints =
+                                usedPoints; // exactly what user entered
+
+                            context.read<ProductBloc>().add(
+                                  ProductEvent.buyProducts(request: {
+                                    "amount": widget.match.matchPrice *
+                                        numberOfTickets.value,
+                                    "email": service<AppPreferencesManager>()
+                                        .currentUserValue!
+                                        .email,
+                                    "productID":
+                                        "20d802f0-1557-49a5-9fcf-7de02e570c57",
+                                    "category": "",
+                                    if (redeemablePoints > 0)
+                                      "redeemablePoints": redeemablePoints,
+                                  }),
+                                );
                           },
                           match: widget.match,
-                          pointsState: pointsState, // ✅ Pass loaded state here
+                          pointsState: pointsState,
                         );
                       },
                       text: "Buy Ticket",

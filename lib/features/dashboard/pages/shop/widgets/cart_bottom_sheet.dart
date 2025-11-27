@@ -32,14 +32,9 @@ void showCartShopBottomSheet(BuildContext context,
       return BlocConsumer<CartBloc, CartState>(
         listener: (context, state) {
           if (state.status == ProductStatus.processingPayment) {
-            rootScaffoldMessengerKey.currentState!.showSnackBar(
-              SnackBar(
-                backgroundColor: AppColors.blackColor,
-                content: Text(
-                  "Securing Payment",
-                  style: TextStyle(color: AppColors.whiteColor),
-                ),
-              ),
+            SnackbarService.show(
+              'Securing Payment',
+              backgroundColor: AppColors.blackColor,
             );
             //AnimatedOverlaySnackbar.show(context, "Loading",color:const Color(0xff1976D2));
           } else if (state.status == ProductStatus.successfulPayment) {
@@ -113,6 +108,9 @@ class _ShopCartBottomSheetContentState
   late List<CartItem> _items;
   late List<Address> _addresses;
   late ValueNotifier<bool> usePointsController;
+  late TextEditingController pointsController;
+  String? pointsError;
+
   int _selectedTab = 0; // 0 = Delivery, 1 = Pick-Up
 
   Address? _selectedAddressDropdown;
@@ -139,12 +137,12 @@ class _ShopCartBottomSheetContentState
     super.initState();
     _items = List<CartItem>.from(widget.cartItems);
     _addresses = List<Address>.from(widget.addresses);
-    usePointsController = ValueNotifier<bool>(false);
+    pointsController = TextEditingController();
   }
 
   @override
   void dispose() {
-    usePointsController.dispose();
+    pointsController.dispose();
     super.dispose();
   }
 
@@ -158,14 +156,6 @@ class _ShopCartBottomSheetContentState
       for (final v in product.variants) {
         sum += v.variantPrice * v.quantity;
       }
-    }
-    return sum;
-  }
-
-  double get _total {
-    double sum = _subtotal;
-    if (usePointsController.value) {
-      sum -= int.tryParse(widget.pointsState.balance) ?? 0;
     }
     return sum;
   }
@@ -829,73 +819,75 @@ class _ShopCartBottomSheetContentState
 
                       const SizedBox(height: 12),
 
-                      // if (points < 9999)
                       Row(
                         children: [
-                          ValueListenableBuilder<bool>(
-                            valueListenable: usePointsController,
-                            builder: (context, usePoints, _) {
-                              return Checkbox(
-                                value: usePoints,
-                                onChanged: points > 0
-                                    ? (val) =>
-                                        usePointsController.value = val ?? false
-                                    : null,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                activeColor:
-                                    Theme.of(context).colorScheme.primary,
-                              );
-                            },
-                          ),
                           Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  fontSize: 14,
+                            child: TextFormField(
+                              controller: pointsController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'Redeem Points',
+                                errorText: pointsError,
+                                border: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12)),
                                 ),
-                                children: [
-                                  const TextSpan(text: "Use "),
-                                  TextSpan(
-                                    text: "$points ",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const TextSpan(text: "Points "),
-                                  TextSpan(
-                                    text:
-                                        "(Ksh ${kshValue.toStringAsFixed(0)})",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ],
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
                               ),
+                              onChanged: (val) {
+                                final int entered = int.tryParse(val) ?? 0;
+                                final int balance = int.tryParse(
+                                        widget.pointsState.balance ?? '0') ??
+                                    0;
+                                setState(() {
+                                  pointsError = entered > balance
+                                      ? 'Insufficient points'
+                                      : null;
+                                });
+                              },
                             ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () {
+                              final int balance = int.tryParse(
+                                      widget.pointsState.balance ?? '0') ??
+                                  0;
+                              pointsController.text = balance.toString();
+                              setState(() {
+                                pointsError = null;
+                              });
+                            },
+                            child: const Text('Max'),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '≈ Ksh ${((int.tryParse(pointsController.text) ?? 0) / 3).toStringAsFixed(2)}',
+                            style: const TextStyle(fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
 
                       const Divider(),
                       _summaryRow('Subtotal',
-                          '$_currency ${_subtotal.toStringAsFixed(0)}'),
+                          '$_currency ${_subtotal.toStringAsFixed(2)}'),
                       _summaryRow(
                           'Delivery',
                           _selectedTab == 0
-                              ? '$_currency ${deliveryFee.toStringAsFixed(0)}'
+                              ? '$_currency ${deliveryFee.toStringAsFixed(2)}'
                               : '$_currency 0'),
                       const Divider(),
-                      ValueListenableBuilder<bool>(
-                        valueListenable: usePointsController,
+                      ValueListenableBuilder(
+                        valueListenable: pointsController,
                         builder: (context, usePoints, _) {
-                          final pointsToUse = usePoints ? points : 0;
+                          int pointsUsed =
+                              int.tryParse(pointsController.text) ?? 0;
                           final totalWithPoints =
-                              _subtotal + deliveryFee - pointsToUse / 3;
+                              _subtotal + deliveryFee - pointsUsed / 3;
 
                           return _summaryRow('Total',
-                              '$_currency ${totalWithPoints.toStringAsFixed(0)}',
+                              '$_currency ${totalWithPoints.toStringAsFixed(2)}',
                               bold: true);
                         },
                       ),
@@ -914,51 +906,44 @@ class _ShopCartBottomSheetContentState
                       onPressed: () {
                         if (_selectedTab == 0 &&
                             _selectedAddressDropdown == null) {
-                          rootScaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('Please select a delivery address.'),
-                              backgroundColor: Colors.red,
-                            ),
+                          SnackbarService.show(
+                            'Please select a delivery address.',
+                            backgroundColor: AppColors.dangerColor,
                           );
                           return;
                         }
 
                         if (_selectedTab == 1 &&
                             _selectedPickupAddressDropdown == null) {
-                          rootScaffoldMessengerKey.currentState?.showSnackBar(
-                            const SnackBar(
-                              content: Text('Please select a pickup location.'),
-                              backgroundColor: Colors.red,
-                            ),
+                          SnackbarService.show(
+                            'Please select a pickup location.',
+                            backgroundColor: AppColors.dangerColor,
                           );
                           return;
                         }
 
                         context.pop();
 
-                        // Build array from cart items
-                        final requestData = _items.expand((product) {
-                          return product.variants.map((variant) {
-                            return {
-                              "deliveryAddressId": _selectedAddressDropdown?.id,
-                              "productTypeID": variant.variantID,
-                              "productID": product.id,
-                              "amount": variant.variantPrice,
-                              "quantity": variant.quantity,
-                            };
-                          });
-                        }).toList();
-
-                        final wrappedRequest = {
-                          "bundledOrders": requestData,
-                          "redeemablePoints":
-                              usePointsController.value ? points : 0
-                        };
+                        final int usedPoints =
+                            int.tryParse(pointsController.text) ?? 0;
 
                         context.read<ProductBloc>().add(
                               ProductEvent.buyBulkProducts(
-                                request: wrappedRequest,
+                                request: {
+                                  "bundledOrders": _items.expand((product) {
+                                    return product.variants.map((variant) {
+                                      return {
+                                        "deliveryAddressId":
+                                            _selectedAddressDropdown?.id,
+                                        "productTypeID": variant.variantID,
+                                        "productID": product.id,
+                                        "amount": variant.variantPrice,
+                                        "quantity": variant.quantity,
+                                      };
+                                    });
+                                  }).toList(),
+                                  "redeemablePoints": usedPoints,
+                                },
                               ),
                             );
                       }),

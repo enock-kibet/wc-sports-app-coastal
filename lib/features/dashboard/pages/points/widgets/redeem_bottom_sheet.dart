@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/dashboard/pages/shop/shop_page.dart';
+import 'package:sports_app/theme/app_colors.dart';
 
 void showTransferPointsBottomSheet(BuildContext context, String userPoints) {
   final emailController = TextEditingController();
@@ -19,16 +21,16 @@ void showTransferPointsBottomSheet(BuildContext context, String userPoints) {
         listener: (context, state) {
           if (state.status == PointsStatus.success) {
             Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Points transferred successfully')),
+            SnackbarService.show(
+              'Points transferred successfully',
+              backgroundColor: AppColors.blackColor,
             );
           }
           if (state.status == PointsStatus.failure) {
             Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content:
-                      Text('Something went wrong. Please try again later')),
+            SnackbarService.show(
+              'Something went wrong. Please try again later',
+              backgroundColor: AppColors.dangerColor,
             );
           }
         },

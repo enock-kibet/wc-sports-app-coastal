@@ -12,6 +12,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/addresses/pickupaddress.dart';
 import 'package:sports_app/data/models/products/cart.dart';
 import 'package:sports_app/data/models/products/product.dart';
@@ -65,14 +66,9 @@ class _ShopPageState extends State<ShopPage> {
       childWidget: BlocConsumer<ProductBloc, ProductState>(
         listener: (context, state) {
           if (state.status == ProductStatus.processingPayment) {
-            rootScaffoldMessengerKey.currentState!.showSnackBar(
-              SnackBar(
-                backgroundColor: AppColors.blackColor,
-                content: Text(
-                  "Securing Payment",
-                  style: TextStyle(color: AppColors.whiteColor),
-                ),
-              ),
+            SnackbarService.show(
+              'Securing Payment',
+              backgroundColor: AppColors.blackColor,
             );
             //AnimatedOverlaySnackbar.show(context, "Loading",color:const Color(0xff1976D2));
           } else if (state.status == ProductStatus.successfulPayment) {

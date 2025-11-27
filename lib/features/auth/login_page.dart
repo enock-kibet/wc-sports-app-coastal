@@ -6,9 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/mixin/input_validation_mixin.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
+import 'package:sports_app/main.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:upgrader/upgrader.dart';
 
@@ -54,20 +56,10 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
           if (state.status == AuthStatus.success) {
             context.read<UserBloc>().add(UpdateUser(state.data));
             //show success snackbar
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Login Successful'),
-                backgroundColor: AppColors.primaryColor,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 3),
-                action: SnackBarAction(
-                  label: 'Dismiss',
-                  textColor: AppColors.whiteColor,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  },
-                ),
-              ),
+
+            SnackbarService.show(
+              'Login Successful',
+              backgroundColor: AppColors.dangerColor,
             );
           }
           if (state.status == AuthStatus.failure) {
@@ -75,20 +67,10 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
             service<Talker>().error(state.failure!.error);
             await GoogleSignIn(scopes: ['profile', 'email']).signOut();
             //show snackbar
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.failure!.error),
-                backgroundColor: AppColors.dangerColor,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 3),
-                action: SnackBarAction(
-                  label: 'Dismiss',
-                  textColor: AppColors.whiteColor,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  },
-                ),
-              ),
+            SnackbarService.show(
+              state.failure!.error,
+              backgroundColor: AppColors.dangerColor,
+              actionLabel: 'Dismiss',
             );
           }
         },

@@ -51,7 +51,7 @@ class RequestInterceptor extends Interceptor {
     final now = DateTime.now().millisecondsSinceEpoch;
 
     // Refresh 20 minutes before expiry
-    const refreshBefore = 20 * 60 * 1000;
+    const refreshBefore = 10 * 60 * 1000;
 
     final needsRefresh = now >= (expiryMillis - refreshBefore);
 
