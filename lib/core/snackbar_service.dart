@@ -18,15 +18,20 @@ class SnackbarService {
 
     messenger.showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
         backgroundColor: backgroundColor,
         behavior: SnackBarBehavior.floating,
         dismissDirection: DismissDirection.horizontal,
         showCloseIcon: true,
+        closeIconColor: Colors.white,
         duration: Duration(seconds: seconds),
         action: actionLabel != null
             ? SnackBarAction(
                 label: actionLabel,
+                textColor: Colors.white,
                 onPressed: onAction ?? messenger.removeCurrentSnackBar,
               )
             : null,
