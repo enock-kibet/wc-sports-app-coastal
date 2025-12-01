@@ -4,12 +4,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/features/dashboard/pages/profile/components/circular_icon_container.dart';
@@ -31,11 +33,17 @@ class _ProfilePageState extends State<ProfilePage> {
   late User currentUser;
   bool loading = false;
   late final AppPreferences _prefs;
+  late final PointsState pointsState;
+  late String points;
 
   @override
   void initState() {
     currentUser = service<AppPreferencesManager>().currentUserValue!;
     _prefs = AppPreferences();
+
+    context.read<PointsBloc>().add(const PointsEvent.points());
+    pointsState = context.read<PointsBloc>().state;
+    points = pointsState.balance;
     super.initState();
   }
 
@@ -48,6 +56,7 @@ class _ProfilePageState extends State<ProfilePage> {
       if (mounted && user != null) {
         setState(() {
           currentUser = user;
+          points = pointsState.balance;
         });
       }
     } catch (e) {
@@ -59,6 +68,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    String formatWithCommas(num value) {
+      final formatter = NumberFormat('#,##0');
+      return formatter.format(value);
+    }
+
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _loadCurrentUser, // 👈 Pull to refresh manually
@@ -107,7 +121,13 @@ class _ProfilePageState extends State<ProfilePage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const Text("0 Points"),
+                        BlocBuilder<PointsBloc, PointsState>(
+                          builder: (context, state) {
+                            return Text(
+                              "${state.balance} points",
+                            );
+                          },
+                        )
                       ],
                     ),
                   ),

@@ -162,8 +162,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                             quantity: numberOfTickets.value,
                           ),
                           buyMerch: (usedPoints) {
-                            final int redeemablePoints =
-                                usedPoints; // exactly what user entered
+                            final int redeemablePoints = usedPoints;
 
                             context.read<ProductBloc>().add(
                                   ProductEvent.buyProducts(request: {

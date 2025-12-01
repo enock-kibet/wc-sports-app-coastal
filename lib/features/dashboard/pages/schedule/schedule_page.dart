@@ -415,53 +415,57 @@ class _SchedulePageState extends State<SchedulePage> {
                                         ],
                                       ),
                                       const SizedBox(height: kLarge),
-                                      Row(
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              context.pushNamed(
-                                                  AppRoute.matchDetails.name,
-                                                  extra: match);
-                                            },
-                                            icon: Icon(LucideIcons.bookmark,
-                                                color: AppColors.purpleColor),
-                                          ),
-                                          const SizedBox(width: kLarge * 3),
-                                          Expanded(
-                                            child: GestureDetector(
-                                              onTap: () {
+                                      if (match.matchDate
+                                          .isAfter(DateTime.now()))
+                                        Row(
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {
                                                 context.pushNamed(
                                                     AppRoute.matchDetails.name,
                                                     extra: match);
                                               },
-                                              child: Container(
-                                                width: double.infinity,
-                                                alignment: Alignment.center,
-                                                height: 50,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: kMedium,
-                                                        vertical: kXSmall),
-                                                decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                      colors: [
-                                                        AppColors.pinkColor,
-                                                        AppColors.purpleColor
-                                                      ],
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            kMedium)),
-                                                child: Text("Buy Ticket",
-                                                    style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onSurface)),
+                                              icon: Icon(LucideIcons.bookmark,
+                                                  color: AppColors.purpleColor),
+                                            ),
+                                            const SizedBox(width: kLarge * 3),
+                                            Expanded(
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  context.pushNamed(
+                                                      AppRoute
+                                                          .matchDetails.name,
+                                                      extra: match);
+                                                },
+                                                child: Container(
+                                                  width: double.infinity,
+                                                  alignment: Alignment.center,
+                                                  height: 50,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: kMedium,
+                                                      vertical: kXSmall),
+                                                  decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        colors: [
+                                                          AppColors.pinkColor,
+                                                          AppColors.purpleColor
+                                                        ],
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              kMedium)),
+                                                  child: Text("Buy Ticket",
+                                                      style: TextStyle(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .onSurface)),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
+                                          ],
+                                        ),
                                     ],
                                   ),
                                 );
