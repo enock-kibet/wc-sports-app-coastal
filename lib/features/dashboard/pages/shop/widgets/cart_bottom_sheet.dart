@@ -79,8 +79,7 @@ void showCartShopBottomSheet(BuildContext context,
   );
 }
 
-const kGoogleApiKey =
-    "AIzaSyCvhSnZ3edg_8TARHCU4cY4JjyrzcG5Eho#"; // Replace with your actual Google API key
+const kGoogleApiKey = "AIzaSyCvhu2jSnZg_8TARHCU4cY4JjyrzcG5Eho";
 
 class _ShopCartBottomSheetContent extends StatefulWidget {
   final bool isLoading;
@@ -247,7 +246,20 @@ class _ShopCartBottomSheetContentState
     final newQty = (oldVariant.quantity + delta).clamp(0, _maxQty.toInt());
 
     if (newQty == 0) {
-      // Remove variant if qty hits 0
+      context.read<ProductBloc>().add(
+            ProductEvent.removeCart(
+              request: {
+                "productID": product.id,
+                "bundledItems": [
+                  {
+                    "variantID": variantId,
+                    "quantity": oldVariant.quantity,
+                  }
+                ],
+              },
+            ),
+          );
+
       final newVariants = List<CartVariant>.from(product.variants)
         ..removeAt(vIndex);
 
@@ -898,56 +910,57 @@ class _ShopCartBottomSheetContentState
                 ),
 
                 // Checkout
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: GradientFilledButton(
-                      text: 'Checkout',
-                      onPressed: () {
-                        if (_selectedTab == 0 &&
-                            _selectedAddressDropdown == null) {
-                          SnackbarService.show(
-                            'Please select a delivery address.',
-                            backgroundColor: AppColors.dangerColor,
-                          );
-                          return;
-                        }
-
-                        if (_selectedTab == 1 &&
-                            _selectedPickupAddressDropdown == null) {
-                          SnackbarService.show(
-                            'Please select a pickup location.',
-                            backgroundColor: AppColors.dangerColor,
-                          );
-                          return;
-                        }
-
-                        context.pop();
-
-                        final int usedPoints =
-                            int.tryParse(pointsController.text) ?? 0;
-
-                        context.read<ProductBloc>().add(
-                              ProductEvent.buyBulkProducts(
-                                request: {
-                                  "bundledOrders": _items.expand((product) {
-                                    return product.variants.map((variant) {
-                                      return {
-                                        "deliveryAddressId":
-                                            _selectedAddressDropdown?.id,
-                                        "productTypeID": variant.variantID,
-                                        "productID": product.id,
-                                        "amount": variant.variantPrice,
-                                        "quantity": variant.quantity,
-                                      };
-                                    });
-                                  }).toList(),
-                                  "redeemablePoints": usedPoints,
-                                },
-                              ),
+                if (_items.isNotEmpty)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: GradientFilledButton(
+                        text: 'Checkout',
+                        onPressed: () {
+                          if (_selectedTab == 0 &&
+                              _selectedAddressDropdown == null) {
+                            SnackbarService.show(
+                              'Please select a delivery address.',
+                              backgroundColor: AppColors.dangerColor,
                             );
-                      }),
-                ),
+                            return;
+                          }
+
+                          if (_selectedTab == 1 &&
+                              _selectedPickupAddressDropdown == null) {
+                            SnackbarService.show(
+                              'Please select a pickup location.',
+                              backgroundColor: AppColors.dangerColor,
+                            );
+                            return;
+                          }
+
+                          context.pop();
+
+                          final int usedPoints =
+                              int.tryParse(pointsController.text) ?? 0;
+
+                          context.read<ProductBloc>().add(
+                                ProductEvent.buyBulkProducts(
+                                  request: {
+                                    "bundledOrders": _items.expand((product) {
+                                      return product.variants.map((variant) {
+                                        return {
+                                          "deliveryAddressId":
+                                              _selectedAddressDropdown?.id,
+                                          "productTypeID": variant.variantID,
+                                          "productID": product.id,
+                                          "amount": variant.variantPrice,
+                                          "quantity": variant.quantity,
+                                        };
+                                      });
+                                    }).toList(),
+                                    "redeemablePoints": usedPoints,
+                                  },
+                                ),
+                              );
+                        }),
+                  ),
               ],
             ),
           );

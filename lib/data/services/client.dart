@@ -186,7 +186,7 @@ class PickupAddressService {
 class MatchService {
   HttpResult<List<MatchType>> getMatches() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Match/a571e8a5-8096-4ac3-bdd3-3dd7b623cbe6/df6fb842-329d-4924-a7b3-6e56177a229c?playStatus=false",
+      "https://backend.wencetechnologies.com/sportapp/api/Match/a571e8a5-8096-4ac3-bdd3-3dd7b623cbe6/df6fb842-329d-4924-a7b3-6e56177a229c?playStatus=false&fromNow=true",
       deserializer: (data) {
         List<MatchType> matchList = [];
 

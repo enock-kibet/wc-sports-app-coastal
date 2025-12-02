@@ -2,10 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmf;
 import 'package:geolocator/geolocator.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/features/app/blocs/address/address_bloc.dart';
+import 'package:sports_app/features/dashboard/pages/shop/widgets/place_search_delegate.dart';
 import '../../../../../data/services/service.dart';
 import '../../../../../localization/app_prefs_manager.dart';
 import '../../../../../theme/app_colors.dart';
@@ -32,6 +34,13 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
   final _countryController = TextEditingController();
   final _cityController = TextEditingController();
   final _addressController = TextEditingController();
+  bool _isSelectingAddress = false;
+
+  int _queryVersion = 0;
+
+  late FlutterGooglePlacesSdk _places;
+  List<AutocompletePrediction> _predictions = [];
+  final _addressSearchController = TextEditingController();
   Map<String, dynamic>? _locationResult;
 
   @override
@@ -39,6 +48,8 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
     super.initState();
     _nameController.text =
         service<AppPreferencesManager>().currentUserValue!.name;
+
+    _places = FlutterGooglePlacesSdk(widget.apiKey);
   }
 
   Future<gmf.LatLng?> getCurrentLatLng() async {
@@ -73,6 +84,24 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
     if (result != null) {
       setState(() {
         _locationResult = result;
+      });
+    }
+  }
+
+  void _pickLocadtion() async {
+    final places = FlutterGooglePlacesSdk(widget.apiKey);
+
+    final result = await showSearch(
+      context: context,
+      delegate: PlaceSearchDelegate(places),
+    );
+
+    if (result != null) {
+      setState(() {
+        _locationResult = {
+          "address": result["address"],
+          "latLng": gmf.LatLng(result["lat"], result["lng"]),
+        };
       });
     }
   }
@@ -151,119 +180,213 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
           right: 16,
           top: 30,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              height: 40,
-              child: TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: "Names",
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  filled: false,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                keyboardType: TextInputType.text,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              height: 40,
-              child: TextField(
-                controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: "Phone",
-                  border: InputBorder.none, // Remove default border
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  filled: false,
+                child: TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: "Full Name",
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  ),
+                  keyboardType: TextInputType.text,
                 ),
-                keyboardType: TextInputType.text,
               ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              height: 40,
-              child: TextField(
-                controller: _countryController,
-                decoration: const InputDecoration(
-                  labelText: "Country",
-                  border: InputBorder.none, // Remove default border
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  filled: false,
+              const SizedBox(height: 18),
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                keyboardType: TextInputType.text,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              height: 40,
-              child: TextField(
-                controller: _cityController,
-                decoration: const InputDecoration(
-                  labelText: "City",
-                  border: InputBorder.none, // Remove default border
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  filled: false,
+                child: TextField(
+                  controller: _phoneController,
+                  decoration: const InputDecoration(
+                    labelText: "Phone",
+                    border: InputBorder.none, // Remove default border
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  ),
+                  keyboardType: TextInputType.text,
                 ),
-                keyboardType: TextInputType.text,
               ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              height: 55,
-              child: ListTile(
-                title: Text(_locationResult?["address"] ?? "Delivery Address"),
-                trailing: const Icon(LucideIcons.mapPin),
-                onTap: _pickLocation,
-              ),
-            ),
-            // set as default address checkbox
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Checkbox(
-                  value: _isDefaultAddress, // Default to true for this example
-                  onChanged: (value) {
-                    setState(() {
-                      _isDefaultAddress = value ?? true;
-                    });
-                  },
+              const SizedBox(height: 18),
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                const Text("Set as default address"),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(
-              child: GradientFilledButton(
-                onPressed: _submit,
-                text: 'Confirm Address',
+                child: TextField(
+                  controller: _countryController,
+                  decoration: const InputDecoration(
+                    labelText: "Country",
+                    border: InputBorder.none, // Remove default border
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  ),
+                  keyboardType: TextInputType.text,
+                ),
               ),
-            )
-          ],
+              const SizedBox(height: 18),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: TextField(
+                  controller: _cityController,
+                  decoration: const InputDecoration(
+                    labelText: "City",
+                    border: InputBorder.none,
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  ),
+                  keyboardType: TextInputType.text,
+                ),
+              ),
+              const SizedBox(height: 18),
+              GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  setState(() {
+                    _predictions.clear();
+                  });
+                },
+                child: SizedBox(
+                  height: 150, // enough space for field + dropdown
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      // ✅ Address Input (Always on top)
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: TextField(
+                          controller: _addressSearchController,
+                          decoration: const InputDecoration(
+                            labelText: "Delivery Address",
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 12),
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) async {
+                            if (_isSelectingAddress) return;
+                            if (value.isEmpty) {
+                              setState(() => _predictions.clear());
+                              return;
+                            }
+
+                            final currentVersion = ++_queryVersion;
+
+                            final res = await _places
+                                .findAutocompletePredictions(value);
+
+                            if (!_isSelectingAddress &&
+                                currentVersion == _queryVersion) {
+                              setState(() {
+                                _predictions =
+                                    List<AutocompletePrediction>.from(
+                                        res.predictions);
+                              });
+                            }
+                          },
+                        ),
+                      ),
+
+                      // ✅ AUTOCOMPLETE DROPDOWN (Z-INDEX ABOVE EVERYTHING)
+                      if (_predictions.isNotEmpty)
+                        Positioned(
+                          top: 55, // directly below the input
+                          left: 0,
+                          right: 0,
+                          child: Material(
+                            elevation: 6, // 👈 gives true Z depth
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: ListView.builder(
+                                padding: EdgeInsets.zero,
+                                itemCount: _predictions.length,
+                                itemBuilder: (context, index) {
+                                  final p = _predictions[index];
+
+                                  return ListTile(
+                                    title: Text(p.fullText),
+                                    onTap: () async {
+                                      _isSelectingAddress = true;
+                                      final details = await _places.fetchPlace(
+                                        p.placeId,
+                                        fields: [
+                                          PlaceField.Location,
+                                          PlaceField.Address,
+                                        ],
+                                      );
+
+                                      final place = details.place!;
+                                      final loc = place.latLng!;
+
+                                      setState(() {
+                                        _locationResult = {
+                                          "address": place.address,
+                                          "latLng":
+                                              gmf.LatLng(loc.lat, loc.lng),
+                                        };
+
+                                        _addressSearchController.text =
+                                            place.address ?? "";
+
+                                        _predictions.clear();
+                                      });
+                                      FocusScope.of(context).unfocus();
+
+                                      _isSelectingAddress = false;
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // set as default address checkbox
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Checkbox(
+                    value:
+                        _isDefaultAddress, // Default to true for this example
+                    onChanged: (value) {
+                      setState(() {
+                        _isDefaultAddress = value ?? true;
+                      });
+                    },
+                  ),
+                  const Text("Set as default address"),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(
+                child: GradientFilledButton(
+                  onPressed: _submit,
+                  text: 'Confirm Address',
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

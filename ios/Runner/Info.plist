@@ -75,5 +75,7 @@
 	<string>This app needs access to your location while using the app.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs access to your photo library so you can select or upload images.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
