@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "555382788437-vi6dgps7sfi471eatva9g4gma3upgs32.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wtl.sportsapp",
+            "certificate_hash": "790f1933140f5b6d51dfc0f4c69e2d2518120803"
+          }
+        },
+        {
           "client_id": "555382788437-909ndslk1uiqkd49uh09071jeekjuf69.apps.googleusercontent.com",
           "client_type": 3
         }
