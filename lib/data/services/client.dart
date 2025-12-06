@@ -485,19 +485,27 @@ class MediaService {
     }
   }
 
-  HttpResult<List<HighlightReel>> getHomeMedia() async {
-    return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/MediaItem/GetMediaById?teamid=a571e8a5-8096-4ac3-bdd3-3dd7b623cbe6",
-      deserializer: (data) {
-        final Map<String, dynamic> json = data as Map<String, dynamic>;
+  Future<MultipleResult<List<HighlightReel>>> getHomeMedia() async {
+    try {
+      return await Http.get(
+        "https://backend.wencetechnologies.com/sportapp/api/MediaItem/GetMediaById?teamid=a571e8a5-8096-4ac3-bdd3-3dd7b623cbe6",
+        deserializer: (data) {
+          final Map<String, dynamic> json = data as Map<String, dynamic>;
+          final response = HighlightReelsResponse.fromJson(json);
+          return response.highlightReels;
+        },
+      );
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "getHomeMedia failed",
+        fatal: false,
+      );
 
-        // ✅ Deserialize the wrapper first
-        final response = HighlightReelsResponse.fromJson(json);
-
-        // ✅ Extract and return just the list
-        return response.highlightReels;
-      },
-    );
+      // Return a failed HttpResult so the UI doesn't crash
+      return HttpResult.error("Failed to load media: $e");
+    }
   }
 }
 

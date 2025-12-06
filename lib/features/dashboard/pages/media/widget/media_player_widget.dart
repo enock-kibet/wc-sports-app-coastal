@@ -33,12 +33,13 @@ class _MediaPlayerWidgetState extends State<MediaPlayerWidget> {
     super.initState();
 
     if (widget.type == "video" && widget.url != null) {
-      _videoController = VideoPlayerController.network(widget.url!)
-        ..initialize().then((_) {
-          setState(() {});
-          _videoController?.setLooping(true);
-          // Do NOT autoplay
-        });
+      _videoController =
+          VideoPlayerController.networkUrl(Uri.parse(widget.url!))
+            ..initialize().then((_) {
+              setState(() {});
+              _videoController?.setLooping(true);
+              // Do NOT autoplay
+            });
     } else if (widget.type?.toLowerCase() == "youtube" && widget.url != null) {
       final videoId = YoutubePlayer.convertUrlToId(widget.url!);
       if (videoId != null) {

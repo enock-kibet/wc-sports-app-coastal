@@ -35,9 +35,7 @@ void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.edgeToEdge,
-    );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -53,9 +51,14 @@ void main() {
         options: DefaultFirebaseOptions.currentPlatform,
       );
 
-      // 🔹 Capture Flutter framework errors
-      FlutterError.onError =
-          FirebaseCrashlytics.instance.recordFlutterFatalError;
+      FlutterError.onError = (FlutterErrorDetails details) {
+        FirebaseCrashlytics.instance.recordFlutterError(details);
+      };
+
+      PlatformDispatcher.instance.onError = (error, stack) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        return true;
+      };
     }
 
     setUpService();
@@ -64,7 +67,7 @@ void main() {
     final runnableApp = _buildRunnableApp(
       isWeb: kIsWeb,
       webAppWidth: 560.0,
-      app: MyApp(),
+      app: const MyApp(),
     );
 
     runApp(runnableApp);
