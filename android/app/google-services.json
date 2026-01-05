@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "555382788437-vi6dgps7sfi471eatva9g4gma3upgs32.apps.googleusercontent.com",
+          "client_id": "555382788437-p4m2jf1qcjm568e7ga0d0qit9ujudabk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wtl.sportsapp",
+            "certificate_hash": "7d1f1d0b3121fa41cbd2803a781f11259e1cfa63"
+          }
+        },
+        {
+          "client_id": "555382788437-sc57qvjaidq57qq4rjks0v8ed0mg8rtu.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.wtl.sportsapp",
