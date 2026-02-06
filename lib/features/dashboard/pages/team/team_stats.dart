@@ -4,8 +4,10 @@ class TeamStats extends StatelessWidget {
   const TeamStats({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final matches = context.read<MatchBloc>().state.statsMatches.toList();
+Widget build(BuildContext context) {
+    return BlocBuilder<MatchBloc, MatchState>(
+      builder: (context, state) {
+        final matches = state.statsMatches;
 
     // print(matches);
     return DefaultTabController(
@@ -84,6 +86,7 @@ class TeamStats extends StatelessWidget {
         ),
       ),
     );
+  });
   }
 }
 

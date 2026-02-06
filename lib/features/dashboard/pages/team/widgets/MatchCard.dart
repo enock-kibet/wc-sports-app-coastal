@@ -36,15 +36,23 @@ class MatchCard extends StatelessWidget {
         "${parsedDate.hour.toString().padLeft(2, '0')}:${parsedDate.minute.toString().padLeft(2, '0')}";
 
     String abbreviationFromName(String name) {
-      final parts = name.split(" ");
-      if (parts.length == 1) {
-        // single word → first 3 letters
-        return parts.first.substring(0, 3).toUpperCase();
-      } else {
-        // take only the first two words' initials
-        return parts.take(2).map((word) => word[0].toUpperCase()).join();
-      }
+    final cleaned = name.trim();
+    if (cleaned.isEmpty) return "N/A";
+
+    // split on ANY whitespace and remove empties
+    final parts = cleaned.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+    if (parts.isEmpty) return "N/A";
+
+    if (parts.length == 1) {
+      final word = parts.first;
+      // take up to 3 chars safely
+      final len = word.length >= 3 ? 3 : word.length;
+      return word.substring(0, len).toUpperCase();
     }
+
+    // initials of first 2 words (safe)
+    return parts.take(2).map((w) => w.substring(0, 1).toUpperCase()).join();
+  }
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),

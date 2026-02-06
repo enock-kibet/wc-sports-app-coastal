@@ -186,7 +186,7 @@ class PickupAddressService {
 class MatchService {
   HttpResult<List<MatchType>> getMatches() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Match/804f0bac-11f1-4981-b67f-51f33efe1d5d/155f166c-320c-47f0-9d26-10d89b6587c1?playStatus=false&fromNow=true",
+      "https://backend.wencetechnologies.com/sportapp/api/Match/804f0bac-11f1-4981-b67f-51f33efe1d5d/155f166c-320c-47f0-9d26-10d89b6587c1?playStatus=false",
       deserializer: (data) {
         List<MatchType> matchList = [];
 
@@ -227,7 +227,7 @@ class MatchService {
 
   HttpResult<List<MatchType>> getMatchStats() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Match/804f0bac-11f1-4981-b67f-51f33efe1d5d/155f166c-320c-47f0-9d26-10d89b6587c1?playStatus=true&fromNow=false",
+      "https://backend.wencetechnologies.com/sportapp/api/Match/804f0bac-11f1-4981-b67f-51f33efe1d5d/155f166c-320c-47f0-9d26-10d89b6587c1?playStatus=true",
       deserializer: (data) {
         List<MatchType> matchList = [];
 
