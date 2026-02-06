@@ -41,21 +41,22 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA2Hxbck21M_gh4zGKAhSfjsn_Hqnd7hSI',
-    appId: '1:555382788437:android:25ff45271d41e8d95fdfdc',
+    apiKey: 'AIzaSyCadR9rn_yagj2H_xMxKB6R0b0sKdSc7Z4',
+    appId: '1:555382788437:android:23f5578e6461105b5fdfdc',
     messagingSenderId: '555382788437',
     projectId: 'wence-sports-d6c49',
     storageBucket: 'wence-sports-d6c49.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDcMxcCE5KbtQobQbRF7CJ9avyJRYO2V18',
-    appId: '1:555382788437:ios:86e6b4759141dfe35fdfdc',
+    apiKey: 'AIzaSyCu5BBjztYJgKAfnhFj4wLKfpINu17Qif8',
+    appId: '1:555382788437:ios:a74e4f40105eda235fdfdc',
     messagingSenderId: '555382788437',
     projectId: 'wence-sports-d6c49',
     storageBucket: 'wence-sports-d6c49.firebasestorage.app',
-    iosClientId: '555382788437-p9ef6e7lq5oo7nb1aesgr658m5v2ckpf.apps.googleusercontent.com',
-    iosBundleId: 'com.example.sportsApp',
+    androidClientId: '555382788437-44mo9hsfqo5gmo8706mb0tp1d88665q6.apps.googleusercontent.com',
+    iosClientId: '555382788437-pfp82hsv807i9ugrs9f9n3jig57s407n.apps.googleusercontent.com',
+    iosBundleId: 'com.wtl.dvsavio',
   );
 
   static const FirebaseOptions web = FirebaseOptions(
@@ -74,6 +75,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '555382788437',
     projectId: 'wence-sports-d6c49',
     storageBucket: 'wence-sports-d6c49.firebasestorage.app',
+    androidClientId: '555382788437-44mo9hsfqo5gmo8706mb0tp1d88665q6.apps.googleusercontent.com',
     iosClientId: '555382788437-p9ef6e7lq5oo7nb1aesgr658m5v2ckpf.apps.googleusercontent.com',
     iosBundleId: 'com.example.sportsApp',
   );

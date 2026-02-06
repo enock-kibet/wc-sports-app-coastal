@@ -67,6 +67,21 @@
 			</array>
 		</dict>
 	</array>
+	<array>
+	<dict>
+		<key>CFBundleTypeRole</key>
+		<string>Editor</string>
+		<key>CFBundleURLName</key>
+		<string>com.wtl.dvsavio</string>
+		<key>CFBundleURLSchemes</key>
+		<array>
+		<string>com.wtl.dvsavio</string>
+		</array>
+	</dict>
+	</array>
+
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We need to track your activity for sign in</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need access to your location to provide personalized content and services.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

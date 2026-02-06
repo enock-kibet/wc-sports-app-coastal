@@ -50,7 +50,8 @@ class PlayerProfilePicture extends StatelessWidget {
         radius: 16,
         padding: EdgeInsets.all(0),
         showBorder: false,
-        height: 200,
+        height: 300,
+        backgroundColor: Colors.black,
         child: PlayerImage(radius: 10, image: player.imageUrl));
   }
 }
@@ -169,7 +170,7 @@ class PlayerStatsTable extends StatelessWidget {
                           DataCell(Text('${getStat("Field Goal")}')),
                           DataCell(Text('${getStat("Free Throw (FT)")}')),
                           DataCell(Text('${getStat("Three Pointer (3 PT)")}')),
-                          DataCell(Text('${getStat("Foul")}')),
+                          DataCell(Text('${getStat("Personal Fouls")}')),
                         ],
                       );
                     }).toList(),

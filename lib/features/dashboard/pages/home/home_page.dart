@@ -29,7 +29,7 @@ import 'package:sports_app/theme/app_colors.dart';
 import 'package:sports_app/theme/theme.dart';
 import 'package:sports_app/utils/dotted.dart';
 
-import '../../../../data/services/notification_service.dart';
+// import '../../../../data/services/notification_service.dart';
 part 'widget/scheduled_tiles.dart';
 part 'widget/previous_tiles.dart';
 part 'widget/total_quantity.dart';
@@ -78,10 +78,10 @@ class _HomePageState extends State<HomePage> {
         userData != null && userData.length >= 6 ? userData[4] : null;
     final userID =
         userData != null && userData.length >= 6 ? userData[6] : null;
-    await WCNotificationService.registerDevice(
-        userID.toString(), uToken.toString());
-    WCNotificationService.listenForTokenRefresh(
-        userID.toString(), uToken.toString());
+    // await WCNotificationService.registerDevice(
+    //     userID.toString(), uToken.toString());
+    // WCNotificationService.listenForTokenRefresh(
+    //     userID.toString(), uToken.toString());
   }
 
   @override
@@ -145,11 +145,8 @@ class _HomePageState extends State<HomePage> {
                             } else if (scheduledMatches is ScheduleLoaded) {
                               final categorized =
                                   scheduledMatches.categorizedSchedulees;
-                              final statsMatches = context
-                                      .read<MatchBloc>()
-                                      .state
-                                      .statsMatches ??
-                                  [];
+                              final statsMatches =
+                                  context.read<MatchBloc>().state.statsMatches;
 
                               return ListView(
                                 children: [

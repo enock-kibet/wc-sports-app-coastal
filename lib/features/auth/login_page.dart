@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/mixin/input_validation_mixin.dart';
 import 'package:sports_app/core/snackbar_service.dart';
@@ -182,6 +185,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                               authBloc.add(AuthEvent.login(request: {
                                 "email": _emailController.text.trim(),
                                 "password": _passwordController.text.trim(),
+                                "clubid": '80e0e316-64a8-4708-9dd5-590f3b6bedff'
                               }));
                             }
                           }
@@ -214,7 +218,8 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                                 "name": googleUser.displayName,
                                 "email": googleUser.email,
                                 "googleId": googleUser.id,
-                                "picture": googleUser.photoUrl
+                                "picture": googleUser.photoUrl,
+                                "clubid": '80e0e316-64a8-4708-9dd5-590f3b6bedff'
                               }));
                             } else {
                               print("Google Sign-In canceled by user.");
@@ -244,6 +249,14 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                             )
                           ],
                         )),
+                    if (Platform.isIOS)
+                      SignInWithAppleButton(
+                        style: SignInWithAppleButtonStyle.black,
+                        height: 56,
+                        onPressed: state.status == AuthStatus.loading
+                            ? null
+                            : _signInWithApple,
+                      ),
                     const SizedBox(
                       height: kSMedium * 5,
                     ),
@@ -264,6 +277,33 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
       return true;
     } else {
       return false;
+    }
+  }
+
+  Future<void> _signInWithApple() async {
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      authBloc.add(
+        AuthEvent.appleLogin(request: {
+          "appleId": credential.userIdentifier,
+          "email": credential.email,
+          "name": "${credential.givenName ?? ''} ${credential.familyName ?? ''}"
+              .trim(),
+          "identityToken": credential.identityToken,
+          "clubid": '80e0e316-64a8-4708-9dd5-590f3b6bedff'
+        }),
+      );
+    } catch (e) {
+      SnackbarService.show(
+        "Apple Sign-In cancelled or failed",
+        backgroundColor: AppColors.dangerColor,
+      );
     }
   }
 }

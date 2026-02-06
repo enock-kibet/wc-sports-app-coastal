@@ -128,7 +128,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
           💸 Ticket Price: ${match.matchPrice}
           📍 Location: ${match.matchVenue}
           Get your tickets now from the Wence Sports app!
-          https://play.google.com/store/apps/details?id=com.wtl.sportsapp''';
+          https://play.google.com/store/apps/details?id=com.wtl.dvsavio''';
 
                       Share.share(shareText, subject: 'Check out this event!');
                     },

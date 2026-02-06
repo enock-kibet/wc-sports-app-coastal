@@ -3,7 +3,7 @@ part of 'service.dart';
 class ProductService {
   HttpResult<List<Product>> getProducts() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/SportApp/api/Product",
+      "https://backend.wencetechnologies.com/SportApp/api/Product?clubid=804f0bac-11f1-4981-b67f-51f33efe1d5d",
       //"https://wencesportswebapplication.vercel.app/api/shop/products",
       deserializer: (data) {
         List<Product> productList = [];
@@ -186,7 +186,7 @@ class PickupAddressService {
 class MatchService {
   HttpResult<List<MatchType>> getMatches() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Match/a571e8a5-8096-4ac3-bdd3-3dd7b623cbe6/df6fb842-329d-4924-a7b3-6e56177a229c?playStatus=false&fromNow=true",
+      "https://backend.wencetechnologies.com/sportapp/api/Match/804f0bac-11f1-4981-b67f-51f33efe1d5d/155f166c-320c-47f0-9d26-10d89b6587c1?playStatus=false&fromNow=true",
       deserializer: (data) {
         List<MatchType> matchList = [];
 
@@ -227,7 +227,7 @@ class MatchService {
 
   HttpResult<List<MatchType>> getMatchStats() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Match/a571e8a5-8096-4ac3-bdd3-3dd7b623cbe6/df6fb842-329d-4924-a7b3-6e56177a229c?playStatus=true",
+      "https://backend.wencetechnologies.com/sportapp/api/Match/804f0bac-11f1-4981-b67f-51f33efe1d5d/155f166c-320c-47f0-9d26-10d89b6587c1?playStatus=true&fromNow=false",
       deserializer: (data) {
         List<MatchType> matchList = [];
 
@@ -291,11 +291,28 @@ class AuthService {
   HttpResult<dynamic> signup(Map<String, dynamic> data) async {
     return Http.post(
       "https://backend.wencetechnologies.com/SportApp/api/User/sign-up?name=${data["name"]}&email=${data["email"]}&password=${data["password"]}&confirmpassword=${data["password"]}",
-      // "https://wencesportswebapplication.vercel.app/api/auth/emailSignUp",
+      //"https://wencesportswebapplication.vercel.app/api/auth/emaillogin",
       data,
       deserializer: (data) => User.fromJson(data["user"]),
     );
   }
+
+  // HttpResult<dynamic> signup(Map<String, dynamic> data) async {
+  //   return Http.post(
+  //     "https://backend.wencetechnologies.com/SportApp/api/User/sign-up?name=${data["name"]}&email=${data["email"]}&password=${data["password"]}&confirmpassword=${data["password"]}",
+  //     data,
+  //     deserializer: (responseData) {
+  //       print(responseData);
+  //       if (responseData != null) {
+  //         return responseData;
+  //       } else {
+  //         print('post response doest show: $responseData');
+  //         service<Talker>().error("Failed to register user: ${responseData}");
+  //         throw Exception("Failed to register user: ${responseData}");
+  //       }
+  //     },
+  //   );
+  // }
 
   HttpResult<dynamic> verifyOtp(Map<String, dynamic> data) async {
     return Http.post(
@@ -309,6 +326,15 @@ class AuthService {
   HttpResult<dynamic> googleLogin(Map<String, dynamic> data) async {
     return Http.post(
       "https://backend.wencetechnologies.com/SportApp/api/User/googlelogin",
+      //"https://wencesportswebapplication.vercel.app/api/auth/googleSignIn",
+      data,
+      deserializer: (data) => User.fromJson(data["user"]),
+    );
+  }
+
+  HttpResult<dynamic> appleLogin(Map<String, dynamic> data) async {
+    return Http.post(
+      "https://backend.wencetechnologies.com/SportApp/api/User/applelogin",
       //"https://wencesportswebapplication.vercel.app/api/auth/googleSignIn",
       data,
       deserializer: (data) => User.fromJson(data["user"]),
@@ -432,7 +458,7 @@ class MediaService {
 
       // API call
       return await Http.get<List<MediaData>>(
-        "https://backend.wencetechnologies.com/SportApp/api/MediaItem",
+        "https://backend.wencetechnologies.com/sportapp/api/MediaItem/GetMediaById?teamid=804f0bac-11f1-4981-b67f-51f33efe1d5d",
         deserializer: (data) {
           try {
             // Parse API highlights
@@ -488,7 +514,7 @@ class MediaService {
   Future<MultipleResult<List<HighlightReel>>> getHomeMedia() async {
     try {
       return await Http.get(
-        "https://backend.wencetechnologies.com/sportapp/api/MediaItem/GetMediaById?teamid=a571e8a5-8096-4ac3-bdd3-3dd7b623cbe6",
+        "https://backend.wencetechnologies.com/sportapp/api/Bannnermedium?teamid=804f0bac-11f1-4981-b67f-51f33efe1d5d",
         deserializer: (data) {
           final Map<String, dynamic> json = data as Map<String, dynamic>;
           final response = HighlightReelsResponse.fromJson(json);
@@ -512,7 +538,7 @@ class MediaService {
 class StatService {
   HttpResult<Map<String, List<Stats>>> getStats() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/PlayerStat/RankStats/155f166c-320c-47f0-9d26-10d89b6587c1?clubid=a571e8a5-8096-4ac3-bdd3-3dd7b623cbe6&minGames=0",
+      "https://backend.wencetechnologies.com/sportapp/api/PlayerStat/RankStats/155f166c-320c-47f0-9d26-10d89b6587c1?clubid=804f0bac-11f1-4981-b67f-51f33efe1d5d&minGames=0",
       deserializer: (data) {
         final Map<String, List<Stats>> statsByCategory = {};
 
@@ -529,7 +555,7 @@ class StatService {
 
   HttpResult<List<PlayerStatResponse>> getPlayerStats(String playerID) async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/PlayerStat/PlayerStatsbyMatch/$playerID/",
+      "https://backend.wencetechnologies.com/sportapp/api/PlayerStat/PlayerStatsbyMatch/$playerID/?seasonid=155f166c-320c-47f0-9d26-10d89b6587c1",
       deserializer: (data) {
         // The response is a list of matches
         final List<dynamic> rawList = data as List<dynamic>;
@@ -546,7 +572,7 @@ class StatService {
 
   HttpResult<List<HighlightReel>> getPlayerMedia(String playerID) async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/MediaItem/GetMediaById?teamid=a571e8a5-8096-4ac3-bdd3-3dd7b623cbe6/$playerID/",
+      "https://backend.wencetechnologies.com/sportapp/api/MediaItem/GetMediaById?teamid=804f0bac-11f1-4981-b67f-51f33efe1d5d/$playerID/",
       deserializer: (data) {
         final Map<String, dynamic> json = data as Map<String, dynamic>;
 
@@ -563,7 +589,7 @@ class StatService {
 class RoasterService {
   HttpResult<List<RoasterData>> getRoasters() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Player/teamplayers/a571e8a5-8096-4ac3-bdd3-3dd7b623cbe6?seasonid=df6fb842-329d-4924-a7b3-6e56177a229c",
+      "https://backend.wencetechnologies.com/sportapp/api/Player/teamplayers/804f0bac-11f1-4981-b67f-51f33efe1d5d?seasonid=155f166c-320c-47f0-9d26-10d89b6587c1",
       deserializer: (data) {
         // Extract the list from the API response
         final players = (data['data'] as List)
@@ -579,7 +605,7 @@ class RoasterService {
 class TeamStatsService {
   HttpResult<List<TeamStatsData>> getTeamStats() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/TeamStanding/df6fb842-329d-4924-a7b3-6e56177a229c/96244279-5975-4530-a663-f24f5c33fd30",
+      "https://backend.wencetechnologies.com/sportapp/api/TeamStanding/155f166c-320c-47f0-9d26-10d89b6587c1/80e0e316-64a8-4708-9dd5-590f3b6bedff",
       deserializer: (data) {
         // Extract the list from the API response
         final standings = (data['data'] as List)

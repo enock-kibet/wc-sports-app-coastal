@@ -39,9 +39,9 @@ class HomeMediaBanner extends StatelessWidget {
           },
           options: CarouselOptions(
               height: 180,
-              autoPlay: true,
+              autoPlay: reels.length > 1 ? true : false,
               enlargeCenterPage: true,
-              viewportFraction: 0.9,
+              viewportFraction: 1,
               aspectRatio: 16 / 9,
               autoPlayInterval: const Duration(seconds: 6),
               pauseAutoPlayOnTouch: true),

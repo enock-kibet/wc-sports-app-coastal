@@ -107,9 +107,9 @@ class _MediaPageState extends State<MediaPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    RecentHighlightsList(
-                                        highlights: mediaData.recentHighlights),
-                                    const SizedBox(height: 24),
+                                    // RecentHighlightsList(
+                                    //     highlights: mediaData.recentHighlights),
+                                    // const SizedBox(height: 24),
                                     SeasonHighlightsList(
                                         seasonHighlights:
                                             mediaData.seasonHighlights),

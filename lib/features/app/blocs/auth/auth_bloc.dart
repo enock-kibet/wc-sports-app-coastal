@@ -101,6 +101,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       });
     });
 
+    on<_AppleLogin>((event, emit) async {
+      emit(state.copyWith(status: AuthStatus.loading));
+      final authResponse = await _authService.appleLogin(event.request);
+      await authResponse.when(onError: (Failure error) {
+        emit(state.copyWith(status: AuthStatus.failure, failure: error));
+      }, onSuccess: (dynamic data) async {
+        emit(state.copyWith(status: AuthStatus.success, data: data as User));
+        await service<AppPreferencesManager>().saveValue(data);
+      });
+    });
+
     on<_EditProfile>((event, emit) async {
       emit(state.copyWith(status: AuthStatus.uploading));
 

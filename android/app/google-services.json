@@ -7,6 +7,69 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:555382788437:android:23f5578e6461105b5fdfdc",
+        "android_client_info": {
+          "package_name": "com.wtl.dvsavio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "555382788437-44mo9hsfqo5gmo8706mb0tp1d88665q6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wtl.dvsavio",
+            "certificate_hash": "790f1933140f5b6d51dfc0f4c69e2d2518120803"
+          }
+        },
+        {
+          "client_id": "555382788437-cso8sl21n1thh3t12mhahrmu8nh6fl4l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wtl.dvsavio",
+            "certificate_hash": "8356bc7a6b758effc32e7a3e6df4466eabcf3ed5"
+          }
+        },
+        {
+          "client_id": "555382788437-oc6nqc3jqrqgpm6p077qrtutblpfmar9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wtl.dvsavio",
+            "certificate_hash": "0680ff967357290a67cbb4b09fa9f48831d5bdbb"
+          }
+        },
+        {
+          "client_id": "555382788437-909ndslk1uiqkd49uh09071jeekjuf69.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCadR9rn_yagj2H_xMxKB6R0b0sKdSc7Z4"
+        },
+        {
+          "current_key": "AIzaSyA2Hxbck21M_gh4zGKAhSfjsn_Hqnd7hSI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "555382788437-909ndslk1uiqkd49uh09071jeekjuf69.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "555382788437-fn3kqfq2d0d5ofdmhlfv6v3ip7bvs5e9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.wtl.sportsapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:555382788437:android:25ff45271d41e8d95fdfdc",
         "android_client_info": {
           "package_name": "com.wtl.sportsapp"
@@ -30,11 +93,22 @@
           }
         },
         {
+          "client_id": "555382788437-v8c7qm57rfrjj14b7sk0c48alf4v6hbb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wtl.sportsapp",
+            "certificate_hash": "0680ff967357290a67cbb4b09fa9f48831d5bdbb"
+          }
+        },
+        {
           "client_id": "555382788437-909ndslk1uiqkd49uh09071jeekjuf69.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
+        {
+          "current_key": "AIzaSyCadR9rn_yagj2H_xMxKB6R0b0sKdSc7Z4"
+        },
         {
           "current_key": "AIzaSyA2Hxbck21M_gh4zGKAhSfjsn_Hqnd7hSI"
         }

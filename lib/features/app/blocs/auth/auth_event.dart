@@ -6,6 +6,8 @@ class AuthEvent with _$AuthEvent {
   const factory AuthEvent.verifyOtp({required dynamic request}) = _VerifyOtp;
   const factory AuthEvent.googlelogin({required dynamic request}) =
       _GoogleLogin;
+
+  const factory AuthEvent.appleLogin({required dynamic request}) = _AppleLogin;
   const factory AuthEvent.resendOtp({required dynamic request}) = _ResendOtp;
 
   const factory AuthEvent.refreshToken({required dynamic request}) =

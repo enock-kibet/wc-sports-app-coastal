@@ -170,19 +170,15 @@ Widget TeamStatValues(
             Text(
               name ?? "2. Kenya Moja",
               style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff4d4d4d)),
+                fontSize: 10,
+              ),
             ),
             SizedBox(
               height: kXXSmall,
             ),
             Text(
               (details ?? "16.7") + " $Category Per Game",
-              style: TextStyle(
-                  fontSize: 8,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff4d4d4d)),
+              style: TextStyle(fontSize: 8),
             )
           ],
         )
@@ -222,7 +218,7 @@ Widget PlayerImage(
             ),
             width: width ?? 116,
             height: height ?? 104,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           )
         : const Text(""),
   );
@@ -231,66 +227,165 @@ Widget PlayerImage(
 class StatCard extends StatelessWidget {
   final String category;
 
-  const StatCard({super.key, this.category = "Points"});
+  const StatCard({
+    super.key,
+    this.category = "Points",
+  });
+
+  static const int maxItems = 3;
 
   @override
   Widget build(BuildContext context) {
-    final stats = context.watch<StatBloc>().state.stats;
-    final entries = (stats ?? {})[category] ?? [];
+    final entries = context.select<StatBloc, List<Stats>>(
+      (bloc) => bloc.state.stats?[category] ?? [],
+    );
 
     return Container(
-      padding:
-          const EdgeInsets.symmetric(vertical: kSmall, horizontal: kSMedium),
+      padding: const EdgeInsets.symmetric(
+        vertical: kSmall,
+        horizontal: kSMedium,
+      ),
       decoration: BoxDecoration(
         border: Border.all(
-            color: Theme.of(context).colorScheme.surface, width: 0.5),
+          color: Theme.of(context).colorScheme.surface,
+          width: 0.5,
+        ),
         borderRadius: BorderRadius.circular(kMedium),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            category,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: kSMedium,
-            ),
-          ),
+          _buildHeader(context, entries),
           const SizedBox(height: kSMedium),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                height: 144,
-                width: 120,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (int i = 0; i < entries.length && i < 4; i++) ...[
-                      TeamStatValues(
-                        Category: category,
-                        alternate: i % 2 == 1,
-                        name: "${entries[i].rank}. ${entries[i].playerName}",
-                        details: "${entries[i].avg}",
-                      ),
-                      if (i < 3) const SizedBox(height: kSMedium),
-                    ],
-                  ],
+          _buildContent(context, entries),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, List<Stats> entries) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          category,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: kSMedium,
+          ),
+        ),
+        if (entries.length > maxItems)
+          TextButton(
+            onPressed: () => _showMoreDialog(context, entries),
+            child: const Text("View More", style: TextStyle(fontSize: 12)),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildContent(BuildContext context, List<Stats> entries) {
+    if (entries.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(kSmall),
+          child: Text("No data available"),
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(child: _buildStatsList(entries)),
+        _buildPlayerImage(entries),
+      ],
+    );
+  }
+
+  Widget _buildStatsList(List<Stats> entries) {
+    final itemCount = entries.length.clamp(0, maxItems);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: List.generate(itemCount, (i) {
+        final entry = entries[i];
+
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: i < itemCount - 1 ? kSMedium : 0,
+          ),
+          child: TeamStatValues(
+            Category: category,
+            alternate: i.isOdd,
+            name: "${entry.rank}. ${entry.playerName}",
+            details: "${entry.avg}",
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildPlayerImage(List<Stats> entries) {
+    if (entries.isEmpty) {
+      return PlayerImage();
+    }
+
+    final topPlayer = entries.first;
+
+    return PlayerImage(
+      image: topPlayer.imageUrl,
+      name: topPlayer.playerName,
+    );
+  }
+
+  void _showMoreDialog(BuildContext context, List<Stats> entries) {
+    showDialog(
+      context: context,
+      useRootNavigator: true,
+      builder: (_) => AlertDialog(
+        title: Text("$category Leaders", style: TextStyle(fontSize: 15)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.separated(
+            shrinkWrap: true,
+            itemCount: entries.length,
+            separatorBuilder: (_, __) => const Divider(),
+            itemBuilder: (_, i) {
+              final player = entries[i];
+
+              return ListTile(
+                leading: SizedBox(
+                  width: 56, // fixed width
+                  child: PlayerImage(
+                    image: player.imageUrl,
+                    name: player.playerName,
+                  ),
                 ),
-              ),
-              if (entries.isNotEmpty)
-                PlayerImage(
-                    image: entries[0].imageUrl, name: entries[0].playerName)
-              else
-                PlayerImage(),
-            ],
+                title: Text(
+                  "${player.rank}. ${player.playerName}",
+                  style: TextStyle(fontSize: 10),
+                ),
+                subtitle: Text("${player.clubname} • ${player.games} games",
+                    style: TextStyle(fontSize: 10)),
+                trailing: Text(
+                  player.avg.toString(),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 10),
+                ),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            child: const Text("Close"),
           ),
         ],
       ),
     );
   }
 }
-
 // Widget TeamSummaryStats() {
 //   return Card(
 //     margin: EdgeInsets.zero,

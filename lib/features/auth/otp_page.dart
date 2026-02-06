@@ -20,7 +20,6 @@ class OtpPage extends StatefulWidget {
   State<OtpPage> createState() => _OtpPageState();
 }
 
-
 class _OtpPageState extends State<OtpPage> {
   late AuthBloc _authBloc;
   late TextEditingController _otpController;
@@ -31,144 +30,184 @@ class _OtpPageState extends State<OtpPage> {
     _otpController = TextEditingController();
     super.initState();
   }
+
   @override
   void dispose() {
     _authBloc.close();
     _otpController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      body: BlocConsumer<AuthBloc,AuthState>(
-        bloc: _authBloc,
-        listener: (context,state){
-          if (state.status == AuthStatus.success) {
-            String message;
-            if(state.data is User){
-              message = "Otp verified successfully";
-            }else{
-              message = state.data;
+    return Scaffold(
+      body: BlocConsumer<AuthBloc, AuthState>(
+          bloc: _authBloc,
+          listener: (context, state) {
+            if (state.status == AuthStatus.success) {
+              String message;
+              if (state.data is User) {
+                message = "Otp verified successfully";
+              } else {
+                message = state.data;
+              }
+              service<Talker>().info(message);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(message),
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 3),
+                  action: SnackBarAction(
+                    label: 'Dismiss',
+                    textColor: Theme.of(context).colorScheme.onSurface,
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    },
+                  ),
+                ),
+              );
             }
-            service<Talker>().info(message);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(message),
-                backgroundColor: AppColors.primaryColor,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 3),
-                action: SnackBarAction(
-                  label: 'Dismiss',
-                  textColor: AppColors.whiteColor,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  },
-                ),
-              ),
-            );
-
-          }
-          if (state.status == AuthStatus.failure) {
-            service<Talker>().error(state.failure!.error);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.failure!.error),
-                backgroundColor: AppColors.dangerColor,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 3),
-                action: SnackBarAction(
-                  label: 'Dismiss',
-                  textColor: AppColors.whiteColor,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  },
-                ),
-              ),
-            );
-          }
-        },
-        builder: (context,state) {
-          return const AppBackground();
-        }
-      ),
-      bottomSheet: BlocBuilder<AuthBloc,AuthState>(
-        bloc: _authBloc,
-        builder: (context,state) {
-          return SingleChildScrollView(
-            child: Padding(padding: EdgeInsets.symmetric(horizontal: kLarge,vertical: kMedium),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('One Time Password Verification',style: TextStyle(fontSize: kMedium,fontWeight: FontWeight.bold),),
-                  SizedBox(height: 20,),
-                  Text('Kindly enter the 5 Digit OTP Code Sent to your Email Address',style: TextStyle(fontSize: kSMedium),),
-                  SizedBox(height: 20,),
-                  PinCodeTextField(controller: _otpController,appContext: context, length: 6,backgroundColor: AppColors.inputFillColor,pinTheme: PinTheme(shape: PinCodeFieldShape.box,borderRadius: BorderRadius.circular(12),fieldHeight: 48,fieldWidth: 48),),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                          onPressed: state.status == AuthStatus.loading? null: (){
-                            _authBloc.add(AuthEvent.resendOtp(request: {
-                              "email":service<AppPreferencesManager>().currentUserValue?.email
-                            }));
-                          },
-                          child: Text("Resend Code ?",))//style: TextStyle(fontSize: kSMedium,fontWeight: FontWeight.bold)))
-                    ],
+            if (state.status == AuthStatus.failure) {
+              service<Talker>().error(state.failure!.error);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.failure!.error),
+                  backgroundColor: AppColors.dangerColor,
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 3),
+                  action: SnackBarAction(
+                    label: 'Dismiss',
+                    textColor: AppColors.whiteColor,
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    },
                   ),
-                  SizedBox(height: 24,),
-                  GestureDetector(
-                    onTap: state.status == AuthStatus.loading?null:
-                        (){
-                            _authBloc.add(AuthEvent.verifyOtp(request: {
-                              "otp":_otpController.text.trim(),
-                              "email":service<AppPreferencesManager>().currentUserValue?.email
-                            }));
-                        },
-                    child: CustomFilledButton(state.status == AuthStatus.loading?"Processing...":'Verify OTP')
-                  ),
-                  SizedBox(height: 20,),
-                  Stack(
-                      alignment: Alignment.center,
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            return const AppBackground();
+          }),
+      bottomSheet: BlocBuilder<AuthBloc, AuthState>(
+          bloc: _authBloc,
+          builder: (context, state) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: kLarge, vertical: kMedium),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'One Time Password Verification',
+                      style: TextStyle(
+                          fontSize: kMedium, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'Kindly enter the 5 Digit OTP Code Sent to your Email Address',
+                      style: TextStyle(fontSize: kSMedium),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    PinCodeTextField(
+                      controller: _otpController,
+                      appContext: context,
+                      length: 6,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          borderRadius: BorderRadius.circular(12),
+                          fieldHeight: 48,
+                          fieldWidth: 48),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24.0),
-                          child: Divider(color: AppColors.greyColor,thickness: .4,),
+                        TextButton(
+                            onPressed: state.status == AuthStatus.loading
+                                ? null
+                                : () {
+                                    _authBloc.add(AuthEvent.resendOtp(request: {
+                                      "email": service<AppPreferencesManager>()
+                                          .currentUserValue
+                                          ?.email
+                                    }));
+                                  },
+                            child: Text(
+                              "Resend Code ?",
+                            )) //style: TextStyle(fontSize: kSMedium,fontWeight: FontWeight.bold)))
+                      ],
+                    ),
+                    SizedBox(
+                      height: 24,
+                    ),
+                    GestureDetector(
+                        onTap: state.status == AuthStatus.loading
+                            ? null
+                            : () {
+                                _authBloc.add(AuthEvent.verifyOtp(request: {
+                                  "otp": _otpController.text.trim(),
+                                  "email": service<AppPreferencesManager>()
+                                      .currentUserValue
+                                      ?.email
+                                }));
+                              },
+                        child: CustomFilledButton(
+                            state.status == AuthStatus.loading
+                                ? "Processing..."
+                                : 'Verify OTP')),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Stack(alignment: Alignment.center, children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Divider(
+                          color: AppColors.greyColor,
+                          thickness: .4,
                         ),
-                        Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8),
-                            color: Theme.of(context).colorScheme.surface,
-                            child:Text("or",
-                              style: TextStyle(fontSize: kSMedium,color: AppColors.greyColor),)
+                      ),
+                      Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          color: Theme.of(context).colorScheme.surface,
+                          child: Text(
+                            "or",
+                            style: TextStyle(
+                                fontSize: kSMedium, color: AppColors.greyColor),
+                          ))
+                    ]),
 
-                        )
-                      ]),
+                    const SizedBox(height: 24),
+                    OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.defaultAppRed,
+                            minimumSize: const Size.fromHeight(48),
+                            textStyle: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.blackColor),
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(kMedium))),
+                            side: BorderSide(
+                                width: 0.6, color: AppColors.defaultAppRed)),
+                        onPressed: () async {
+                          service<AppPreferencesManager>().logOut();
+                        },
+                        child: Text("Change Email")),
 
-                  const SizedBox(height: 24),
-                  OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.defaultAppRed,
-                        minimumSize: const Size.fromHeight(48),
-                        textStyle: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: AppColors.blackColor),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(kMedium))
-                        ),
-                        side: BorderSide(width: 0.6,color: AppColors.defaultAppRed)
-
-
-                  ),onPressed: ()async {
-                        service<AppPreferencesManager>().logOut();
-                  }, child: Text("Change Email")),
-
-                  //CustomOutlinedButton("Change Email"),
-
-
-                ],
+                    //CustomOutlinedButton("Change Email"),
+                  ],
+                ),
               ),
-            ),
-          );
-        }
-      ),
+            );
+          }),
     );
   }
 }

@@ -167,6 +167,18 @@ class PreviousTiles extends StatelessWidget {
     );
   }
 
+  String _getInitials(String team) {
+    final parts = team.trim().split(' ').where((p) => p.isNotEmpty).toList();
+
+    if (parts.isEmpty) return '?';
+
+    if (parts.length == 1) {
+      return parts.first[0].toUpperCase();
+    }
+
+    return (parts.first[0] + parts.last[0]).toUpperCase();
+  }
+
   Widget _buildTeamsColumn(MatchType match, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,7 +197,7 @@ class PreviousTiles extends StatelessWidget {
           backgroundColor: color,
           radius: 10,
           child: Text(
-            team.split(' ').first[0].toUpperCase() + team.split(' ').last[0],
+            _getInitials(team),
             style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w600),
           ),
         ),
