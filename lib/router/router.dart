@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sports_app/data/models/match/match-recarp.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/models/player/player.dart';
 import 'package:sports_app/data/models/points/points.dart';
@@ -29,6 +30,7 @@ import 'package:sports_app/features/dashboard/pages/schedule/schedule_page.dart'
 import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/splash_screen.dart';
 import 'package:sports_app/features/dashboard/pages/standings/standinds_page.dart';
+import 'package:sports_app/features/dashboard/pages/team/game-recarp.dart';
 import 'package:sports_app/features/dashboard/pages/team/player/player.dart';
 import 'package:sports_app/features/dashboard/pages/team/team.dart';
 import 'package:sports_app/features/dashboard/pages/webview/paymentwebview.dart';
@@ -181,6 +183,13 @@ final router = GoRouter(
         return MaterialPage(
           child: const SplashScreen(),
         );
+      },
+    ),
+    GoRoute(
+      path: '/game-recap',
+      builder: (context, state) {
+        final match = state.extra as MatchModel;
+        return GameRecapPage(match: match);
       },
     ),
     StatefulShellRoute.indexedStack(

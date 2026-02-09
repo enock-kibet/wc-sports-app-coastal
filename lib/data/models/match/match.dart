@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sports_app/data/models/match/match-recarp.dart';
 
 part 'match.freezed.dart';
 part 'match.g.dart';
@@ -19,6 +20,7 @@ class MatchType with _$MatchType {
     required double matchPrice,
     String? teamOneScore,
     String? teamTwoScore,
+    MatchModel? recap, 
   }) = _MatchType;
   factory MatchType.fromJson(Map<String, Object?> json) =>
       _$MatchTypeFromJson(json);

@@ -1,0 +1,1151 @@
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+
+part of 'match-recarp.dart';
+
+// **************************************************************************
+// FreezedGenerator
+// **************************************************************************
+
+T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+
+MatchModel _$MatchModelFromJson(Map<String, dynamic> json) {
+  return _MatchModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$MatchModel {
+  String get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  ClubModel get clubOne => throw _privateConstructorUsedError;
+  ClubModel get clubTwo => throw _privateConstructorUsedError;
+  MatchDateModel get matchDate => throw _privateConstructorUsedError;
+  VenueModel get venue => throw _privateConstructorUsedError;
+  String get description => throw _privateConstructorUsedError;
+  String get matchWinner => throw _privateConstructorUsedError;
+  String get clubOneScore => throw _privateConstructorUsedError;
+  String get clubTwoScore => throw _privateConstructorUsedError;
+  bool get matchStatus => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $MatchModelCopyWith<MatchModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MatchModelCopyWith<$Res> {
+  factory $MatchModelCopyWith(
+          MatchModel value, $Res Function(MatchModel) then) =
+      _$MatchModelCopyWithImpl<$Res, MatchModel>;
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      ClubModel clubOne,
+      ClubModel clubTwo,
+      MatchDateModel matchDate,
+      VenueModel venue,
+      String description,
+      String matchWinner,
+      String clubOneScore,
+      String clubTwoScore,
+      bool matchStatus});
+
+  $ClubModelCopyWith<$Res> get clubOne;
+  $ClubModelCopyWith<$Res> get clubTwo;
+  $MatchDateModelCopyWith<$Res> get matchDate;
+  $VenueModelCopyWith<$Res> get venue;
+}
+
+/// @nodoc
+class _$MatchModelCopyWithImpl<$Res, $Val extends MatchModel>
+    implements $MatchModelCopyWith<$Res> {
+  _$MatchModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? clubOne = null,
+    Object? clubTwo = null,
+    Object? matchDate = null,
+    Object? venue = null,
+    Object? description = null,
+    Object? matchWinner = null,
+    Object? clubOneScore = null,
+    Object? clubTwoScore = null,
+    Object? matchStatus = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubOne: null == clubOne
+          ? _value.clubOne
+          : clubOne // ignore: cast_nullable_to_non_nullable
+              as ClubModel,
+      clubTwo: null == clubTwo
+          ? _value.clubTwo
+          : clubTwo // ignore: cast_nullable_to_non_nullable
+              as ClubModel,
+      matchDate: null == matchDate
+          ? _value.matchDate
+          : matchDate // ignore: cast_nullable_to_non_nullable
+              as MatchDateModel,
+      venue: null == venue
+          ? _value.venue
+          : venue // ignore: cast_nullable_to_non_nullable
+              as VenueModel,
+      description: null == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      matchWinner: null == matchWinner
+          ? _value.matchWinner
+          : matchWinner // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubOneScore: null == clubOneScore
+          ? _value.clubOneScore
+          : clubOneScore // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubTwoScore: null == clubTwoScore
+          ? _value.clubTwoScore
+          : clubTwoScore // ignore: cast_nullable_to_non_nullable
+              as String,
+      matchStatus: null == matchStatus
+          ? _value.matchStatus
+          : matchStatus // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $ClubModelCopyWith<$Res> get clubOne {
+    return $ClubModelCopyWith<$Res>(_value.clubOne, (value) {
+      return _then(_value.copyWith(clubOne: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $ClubModelCopyWith<$Res> get clubTwo {
+    return $ClubModelCopyWith<$Res>(_value.clubTwo, (value) {
+      return _then(_value.copyWith(clubTwo: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $MatchDateModelCopyWith<$Res> get matchDate {
+    return $MatchDateModelCopyWith<$Res>(_value.matchDate, (value) {
+      return _then(_value.copyWith(matchDate: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $VenueModelCopyWith<$Res> get venue {
+    return $VenueModelCopyWith<$Res>(_value.venue, (value) {
+      return _then(_value.copyWith(venue: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$MatchModelImplCopyWith<$Res>
+    implements $MatchModelCopyWith<$Res> {
+  factory _$$MatchModelImplCopyWith(
+          _$MatchModelImpl value, $Res Function(_$MatchModelImpl) then) =
+      __$$MatchModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      ClubModel clubOne,
+      ClubModel clubTwo,
+      MatchDateModel matchDate,
+      VenueModel venue,
+      String description,
+      String matchWinner,
+      String clubOneScore,
+      String clubTwoScore,
+      bool matchStatus});
+
+  @override
+  $ClubModelCopyWith<$Res> get clubOne;
+  @override
+  $ClubModelCopyWith<$Res> get clubTwo;
+  @override
+  $MatchDateModelCopyWith<$Res> get matchDate;
+  @override
+  $VenueModelCopyWith<$Res> get venue;
+}
+
+/// @nodoc
+class __$$MatchModelImplCopyWithImpl<$Res>
+    extends _$MatchModelCopyWithImpl<$Res, _$MatchModelImpl>
+    implements _$$MatchModelImplCopyWith<$Res> {
+  __$$MatchModelImplCopyWithImpl(
+      _$MatchModelImpl _value, $Res Function(_$MatchModelImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? clubOne = null,
+    Object? clubTwo = null,
+    Object? matchDate = null,
+    Object? venue = null,
+    Object? description = null,
+    Object? matchWinner = null,
+    Object? clubOneScore = null,
+    Object? clubTwoScore = null,
+    Object? matchStatus = null,
+  }) {
+    return _then(_$MatchModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubOne: null == clubOne
+          ? _value.clubOne
+          : clubOne // ignore: cast_nullable_to_non_nullable
+              as ClubModel,
+      clubTwo: null == clubTwo
+          ? _value.clubTwo
+          : clubTwo // ignore: cast_nullable_to_non_nullable
+              as ClubModel,
+      matchDate: null == matchDate
+          ? _value.matchDate
+          : matchDate // ignore: cast_nullable_to_non_nullable
+              as MatchDateModel,
+      venue: null == venue
+          ? _value.venue
+          : venue // ignore: cast_nullable_to_non_nullable
+              as VenueModel,
+      description: null == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      matchWinner: null == matchWinner
+          ? _value.matchWinner
+          : matchWinner // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubOneScore: null == clubOneScore
+          ? _value.clubOneScore
+          : clubOneScore // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubTwoScore: null == clubTwoScore
+          ? _value.clubTwoScore
+          : clubTwoScore // ignore: cast_nullable_to_non_nullable
+              as String,
+      matchStatus: null == matchStatus
+          ? _value.matchStatus
+          : matchStatus // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$MatchModelImpl implements _MatchModel {
+  const _$MatchModelImpl(
+      {required this.id,
+      required this.name,
+      required this.clubOne,
+      required this.clubTwo,
+      required this.matchDate,
+      required this.venue,
+      required this.description,
+      required this.matchWinner,
+      required this.clubOneScore,
+      required this.clubTwoScore,
+      required this.matchStatus});
+
+  factory _$MatchModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MatchModelImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String name;
+  @override
+  final ClubModel clubOne;
+  @override
+  final ClubModel clubTwo;
+  @override
+  final MatchDateModel matchDate;
+  @override
+  final VenueModel venue;
+  @override
+  final String description;
+  @override
+  final String matchWinner;
+  @override
+  final String clubOneScore;
+  @override
+  final String clubTwoScore;
+  @override
+  final bool matchStatus;
+
+  @override
+  String toString() {
+    return 'MatchModel(id: $id, name: $name, clubOne: $clubOne, clubTwo: $clubTwo, matchDate: $matchDate, venue: $venue, description: $description, matchWinner: $matchWinner, clubOneScore: $clubOneScore, clubTwoScore: $clubTwoScore, matchStatus: $matchStatus)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$MatchModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.clubOne, clubOne) || other.clubOne == clubOne) &&
+            (identical(other.clubTwo, clubTwo) || other.clubTwo == clubTwo) &&
+            (identical(other.matchDate, matchDate) ||
+                other.matchDate == matchDate) &&
+            (identical(other.venue, venue) || other.venue == venue) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.matchWinner, matchWinner) ||
+                other.matchWinner == matchWinner) &&
+            (identical(other.clubOneScore, clubOneScore) ||
+                other.clubOneScore == clubOneScore) &&
+            (identical(other.clubTwoScore, clubTwoScore) ||
+                other.clubTwoScore == clubTwoScore) &&
+            (identical(other.matchStatus, matchStatus) ||
+                other.matchStatus == matchStatus));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      clubOne,
+      clubTwo,
+      matchDate,
+      venue,
+      description,
+      matchWinner,
+      clubOneScore,
+      clubTwoScore,
+      matchStatus);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MatchModelImplCopyWith<_$MatchModelImpl> get copyWith =>
+      __$$MatchModelImplCopyWithImpl<_$MatchModelImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$MatchModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _MatchModel implements MatchModel {
+  const factory _MatchModel(
+      {required final String id,
+      required final String name,
+      required final ClubModel clubOne,
+      required final ClubModel clubTwo,
+      required final MatchDateModel matchDate,
+      required final VenueModel venue,
+      required final String description,
+      required final String matchWinner,
+      required final String clubOneScore,
+      required final String clubTwoScore,
+      required final bool matchStatus}) = _$MatchModelImpl;
+
+  factory _MatchModel.fromJson(Map<String, dynamic> json) =
+      _$MatchModelImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get name;
+  @override
+  ClubModel get clubOne;
+  @override
+  ClubModel get clubTwo;
+  @override
+  MatchDateModel get matchDate;
+  @override
+  VenueModel get venue;
+  @override
+  String get description;
+  @override
+  String get matchWinner;
+  @override
+  String get clubOneScore;
+  @override
+  String get clubTwoScore;
+  @override
+  bool get matchStatus;
+  @override
+  @JsonKey(ignore: true)
+  _$$MatchModelImplCopyWith<_$MatchModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+ClubModel _$ClubModelFromJson(Map<String, dynamic> json) {
+  return _ClubModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ClubModel {
+  String get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String? get pic => throw _privateConstructorUsedError;
+  List<StatModel> get stats => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $ClubModelCopyWith<ClubModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ClubModelCopyWith<$Res> {
+  factory $ClubModelCopyWith(ClubModel value, $Res Function(ClubModel) then) =
+      _$ClubModelCopyWithImpl<$Res, ClubModel>;
+  @useResult
+  $Res call({String id, String name, String? pic, List<StatModel> stats});
+}
+
+/// @nodoc
+class _$ClubModelCopyWithImpl<$Res, $Val extends ClubModel>
+    implements $ClubModelCopyWith<$Res> {
+  _$ClubModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? pic = freezed,
+    Object? stats = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      pic: freezed == pic
+          ? _value.pic
+          : pic // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stats: null == stats
+          ? _value.stats
+          : stats // ignore: cast_nullable_to_non_nullable
+              as List<StatModel>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ClubModelImplCopyWith<$Res>
+    implements $ClubModelCopyWith<$Res> {
+  factory _$$ClubModelImplCopyWith(
+          _$ClubModelImpl value, $Res Function(_$ClubModelImpl) then) =
+      __$$ClubModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id, String name, String? pic, List<StatModel> stats});
+}
+
+/// @nodoc
+class __$$ClubModelImplCopyWithImpl<$Res>
+    extends _$ClubModelCopyWithImpl<$Res, _$ClubModelImpl>
+    implements _$$ClubModelImplCopyWith<$Res> {
+  __$$ClubModelImplCopyWithImpl(
+      _$ClubModelImpl _value, $Res Function(_$ClubModelImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? pic = freezed,
+    Object? stats = null,
+  }) {
+    return _then(_$ClubModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      pic: freezed == pic
+          ? _value.pic
+          : pic // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stats: null == stats
+          ? _value._stats
+          : stats // ignore: cast_nullable_to_non_nullable
+              as List<StatModel>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ClubModelImpl implements _ClubModel {
+  const _$ClubModelImpl(
+      {required this.id,
+      required this.name,
+      this.pic,
+      final List<StatModel> stats = const []})
+      : _stats = stats;
+
+  factory _$ClubModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ClubModelImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String name;
+  @override
+  final String? pic;
+  final List<StatModel> _stats;
+  @override
+  @JsonKey()
+  List<StatModel> get stats {
+    if (_stats is EqualUnmodifiableListView) return _stats;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_stats);
+  }
+
+  @override
+  String toString() {
+    return 'ClubModel(id: $id, name: $name, pic: $pic, stats: $stats)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ClubModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.pic, pic) || other.pic == pic) &&
+            const DeepCollectionEquality().equals(other._stats, _stats));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, name, pic, const DeepCollectionEquality().hash(_stats));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ClubModelImplCopyWith<_$ClubModelImpl> get copyWith =>
+      __$$ClubModelImplCopyWithImpl<_$ClubModelImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ClubModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ClubModel implements ClubModel {
+  const factory _ClubModel(
+      {required final String id,
+      required final String name,
+      final String? pic,
+      final List<StatModel> stats}) = _$ClubModelImpl;
+
+  factory _ClubModel.fromJson(Map<String, dynamic> json) =
+      _$ClubModelImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get name;
+  @override
+  String? get pic;
+  @override
+  List<StatModel> get stats;
+  @override
+  @JsonKey(ignore: true)
+  _$$ClubModelImplCopyWith<_$ClubModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+StatModel _$StatModelFromJson(Map<String, dynamic> json) {
+  return _StatModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$StatModel {
+  String get stat => throw _privateConstructorUsedError;
+  int get statValue => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $StatModelCopyWith<StatModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $StatModelCopyWith<$Res> {
+  factory $StatModelCopyWith(StatModel value, $Res Function(StatModel) then) =
+      _$StatModelCopyWithImpl<$Res, StatModel>;
+  @useResult
+  $Res call({String stat, int statValue});
+}
+
+/// @nodoc
+class _$StatModelCopyWithImpl<$Res, $Val extends StatModel>
+    implements $StatModelCopyWith<$Res> {
+  _$StatModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? stat = null,
+    Object? statValue = null,
+  }) {
+    return _then(_value.copyWith(
+      stat: null == stat
+          ? _value.stat
+          : stat // ignore: cast_nullable_to_non_nullable
+              as String,
+      statValue: null == statValue
+          ? _value.statValue
+          : statValue // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$StatModelImplCopyWith<$Res>
+    implements $StatModelCopyWith<$Res> {
+  factory _$$StatModelImplCopyWith(
+          _$StatModelImpl value, $Res Function(_$StatModelImpl) then) =
+      __$$StatModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String stat, int statValue});
+}
+
+/// @nodoc
+class __$$StatModelImplCopyWithImpl<$Res>
+    extends _$StatModelCopyWithImpl<$Res, _$StatModelImpl>
+    implements _$$StatModelImplCopyWith<$Res> {
+  __$$StatModelImplCopyWithImpl(
+      _$StatModelImpl _value, $Res Function(_$StatModelImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? stat = null,
+    Object? statValue = null,
+  }) {
+    return _then(_$StatModelImpl(
+      stat: null == stat
+          ? _value.stat
+          : stat // ignore: cast_nullable_to_non_nullable
+              as String,
+      statValue: null == statValue
+          ? _value.statValue
+          : statValue // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$StatModelImpl implements _StatModel {
+  const _$StatModelImpl({required this.stat, required this.statValue});
+
+  factory _$StatModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$StatModelImplFromJson(json);
+
+  @override
+  final String stat;
+  @override
+  final int statValue;
+
+  @override
+  String toString() {
+    return 'StatModel(stat: $stat, statValue: $statValue)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$StatModelImpl &&
+            (identical(other.stat, stat) || other.stat == stat) &&
+            (identical(other.statValue, statValue) ||
+                other.statValue == statValue));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, stat, statValue);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$StatModelImplCopyWith<_$StatModelImpl> get copyWith =>
+      __$$StatModelImplCopyWithImpl<_$StatModelImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$StatModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _StatModel implements StatModel {
+  const factory _StatModel(
+      {required final String stat,
+      required final int statValue}) = _$StatModelImpl;
+
+  factory _StatModel.fromJson(Map<String, dynamic> json) =
+      _$StatModelImpl.fromJson;
+
+  @override
+  String get stat;
+  @override
+  int get statValue;
+  @override
+  @JsonKey(ignore: true)
+  _$$StatModelImplCopyWith<_$StatModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+MatchDateModel _$MatchDateModelFromJson(Map<String, dynamic> json) {
+  return _MatchDateModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$MatchDateModel {
+  String get id => throw _privateConstructorUsedError;
+  DateTime get date => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $MatchDateModelCopyWith<MatchDateModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MatchDateModelCopyWith<$Res> {
+  factory $MatchDateModelCopyWith(
+          MatchDateModel value, $Res Function(MatchDateModel) then) =
+      _$MatchDateModelCopyWithImpl<$Res, MatchDateModel>;
+  @useResult
+  $Res call({String id, DateTime date});
+}
+
+/// @nodoc
+class _$MatchDateModelCopyWithImpl<$Res, $Val extends MatchDateModel>
+    implements $MatchDateModelCopyWith<$Res> {
+  _$MatchDateModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? date = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$MatchDateModelImplCopyWith<$Res>
+    implements $MatchDateModelCopyWith<$Res> {
+  factory _$$MatchDateModelImplCopyWith(_$MatchDateModelImpl value,
+          $Res Function(_$MatchDateModelImpl) then) =
+      __$$MatchDateModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id, DateTime date});
+}
+
+/// @nodoc
+class __$$MatchDateModelImplCopyWithImpl<$Res>
+    extends _$MatchDateModelCopyWithImpl<$Res, _$MatchDateModelImpl>
+    implements _$$MatchDateModelImplCopyWith<$Res> {
+  __$$MatchDateModelImplCopyWithImpl(
+      _$MatchDateModelImpl _value, $Res Function(_$MatchDateModelImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? date = null,
+  }) {
+    return _then(_$MatchDateModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$MatchDateModelImpl implements _MatchDateModel {
+  const _$MatchDateModelImpl({required this.id, required this.date});
+
+  factory _$MatchDateModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MatchDateModelImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final DateTime date;
+
+  @override
+  String toString() {
+    return 'MatchDateModel(id: $id, date: $date)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$MatchDateModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.date, date) || other.date == date));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, date);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MatchDateModelImplCopyWith<_$MatchDateModelImpl> get copyWith =>
+      __$$MatchDateModelImplCopyWithImpl<_$MatchDateModelImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$MatchDateModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _MatchDateModel implements MatchDateModel {
+  const factory _MatchDateModel(
+      {required final String id,
+      required final DateTime date}) = _$MatchDateModelImpl;
+
+  factory _MatchDateModel.fromJson(Map<String, dynamic> json) =
+      _$MatchDateModelImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  DateTime get date;
+  @override
+  @JsonKey(ignore: true)
+  _$$MatchDateModelImplCopyWith<_$MatchDateModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+VenueModel _$VenueModelFromJson(Map<String, dynamic> json) {
+  return _VenueModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$VenueModel {
+  String get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get location => throw _privateConstructorUsedError;
+  double get latitude => throw _privateConstructorUsedError;
+  double get longitude => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $VenueModelCopyWith<VenueModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $VenueModelCopyWith<$Res> {
+  factory $VenueModelCopyWith(
+          VenueModel value, $Res Function(VenueModel) then) =
+      _$VenueModelCopyWithImpl<$Res, VenueModel>;
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String location,
+      double latitude,
+      double longitude});
+}
+
+/// @nodoc
+class _$VenueModelCopyWithImpl<$Res, $Val extends VenueModel>
+    implements $VenueModelCopyWith<$Res> {
+  _$VenueModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? location = null,
+    Object? latitude = null,
+    Object? longitude = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      location: null == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String,
+      latitude: null == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      longitude: null == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$VenueModelImplCopyWith<$Res>
+    implements $VenueModelCopyWith<$Res> {
+  factory _$$VenueModelImplCopyWith(
+          _$VenueModelImpl value, $Res Function(_$VenueModelImpl) then) =
+      __$$VenueModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String location,
+      double latitude,
+      double longitude});
+}
+
+/// @nodoc
+class __$$VenueModelImplCopyWithImpl<$Res>
+    extends _$VenueModelCopyWithImpl<$Res, _$VenueModelImpl>
+    implements _$$VenueModelImplCopyWith<$Res> {
+  __$$VenueModelImplCopyWithImpl(
+      _$VenueModelImpl _value, $Res Function(_$VenueModelImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? location = null,
+    Object? latitude = null,
+    Object? longitude = null,
+  }) {
+    return _then(_$VenueModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      location: null == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String,
+      latitude: null == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      longitude: null == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$VenueModelImpl implements _VenueModel {
+  const _$VenueModelImpl(
+      {required this.id,
+      required this.name,
+      required this.location,
+      required this.latitude,
+      required this.longitude});
+
+  factory _$VenueModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$VenueModelImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String name;
+  @override
+  final String location;
+  @override
+  final double latitude;
+  @override
+  final double longitude;
+
+  @override
+  String toString() {
+    return 'VenueModel(id: $id, name: $name, location: $location, latitude: $latitude, longitude: $longitude)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$VenueModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, location, latitude, longitude);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$VenueModelImplCopyWith<_$VenueModelImpl> get copyWith =>
+      __$$VenueModelImplCopyWithImpl<_$VenueModelImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$VenueModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _VenueModel implements VenueModel {
+  const factory _VenueModel(
+      {required final String id,
+      required final String name,
+      required final String location,
+      required final double latitude,
+      required final double longitude}) = _$VenueModelImpl;
+
+  factory _VenueModel.fromJson(Map<String, dynamic> json) =
+      _$VenueModelImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get name;
+  @override
+  String get location;
+  @override
+  double get latitude;
+  @override
+  double get longitude;
+  @override
+  @JsonKey(ignore: true)
+  _$$VenueModelImplCopyWith<_$VenueModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}

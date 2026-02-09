@@ -63,6 +63,7 @@ Widget build(BuildContext context) {
                       itemCount: matches.length,
                       itemBuilder: (context, index) {
                         return MatchCard(
+                          match: matches[index].recap,
                           homeTeam: matches[index].teamOne,
                           homeAbbr: "AP",
                           homeColor: Colors.indigo,

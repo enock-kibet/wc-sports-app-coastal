@@ -186,32 +186,27 @@ class PickupAddressService {
 class MatchService {
   HttpResult<List<MatchType>> getMatches() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Match/804f0bac-11f1-4981-b67f-51f33efe1d5d/155f166c-320c-47f0-9d26-10d89b6587c1?playStatus=false",
+      "https://backend.wencetechnologies.com/sportapp/api/Match/804f0bac-11f1-4981-b67f-51f33efe1d5d/155f166c-320c-47f0-9d26-10d89b6587c1",
       deserializer: (data) {
         List<MatchType> matchList = [];
 
-        for (var record in data["data"]) {
+         for (final record in (data["data"] as List? ?? const [])) {
           try {
-            // Extracting the first match date if available
-            String? matchDateString = (record["matchDate"] is Map &&
-                    record["matchDate"]!.containsKey("date"))
-                ? record["matchDate"]!["date"] as String
-                : null;
+            final recap = _toMatchModel(record as Map<String, dynamic>);
 
-            MatchType match = MatchType(
-              matchId: record["id"] ?? "Unknown ID",
-              teamOne: record["clubOne"]?["name"] ?? "Unknown Team",
-              teamTwo: record["clubTwo"]?["name"] ?? "Unknown Team",
-              matchName: record["name"] ?? "Unnamed Match",
-              matchDescription: record["description"] ?? "No Description",
-              matchDate: matchDateString != null
-                  ? DateTime.tryParse(matchDateString) ?? DateTime.now()
-                  : DateTime.now(),
-              matchVenue: record["venue"]?["name"] ?? "Unknown Venue",
-              matchLocation: record["venue"]?["location"] ?? "Unknown Location",
+            final match = MatchType(
+              matchId: recap.id,
+              teamOne: recap.clubOne.name,
+              teamTwo: recap.clubTwo.name,
+              matchName: recap.name,
+              matchDescription: recap.description,
+              matchDate: recap.matchDate.date,
+              matchVenue: recap.venue.name,
+              matchLocation: recap.venue.location,
               matchPrice: getRandomMultipleOf50()?.toDouble() ?? 50.0,
-              teamOneScore: record["clubOneScore"] ?? "0",
-              teamTwoScore: record["clubTwoScore"] ?? "0",
+              teamOneScore: recap.clubOneScore,
+              teamTwoScore: recap.clubTwoScore,
+              recap: recap,
             );
 
             matchList.add(match);
@@ -233,6 +228,7 @@ class MatchService {
 
         for (var record in data["data"]) {
           try {
+            final recap = _toMatchModel(record as Map<String, dynamic>);
             // Extracting the first match date if available
             String? matchDateString = (record["matchDate"] is Map &&
                     record["matchDate"]!.containsKey("date"))
@@ -253,6 +249,7 @@ class MatchService {
               matchPrice: getRandomMultipleOf50()?.toDouble() ?? 50.0,
               teamOneScore: record["clubOneScore"] ?? "0",
               teamTwoScore: record["clubTwoScore"] ?? "0",
+              recap: recap,
             );
 
             matchList.add(match);
@@ -264,6 +261,77 @@ class MatchService {
         return matchList;
       },
     );
+  }
+
+  /// ✅ Map JSON record -> MatchModel (with stats)
+  MatchModel _toMatchModel(Map<String, dynamic> record) {
+    final clubOneJson = (record["clubOne"] as Map<String, dynamic>? ?? {});
+    final clubTwoJson = (record["clubTwo"] as Map<String, dynamic>? ?? {});
+    final matchDateJson = (record["matchDate"] as Map<String, dynamic>? ?? {});
+    final venueJson = (record["venue"] as Map<String, dynamic>? ?? {});
+
+    return MatchModel(
+      id: (record["id"] ?? "").toString(),
+      name: (record["name"] ?? "").toString(),
+      description: (record["description"] ?? "").toString(),
+      matchWinner: (record["matchWinner"] ?? "").toString(),
+      clubOneScore: (record["clubOneScore"] ?? "0").toString(),
+      clubTwoScore: (record["clubTwoScore"] ?? "0").toString(),
+      matchStatus: (record["matchStatus"] ?? false) == true,
+
+      clubOne: ClubModel(
+        id: (clubOneJson["id"] ?? "").toString(),
+        name: (clubOneJson["name"] ?? "").toString(),
+        pic: (clubOneJson["pic"] ?? "").toString(),
+        stats: _parseStats(clubOneJson["stats"]),
+      ),
+
+      clubTwo: ClubModel(
+        id: (clubTwoJson["id"] ?? "").toString(),
+        name: (clubTwoJson["name"] ?? "").toString(),
+        pic: (clubTwoJson["pic"] ?? "").toString(),
+        stats: _parseStats(clubTwoJson["stats"]),
+      ),
+
+      matchDate: MatchDateModel(
+        id: (matchDateJson["id"] ?? "").toString(),
+        date: DateTime.tryParse((matchDateJson["date"] ?? "").toString()) ??
+            DateTime.now(),
+      ),
+
+      venue: VenueModel(
+        id: (venueJson["id"] ?? "").toString(),
+        name: (venueJson["name"] ?? "").toString(),
+        location: (venueJson["location"] ?? "").toString(),
+        latitude: _toDouble(venueJson["latitude"]),
+        longitude: _toDouble(venueJson["longitude"]),
+      ),
+    );
+  }
+
+  List<StatModel> _parseStats(dynamic raw) {
+    if (raw is! List) return const [];
+    return raw
+        .whereType<Map>()
+        .map((m) {
+          final mm = Map<String, dynamic>.from(m);
+          return StatModel(
+            stat: (mm["stat"] ?? "").toString(),
+            statValue: _toInt(mm["statValue"]),
+          );
+        })
+        .toList();
+  }
+
+  double _toDouble(dynamic v) {
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString()) ?? 0.0;
+  }
+
+  int _toInt(dynamic v) {
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v.toString()) ?? 0;
   }
 }
 
