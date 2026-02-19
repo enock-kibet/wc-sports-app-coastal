@@ -153,6 +153,7 @@ class _HomePageState extends State<HomePage> {
                                   scheduledMatches.categorizedSchedulees;
                               final statsMatches =
                                   context.read<MatchBloc>().state.statsMatches;
+                              final hasUpcomingMatches = categorized.isNotEmpty;
 
                               return ListView(
                                 children: [
@@ -202,7 +203,8 @@ class _HomePageState extends State<HomePage> {
                                   ],
 
                                   // --- Previous Matches ---
-                                  if (statsMatches.isNotEmpty) ...[
+                                  if (!hasUpcomingMatches &&
+                                      statsMatches.isNotEmpty) ...[
                                     const SizedBox(height: 24),
                                     Padding(
                                       padding:
