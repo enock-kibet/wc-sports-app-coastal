@@ -208,4 +208,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
     });
   }
+
+  Future<void> deleteProfile() async {
+    emit(state.copyWith(status: AuthStatus.loading, failure: null));
+    final response = await _authService.deleteMe();
+
+    await response.when(
+      onError: (error) {
+        emit(state.copyWith(
+          status: AuthStatus.failure,
+          failure: error,
+        ));
+      },
+      onSuccess: (message) async {
+        await service<AppPreferencesManager>().logOut();
+        emit(state.copyWith(
+          status: AuthStatus.success,
+          failure: null,
+          data: message,
+        ));
+      },
+    );
+  }
 }

@@ -27,7 +27,7 @@ if (flutterVersionName == null) {
 }
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = file('/home/kibet/Code/P/WC/WC_SPORTS/key/key.properties')
+def keystorePropertiesFile = file('/Users/kibet/Documents/Code/WTL/Sports App/wc-sports-app-don/key/key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }

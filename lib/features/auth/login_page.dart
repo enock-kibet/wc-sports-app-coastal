@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -29,6 +30,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> with InputValidationMixin {
   final ValueNotifier<bool> _isHidden = ValueNotifier(true);
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   late AuthBloc authBloc;
   final _loginFormKey = GlobalKey<FormState>();
   final TextEditingController _emailController =
@@ -249,8 +251,14 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                             )
                           ],
                         )),
+                    const SizedBox(
+                      height: kSMedium,
+                    ),
                     if (Platform.isIOS)
                       SignInWithAppleButton(
+                        text: state.status == AuthStatus.loading
+                            ? "Loading..."
+                            : 'Sign In with Apple',
                         style: SignInWithAppleButtonStyle.black,
                         height: 56,
                         onPressed: state.status == AuthStatus.loading
@@ -280,6 +288,33 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
     }
   }
 
+  // Future<void> _signInWithApple() async {
+  //   try {
+  //     final credential = await SignInWithApple.getAppleIDCredential(
+  //       scopes: [
+  //         AppleIDAuthorizationScopes.email,
+  //         AppleIDAuthorizationScopes.fullName,
+  //       ],
+  //     );
+
+  //     authBloc.add(
+  //       AuthEvent.appleLogin(request: {
+  //         "appleId": credential.userIdentifier,
+  //         "email": credential.email,
+  //         "name": "${credential.givenName ?? ''} ${credential.familyName ?? ''}"
+  //             .trim(),
+  //         "identityToken": credential.identityToken,
+  //         "clubid": '80e0e316-64a8-4708-9dd5-590f3b6bedff'
+  //       }),
+  //     );
+  //   } catch (e) {
+  //     SnackbarService.show(
+  //       "Apple Sign-In cancelled or failed",
+  //       backgroundColor: AppColors.dangerColor,
+  //     );
+  //   }
+  // }
+
   Future<void> _signInWithApple() async {
     try {
       final credential = await SignInWithApple.getAppleIDCredential(
@@ -289,17 +324,51 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
         ],
       );
 
+      print(credential);
+
+      final appleId = credential.userIdentifier;
+      final identityToken = credential.identityToken;
+
+      if (appleId == null || identityToken == null) {
+        throw Exception("Invalid Apple credential");
+      }
+
+      final name =
+          "${credential.givenName ?? ''} ${credential.familyName ?? ''}".trim();
+
+      String? storedEmail =
+          await _secureStorage.read(key: "apple_email_$appleId");
+
+      if (credential.email != null) {
+        storedEmail = credential.email;
+        await _secureStorage.write(
+          key: "apple_email_$appleId",
+          value: credential.email,
+        );
+      }
+
+      String? storedName =
+          await _secureStorage.read(key: "apple_name_$appleId");
+
+      if (name.isNotEmpty) {
+        storedName = name;
+        await _secureStorage.write(
+          key: "apple_name_$appleId",
+          value: name,
+        );
+      }
+
       authBloc.add(
         AuthEvent.appleLogin(request: {
-          "appleId": credential.userIdentifier,
-          "email": credential.email,
-          "name": "${credential.givenName ?? ''} ${credential.familyName ?? ''}"
-              .trim(),
-          "identityToken": credential.identityToken,
-          "clubid": '80e0e316-64a8-4708-9dd5-590f3b6bedff'
+          "appleId": appleId,
+          if (storedEmail != null) "email": storedEmail,
+          if (storedName != null) "name": storedName,
+          "identityToken": identityToken,
+          "clubid": "80e0e316-64a8-4708-9dd5-590f3b6bedff"
         }),
       );
     } catch (e) {
+      print(e);
       SnackbarService.show(
         "Apple Sign-In cancelled or failed",
         backgroundColor: AppColors.dangerColor,

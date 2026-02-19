@@ -8,6 +8,7 @@ import 'package:sports_app/common/custom_text_form_field.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/huge_icon_button.dart';
 import 'package:sports_app/data/models/user/user.dart';
+import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 import 'package:sports_app/features/dashboard/pages/profile/widgets/profile_list_item.dart';
 import 'package:sports_app/features/dashboard/pages/profile/widgets/profile_picture.dart';
@@ -28,6 +29,7 @@ class _EditProfileMainState extends State<EditProfileMain> {
   final _oldPassword = TextEditingController();
   final _newPassword = TextEditingController();
   final _confirmNewPassword = TextEditingController();
+  late final AuthBloc _authBloc;
   late User user;
   String? picture;
 
@@ -38,10 +40,20 @@ class _EditProfileMainState extends State<EditProfileMain> {
 
   @override
   void initState() {
+    _authBloc = AuthBloc();
     user = service<AppPreferencesManager>().currentUserValue!;
     picture = user.picture;
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _oldPassword.dispose();
+    _newPassword.dispose();
+    _confirmNewPassword.dispose();
+    _authBloc.close();
+    super.dispose();
   }
 
   @override
@@ -50,100 +62,127 @@ class _EditProfileMainState extends State<EditProfileMain> {
     // context.watch<UserCubit>().state;
     final theme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              HugeIconButton(
-                icon: HugeIcons.strokeRoundedArrowLeft01,
-                onPressed: () {
-                  context.goNamed(AppRoute.profile.name);
-                },
-              ),
-              Text(
-                "Edit profile",
-                style: TextStyle(fontSize: kXLMedium, color: theme.onSurface),
-              ),
-              const SizedBox(),
-            ],
+    return BlocListener<AuthBloc, AuthState>(
+      bloc: _authBloc,
+      listener: (context, state) {
+        if (state.status == AuthStatus.success &&
+            state.data is String &&
+            context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.data as String)),
+          );
+        }
+
+        if (state.status == AuthStatus.failure &&
+            state.failure != null &&
+            context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.failure!.error)),
+          );
+        }
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                HugeIconButton(
+                  icon: HugeIcons.strokeRoundedArrowLeft01,
+                  onPressed: () {
+                    context.goNamed(AppRoute.profile.name);
+                  },
+                ),
+                Text(
+                  "Edit profile",
+                  style: TextStyle(fontSize: kXLMedium, color: theme.onSurface),
+                ),
+                const SizedBox(),
+              ],
+            ),
           ),
-        ),
-        extendBodyBehindAppBar: false,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 0, left: 24, right: 24),
-                child: Center(
-                  child: Container(
-                    height: 200,
-                    width: 200,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(48),
-                      child: BlocBuilder<UserBloc, User?>(
-                          builder: (context, user) {
-                        return
-                            // CachedNetworkImage(
-                            //   imageUrl: user?.picture ?? "",
-                            //   errorWidget: (context, url, error) => Icon(
-                            //     Icons.person,
-                            //     size: 48,
-                            //     color: AppColors.greyColor,
-                            //   ),
-                            //   width: 120,
-                            //   height: 120,
-                            //   fit: BoxFit.fitHeight,
-                            // );
-                            ProfilePicture(
-                          picture: picture,
-                        );
-                      }),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                ),
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: ListView(
-                  scrollDirection: Axis.vertical,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  children: [
-                    ProfileListItem(
-                      title: 'Personal Details',
-                      iconData: HugeIcons.strokeRoundedUserAccount,
-                      onTap: () {
-                        // Navigate to the personal details page
-                        context.pushNamed(
-                          AppRoute.profileDetails.name,
-                          extra:
-                              service<AppPreferencesManager>().currentUserValue,
-                        );
-                      },
-                    ),
-                    ProfileListItem(
-                        title: 'Change Password',
-                        iconData: HugeIcons.strokeRoundedLockPassword,
-                        onTap: () {
-                          _showChangePasswordBottomSheet(context, "user.id");
+          extendBodyBehindAppBar: false,
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 0, left: 24, right: 24),
+                  child: Center(
+                    child: Container(
+                      height: 200,
+                      width: 200,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(48),
+                        child: BlocBuilder<UserBloc, User?>(
+                            builder: (context, user) {
+                          return
+                              // CachedNetworkImage(
+                              //   imageUrl: user?.picture ?? "",
+                              //   errorWidget: (context, url, error) => Icon(
+                              //     Icons.person,
+                              //     size: 48,
+                              //     color: AppColors.greyColor,
+                              //   ),
+                              //   width: 120,
+                              //   height: 120,
+                              //   fit: BoxFit.fitHeight,
+                              // );
+                              ProfilePicture(
+                            picture: picture,
+                          );
                         }),
-                  ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ));
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                    ),
+                  ),
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  child: ListView(
+                    scrollDirection: Axis.vertical,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                    children: [
+                      ProfileListItem(
+                        title: 'Personal Details',
+                        iconData: HugeIcons.strokeRoundedUserAccount,
+                        onTap: () {
+                          // Navigate to the personal details page
+                          context.pushNamed(
+                            AppRoute.profileDetails.name,
+                            extra: service<AppPreferencesManager>()
+                                .currentUserValue,
+                          );
+                        },
+                      ),
+                      ProfileListItem(
+                          title: 'Change Password',
+                          iconData: HugeIcons.strokeRoundedLockPassword,
+                          onTap: () {
+                            _showChangePasswordBottomSheet(context, "user.id");
+                          }),
+                      ProfileListItem(
+                        title: 'Delete Profile',
+                        iconData: Icons.delete_forever_outlined,
+                        onTap: () {
+                          _showDeleteProfileDialog(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )),
+    );
   }
 
   void _showChangePasswordBottomSheet(BuildContext context, String userId) {
@@ -235,5 +274,33 @@ class _EditProfileMainState extends State<EditProfileMain> {
       _newPassword.clear();
       _confirmNewPassword.clear();
     });
+  }
+
+  Future<void> _showDeleteProfileDialog(BuildContext context) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Profile'),
+          content: const Text(
+            'Are you sure you want to delete your profile? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true && context.mounted) {
+      await _authBloc.deleteProfile();
+    }
   }
 }

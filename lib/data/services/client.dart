@@ -186,11 +186,11 @@ class PickupAddressService {
 class MatchService {
   HttpResult<List<MatchType>> getMatches() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Match/804f0bac-11f1-4981-b67f-51f33efe1d5d/155f166c-320c-47f0-9d26-10d89b6587c1",
+      "https://backend.wencetechnologies.com/sportapp/api/Match/leagueMatches/804f0bac-11f1-4981-b67f-51f33efe1d5d/cf43b214-c667-4e99-8718-7b0dcfb4cd43?playStatus=false&fromNow=true",
       deserializer: (data) {
         List<MatchType> matchList = [];
 
-         for (final record in (data["data"] as List? ?? const [])) {
+        for (final record in (data["data"] as List? ?? const [])) {
           try {
             final recap = _toMatchModel(record as Map<String, dynamic>);
 
@@ -222,7 +222,7 @@ class MatchService {
 
   HttpResult<List<MatchType>> getMatchStats() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Match/804f0bac-11f1-4981-b67f-51f33efe1d5d/155f166c-320c-47f0-9d26-10d89b6587c1?playStatus=true",
+      "https://backend.wencetechnologies.com/sportapp/api/Match/leagueMatches/804f0bac-11f1-4981-b67f-51f33efe1d5d/cf43b214-c667-4e99-8718-7b0dcfb4cd43?playStatus=true&fromNow=false",
       deserializer: (data) {
         List<MatchType> matchList = [];
 
@@ -278,27 +278,23 @@ class MatchService {
       clubOneScore: (record["clubOneScore"] ?? "0").toString(),
       clubTwoScore: (record["clubTwoScore"] ?? "0").toString(),
       matchStatus: (record["matchStatus"] ?? false) == true,
-
       clubOne: ClubModel(
         id: (clubOneJson["id"] ?? "").toString(),
         name: (clubOneJson["name"] ?? "").toString(),
         pic: (clubOneJson["pic"] ?? "").toString(),
         stats: _parseStats(clubOneJson["stats"]),
       ),
-
       clubTwo: ClubModel(
         id: (clubTwoJson["id"] ?? "").toString(),
         name: (clubTwoJson["name"] ?? "").toString(),
         pic: (clubTwoJson["pic"] ?? "").toString(),
         stats: _parseStats(clubTwoJson["stats"]),
       ),
-
       matchDate: MatchDateModel(
         id: (matchDateJson["id"] ?? "").toString(),
         date: DateTime.tryParse((matchDateJson["date"] ?? "").toString()) ??
             DateTime.now(),
       ),
-
       venue: VenueModel(
         id: (venueJson["id"] ?? "").toString(),
         name: (venueJson["name"] ?? "").toString(),
@@ -311,16 +307,13 @@ class MatchService {
 
   List<StatModel> _parseStats(dynamic raw) {
     if (raw is! List) return const [];
-    return raw
-        .whereType<Map>()
-        .map((m) {
-          final mm = Map<String, dynamic>.from(m);
-          return StatModel(
-            stat: (mm["stat"] ?? "").toString(),
-            statValue: _toInt(mm["statValue"]),
-          );
-        })
-        .toList();
+    return raw.whereType<Map>().map((m) {
+      final mm = Map<String, dynamic>.from(m);
+      return StatModel(
+        stat: (mm["stat"] ?? "").toString(),
+        statValue: _toInt(mm["statValue"]),
+      );
+    }).toList();
   }
 
   double _toDouble(dynamic v) {
@@ -402,7 +395,7 @@ class AuthService {
 
   HttpResult<dynamic> appleLogin(Map<String, dynamic> data) async {
     return Http.post(
-      "https://backend.wencetechnologies.com/SportApp/api/User/applelogin",
+      "https://backend.wencetechnologies.com/sportapp/api/User/applelogin",
       //"https://wencesportswebapplication.vercel.app/api/auth/googleSignIn",
       data,
       deserializer: (data) => User.fromJson(data["user"]),
@@ -423,6 +416,20 @@ class AuthService {
       "https://wencesportswebapplication.vercel.app/api/auth/sign-out",
       {},
       deserializer: (data) => data["msg"],
+    );
+  }
+
+  HttpResult<String> deleteMe() async {
+    return Http.post(
+      "https://backend.wencetechnologies.com/sportapp/api/User/deleteme",
+      {},
+      deserializer: (data) {
+        if (data is Map<String, dynamic>) {
+          return (data["msg"] ?? data["message"] ?? "Profile deleted")
+              .toString();
+        }
+        return "Profile deleted";
+      },
     );
   }
 }
@@ -673,7 +680,7 @@ class RoasterService {
 class TeamStatsService {
   HttpResult<List<TeamStatsData>> getTeamStats() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/TeamStanding/155f166c-320c-47f0-9d26-10d89b6587c1/80e0e316-64a8-4708-9dd5-590f3b6bedff",
+      "https://backend.wencetechnologies.com/sportapp/api/TeamStanding/25efc8a7-0c12-4208-a76d-13098ddee997/cf43b214-c667-4e99-8718-7b0dcfb4cd43",
       deserializer: (data) {
         // Extract the list from the API response
         final standings = (data['data'] as List)

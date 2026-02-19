@@ -39,7 +39,8 @@ class RequestInterceptor extends Interceptor {
     // Skip refresh for refresh endpoint itself
     if (options.path.contains("User/refresh") ||
         options.path.contains("/User/emaillogin") ||
-        options.path.contains("/User/googlelogin")) {
+        options.path.contains("/User/googlelogin") ||
+        options.path.contains("/User/applelogin")) {
       if (accessToken != null && accessToken.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $accessToken';
       }

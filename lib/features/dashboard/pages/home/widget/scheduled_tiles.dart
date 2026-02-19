@@ -185,7 +185,10 @@ class ScheduledTiles extends StatelessWidget {
           backgroundColor: color,
           radius: 10,
           child: Text(
-            team.split(' ').first[0].toUpperCase() + team.split(' ').last[0],
+            team.split(' ').first[0].toUpperCase() +
+                (team.split(' ').last.isNotEmpty
+                    ? team.split(' ').last[0].toUpperCase()
+                    : ''),
             style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w600),
           ),
         ),

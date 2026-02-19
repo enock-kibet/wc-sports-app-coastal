@@ -14,6 +14,7 @@ import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/models/stripe_checkout/stripe_checkout.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/data/services/upgrade_service.dart';
 import 'package:sports_app/features/app/blocs/matches/match_bloc.dart';
 import 'package:sports_app/features/app/blocs/matches/match_schedule/schedule_bloc.dart';
 import 'package:sports_app/features/app/blocs/media/media_bloc.dart';
@@ -28,7 +29,6 @@ import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/app_colors.dart';
 import 'package:sports_app/theme/theme.dart';
 import 'package:sports_app/utils/dotted.dart';
-import 'package:upgrader/upgrader.dart';
 
 // import '../../../../data/services/notification_service.dart';
 part 'widget/scheduled_tiles.dart';
@@ -55,6 +55,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AndroidInAppUpdates.checkAndUpdate(
+          immediate: true); // or false for flexible
+    });
+
     _stripeBloc = StripeBloc();
     searchText = TextEditingController();
 
@@ -95,157 +100,157 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return UpgradeAlert(
-      upgrader: Upgrader(
-    ),
-      child: BlocBuilder<HideCubit, bool>(builder: (context, reveal) {
-        return Scaffold(
-          body: AppBackground(
-            childWidget: SafeArea(
-                child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: kMedium),
-              child: Column(
-                children: [
-                  const SizedBox(height: kMedium),
-                  headerSection(context),
-                  const SizedBox(height: kMedium),
-                  searchField(
-                      controller: searchText,
-                      focusNode: _focusNode,
-                      onChanged: (string) => context
-                          .read<MatchBloc>()
-                          .add(MatchEvent.searchMatch(search: searchText.text))),
-                  reveal ? Container() : const SizedBox(height: kMedium),
-                  reveal
-                      ? Container()
-                      : BlocProvider(
-                          create: (context) =>
-                              MediaBloc()..add(MediaEvent.getHomeMedia()),
-                          child: const HomeMediaBanner(),
-                        ),
-                  reveal ? Container() : const SizedBox(height: kMedium),
-                  reveal ? Container() : SizedBox(),
-                  Expanded(
-                    child: BlocBuilder<MatchBloc, MatchState>(
-                      builder: (context, state) {
-                        switch (state.status) {
-                          case MatchStatus.loading:
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          case MatchStatus.failure:
-                            return Center(
-                              child: Text(state.failure!.error),
-                            );
-                          case MatchStatus.success:
-                            context.read<ScheduleBloc>().add(LoadSchedules(
-                                reveal ? state.searchedMatches : state.matches));
-      
-                            return BlocBuilder<ScheduleBloc, ScheduleState>(
-                                builder: (context, scheduledMatches) {
-                              if (scheduledMatches is ScheduleLoading) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              } else if (scheduledMatches is ScheduleLoaded) {
-                                final categorized =
-                                    scheduledMatches.categorizedSchedulees;
-                                final statsMatches =
-                                    context.read<MatchBloc>().state.statsMatches;
-      
-                                return ListView(
-                                  children: [
-                                    // --- Upcoming Schedule ---
-                                    if (categorized.isNotEmpty) ...[
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 1.0),
-                                        child: Text(
-                                          "Upcoming Matches",
-                                          style: context.textTheme.headlineLarge
-                                              ?.copyWith(
-                                            fontSize: 18,
-                                            color: AppColors.whiteColor,
-                                          ),
+    return BlocBuilder<HideCubit, bool>(builder: (context, reveal) {
+      return Scaffold(
+        body: AppBackground(
+          childWidget: SafeArea(
+              child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: kMedium),
+            child: Column(
+              children: [
+                const SizedBox(height: kMedium),
+                headerSection(context),
+                const SizedBox(height: kMedium),
+                searchField(
+                    controller: searchText,
+                    focusNode: _focusNode,
+                    onChanged: (string) => context
+                        .read<MatchBloc>()
+                        .add(MatchEvent.searchMatch(search: searchText.text))),
+                reveal ? Container() : const SizedBox(height: kMedium),
+                reveal
+                    ? Container()
+                    : BlocProvider(
+                        create: (context) =>
+                            MediaBloc()..add(MediaEvent.getHomeMedia()),
+                        child: const HomeMediaBanner(),
+                      ),
+                reveal ? Container() : const SizedBox(height: kMedium),
+                reveal ? Container() : SizedBox(),
+                Expanded(
+                  child: BlocBuilder<MatchBloc, MatchState>(
+                    builder: (context, state) {
+                      switch (state.status) {
+                        case MatchStatus.loading:
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        case MatchStatus.failure:
+                          return Center(
+                            child: Text(state.failure!.error),
+                          );
+                        case MatchStatus.success:
+                          context.read<ScheduleBloc>().add(LoadSchedules(
+                              reveal ? state.searchedMatches : state.matches));
+
+                          return BlocBuilder<ScheduleBloc, ScheduleState>(
+                              builder: (context, scheduledMatches) {
+                            if (scheduledMatches is ScheduleLoading) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else if (scheduledMatches is ScheduleLoaded) {
+                              final categorized =
+                                  scheduledMatches.categorizedSchedulees;
+                              final statsMatches =
+                                  context.read<MatchBloc>().state.statsMatches;
+
+                              return ListView(
+                                children: [
+                                  // --- Upcoming Schedule ---
+                                  if (categorized.isNotEmpty) ...[
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 1.0),
+                                      child: Text(
+                                        "Upcoming Matches",
+                                        style: context.textTheme.headlineLarge
+                                            ?.copyWith(
+                                          fontSize: 18,
+                                          color: AppColors.whiteColor,
                                         ),
                                       ),
-                                      ...categorized.entries.map((entry) {
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 8.0, bottom: 12),
-                                              child: Text(
-                                                entry.key
-                                                    .toString()
-                                                    .split('.')
-                                                    .last
-                                                    .toTitleCase(),
-                                                style: context.textTheme.bodySmall
-                                                    ?.copyWith(
-                                                  color: AppColors.whiteColor,
-                                                ),
+                                    ),
+                                    ...categorized.entries.map((entry) {
+                                      String entryTitle = entry.key
+                                          .toString()
+                                          .split('.')
+                                          .last
+                                          .toTitleCase();
+                                      if (entryTitle == 'Thisweek') {
+                                        entryTitle = "This Week";
+                                      }
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 8.0, bottom: 12),
+                                            child: Text(
+                                              entryTitle,
+                                              style: context.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                color: AppColors.whiteColor,
                                               ),
                                             ),
-                                            ...entry.value.map((match) =>
-                                                ScheduledTiles(match: match)),
-                                          ],
-                                        );
-                                      }),
-                                    ],
-      
-                                    // --- Previous Matches ---
-                                    if (statsMatches.isNotEmpty) ...[
-                                      const SizedBox(height: 24),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 12.0),
-                                        child: Text(
-                                          "Previous Matches",
-                                          style: context.textTheme.headlineLarge
-                                              ?.copyWith(
-                                            fontSize: 18,
-                                            color: AppColors.whiteColor,
                                           ),
-                                        ),
-                                      ),
-                                      ...statsMatches.map(
-                                          (match) => PreviousTiles(match: match)),
-                                    ],
-      
-                                    // --- If both are empty ---
-                                    if (categorized.isEmpty &&
-                                        statsMatches.isEmpty)
-                                      const Center(
-                                        child: Padding(
-                                          padding: EdgeInsets.only(top: 40.0),
-                                          child: Text(
-                                            "No matches available",
-                                            style:
-                                                TextStyle(color: Colors.white70),
-                                          ),
-                                        ),
-                                      ),
+                                          ...entry.value.map((match) =>
+                                              ScheduledTiles(match: match)),
+                                        ],
+                                      );
+                                    }),
                                   ],
-                                );
-                              }
-                              return (Container());
-                            });
-      
-                          default:
-                            return const SizedBox.shrink();
-                        }
-                      },
-                    ),
+
+                                  // --- Previous Matches ---
+                                  if (statsMatches.isNotEmpty) ...[
+                                    const SizedBox(height: 24),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 12.0),
+                                      child: Text(
+                                        "Previous Matches",
+                                        style: context.textTheme.headlineLarge
+                                            ?.copyWith(
+                                          fontSize: 18,
+                                          color: AppColors.whiteColor,
+                                        ),
+                                      ),
+                                    ),
+                                    ...statsMatches.map(
+                                        (match) => PreviousTiles(match: match)),
+                                  ],
+
+                                  // --- If both are empty ---
+                                  if (categorized.isEmpty &&
+                                      statsMatches.isEmpty)
+                                    const Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top: 40.0),
+                                        child: Text(
+                                          "No matches available",
+                                          style:
+                                              TextStyle(color: Colors.white70),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            }
+                            return (Container());
+                          });
+
+                        default:
+                          return const SizedBox.shrink();
+                      }
+                    },
                   ),
-                ],
-              ),
-            )),
-          ),
-        );
-      }),
-    );
+                ),
+              ],
+            ),
+          )),
+        ),
+      );
+    });
   }
 
   SingleChildScrollView schedules({required List<MatchType> matches}) {

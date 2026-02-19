@@ -20,6 +20,7 @@ import 'package:sports_app/features/app/side_menu_cubit.dart';
 import 'package:sports_app/firebase_options.dart';
 import 'package:sports_app/localization/app_prefs.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
+import 'package:upgrader/upgrader.dart';
 
 import 'data/services/service.dart';
 import 'features/app/blocs/matches/match_bloc.dart';
@@ -46,10 +47,24 @@ void main() {
       ),
     );
 
+    Future<void> initFirebase() async {
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      } on FirebaseException catch (e) {
+        if (e.code == 'duplicate-app') {
+          Firebase.app();
+        } else {
+          rethrow;
+        }
+      }
+    }
+
     if (Platform.isAndroid || Platform.isIOS || kIsWeb) {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      if (Firebase.apps.isEmpty) {
+        await initFirebase();
+      }
 
       FlutterError.onError = (FlutterErrorDetails details) {
         FirebaseCrashlytics.instance.recordFlutterError(details);
@@ -150,14 +165,22 @@ class _MyAppState extends State<MyApp> {
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
-          return MaterialApp.router(
-            scaffoldMessengerKey: SnackbarService.messengerKey,
-            title: 'Sports App',
-            debugShowCheckedModeBanner: false,
-            // theme: systemMode,
-            darkTheme: darkMode,
-            themeMode: themeMode, // 👈 switch dynamically
-            routerConfig: router,
+          return UpgradeAlert(
+            upgrader: Upgrader(
+              debugLogging: true,
+              minAppVersion: '99.0.0',
+              // optional:
+              durationUntilAlertAgain: Duration.zero,
+              // durationUntilAlertAgain: Duration.zero,
+            ),
+            child: MaterialApp.router(
+              scaffoldMessengerKey: SnackbarService.messengerKey,
+              title: 'Sports App',
+              debugShowCheckedModeBanner: false,
+              darkTheme: darkMode,
+              themeMode: themeMode,
+              routerConfig: router,
+            ),
           );
         },
       ),
