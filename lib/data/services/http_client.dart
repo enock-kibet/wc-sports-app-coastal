@@ -28,7 +28,12 @@ class RequestInterceptor extends Interceptor {
     options.headers['Accept'] = 'application/json';
     options.headers['Content-Type'] = 'application/json';
 
-    final prefs = service<AppPreferencesManager>();
+    final useAuthToken = options.extra[_useAuthTokenKey] as bool? ?? true;
+    if (!useAuthToken) {
+      options.headers.remove('Authorization');
+      return handler.next(options);
+    }
+
     final authRepo = service<AuthRepository>();
     final asyncPrefs = SharedPreferencesAsync();
 
@@ -36,25 +41,21 @@ class RequestInterceptor extends Interceptor {
     String? accessToken =
         userData != null && userData.length >= 5 ? userData[4] : null;
 
-    // Skip refresh for refresh endpoint itself
-    if (options.path.contains("User/refresh") ||
-        options.path.contains("/User/emaillogin") ||
-        options.path.contains("/User/googlelogin") ||
-        options.path.contains("/User/applelogin")) {
-      if (accessToken != null && accessToken.isNotEmpty) {
-        options.headers['Authorization'] = 'Bearer $accessToken';
-      }
+    if (accessToken == null || accessToken.isEmpty) {
       return handler.next(options);
     }
 
-    // Decode expiry
-    final expiryMillis = _decodeJwtExpiry(accessToken!);
+    if (_isRefreshExemptPath(options.path)) {
+      options.headers['Authorization'] = 'Bearer $accessToken';
+      return handler.next(options);
+    }
+
+    final expiryMillis = _decodeJwtExpiry(accessToken);
     final now = DateTime.now().millisecondsSinceEpoch;
 
-    // Refresh 20 minutes before expiry
     const refreshBefore = 10 * 60 * 1000;
-
-    final needsRefresh = now >= (expiryMillis - refreshBefore);
+    final needsRefresh =
+        expiryMillis != null && now >= (expiryMillis - refreshBefore);
 
     if (needsRefresh) {
       print("🔄 Token almost expired → Refreshing...");
@@ -62,7 +63,6 @@ class RequestInterceptor extends Interceptor {
       final refreshSuccess = await authRepo.refreshToken();
 
       if (refreshSuccess) {
-        // ⬅️ Reload NEW token from prefs
         final newUserData = await asyncPrefs.getStringList("USERDATA");
         accessToken = newUserData != null && newUserData.length >= 5
             ? newUserData[4]
@@ -74,7 +74,6 @@ class RequestInterceptor extends Interceptor {
       }
     }
 
-    // Attach token
     if (accessToken != null && accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $accessToken';
     }
@@ -94,6 +93,7 @@ class RequestInterceptor extends Interceptor {
 typedef Deserializer<X> = X Function(dynamic data);
 typedef HttpResult<X> = Future<MultipleResult<X>>;
 final cookieJar = CookieJar();
+const _useAuthTokenKey = 'useAuthToken';
 
 class Http {
   static final dio = Dio(BaseOptions(
@@ -122,6 +122,7 @@ class Http {
     String url, {
     dynamic data,
     Options? options,
+    bool useAuthToken = true,
     Deserializer<T>? deserializer,
     Map<String, dynamic>? queryParams,
     ProgressCallback? progressCallback,
@@ -130,7 +131,7 @@ class Http {
       final res = await dio.get(
         url,
         data: data,
-        options: options,
+        options: _withAuthOption(options, useAuthToken),
         queryParameters: queryParams,
         onReceiveProgress: progressCallback,
       );
@@ -155,16 +156,17 @@ class Http {
     String url,
     dynamic data, {
     Options? options,
+    bool useAuthToken = true,
     Deserializer<T>? deserializer,
     Map<String, dynamic>? queryParams,
     ProgressCallback? progressCallback,
-    Map<String, String> headers = const {},
+    Map<String, String>? headers,
   }) async {
     try {
       final res = await dio.post(
         url,
         data: data,
-        options: options,
+        options: _withAuthOption(options, useAuthToken, headers: headers),
         queryParameters: queryParams,
         onSendProgress: progressCallback,
       );
@@ -189,6 +191,7 @@ class Http {
     String url,
     dynamic data, {
     Options? options,
+    bool useAuthToken = true,
     Deserializer<T>? deserializer,
     ProgressCallback? progressCallback,
   }) async {
@@ -196,7 +199,7 @@ class Http {
       final res = await dio.put(
         url,
         data: data,
-        options: options,
+        options: _withAuthOption(options, useAuthToken),
         onSendProgress: progressCallback,
       );
       return MultipleResult.onSuccess(
@@ -218,10 +221,15 @@ class Http {
     String url,
     dynamic data, {
     Options? options,
+    bool useAuthToken = true,
     Deserializer<T>? deserializer,
   }) async {
     try {
-      final res = await dio.patch(url, data: data, options: options);
+      final res = await dio.patch(
+        url,
+        data: data,
+        options: _withAuthOption(options, useAuthToken),
+      );
       return MultipleResult.onSuccess(
         data: deserializer != null ? deserializer(res.data) : res.data,
       );
@@ -240,12 +248,13 @@ class Http {
   static HttpResult<T> delete<T>(
     String url, {
     Options? options,
+    bool useAuthToken = true,
     Deserializer<T>? deserializer,
   }) async {
     try {
       final res = await dio.delete(
         url,
-        options: options,
+        options: _withAuthOption(options, useAuthToken),
       );
       return MultipleResult.onSuccess(
         data: deserializer != null ? deserializer(res.data) : res.data,
@@ -260,12 +269,55 @@ class Http {
       );
     }
   }
+
+  static Options _withAuthOption(
+    Options? options,
+    bool useAuthToken, {
+    Map<String, String>? headers,
+  }) {
+    final mergedExtra = <String, dynamic>{
+      ...?options?.extra,
+      _useAuthTokenKey: useAuthToken,
+    };
+
+    final mergedHeaders = <String, dynamic>{
+      ...?options?.headers,
+      ...?headers,
+    };
+
+    return (options ?? Options()).copyWith(
+      extra: mergedExtra,
+      headers: mergedHeaders.isEmpty ? null : mergedHeaders,
+    );
+  }
 }
 
-int _decodeJwtExpiry(String token) {
+bool _isRefreshExemptPath(String path) {
+  const exemptPaths = <String>[
+    "User/refresh",
+    "/User/emaillogin",
+    "/User/googlelogin",
+    "/User/applelogin",
+  ];
+
+  return exemptPaths.any(path.contains);
+}
+
+int? _decodeJwtExpiry(String token) {
   final parts = token.split('.');
-  if (parts.length != 3) throw Exception('Invalid JWT format');
-  final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
-  final Map<String, dynamic> payloadMap = jsonDecode(payload);
-  return payloadMap['exp'] * 1000; // Convert to milliseconds
+  if (parts.length != 3) return null;
+  try {
+    final payload =
+        utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+    final Map<String, dynamic> payloadMap = jsonDecode(payload);
+    final exp = payloadMap['exp'];
+    if (exp is int) return exp * 1000;
+    if (exp is String) {
+      final parsed = int.tryParse(exp);
+      return parsed != null ? parsed * 1000 : null;
+    }
+    return null;
+  } catch (_) {
+    return null;
+  }
 }

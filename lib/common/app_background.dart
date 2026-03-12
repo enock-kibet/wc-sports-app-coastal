@@ -9,14 +9,13 @@ class AppBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        /// Base dark background
         Container(
           width: double.infinity,
           height: double.infinity,
-          color: const Color(0xFF050007),
+          decoration: BoxDecoration(
+            color: const Color(0xFF050007),
+          ),
         ),
-
-        /// Purple glow (top-left)
         Container(
           width: double.infinity,
           height: double.infinity,
@@ -25,16 +24,14 @@ class AppBackground extends StatelessWidget {
               center: Alignment.topLeft,
               radius: 1.2,
               colors: [
-                Color(0xFF5A0A6E), // rich purple
+                Color(0xFF5A0A6E),
                 Color(0xFF2A0033),
-                Color(0xFF050007), // fades to black
+                Color(0xFF050007),
               ],
               stops: [0.0, 0.45, 1.0],
             ),
           ),
         ),
-
-        /// Dark fade overlay (bottom emphasis)
         Container(
           width: double.infinity,
           height: double.infinity,
@@ -49,8 +46,6 @@ class AppBackground extends StatelessWidget {
             ),
           ),
         ),
-
-        /// Content
         if (childWidget != null) childWidget!,
       ],
     );

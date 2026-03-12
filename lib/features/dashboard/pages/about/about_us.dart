@@ -9,6 +9,13 @@ class AboutUs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final iconTileColor =
+        isDark ? Colors.white.withValues(alpha: 0.08) : theme.colorScheme.surface;
+    final iconTint =
+        isDark ? Colors.white : theme.colorScheme.onSurface;
+
     return Scaffold(
       body: AppBackground(
         childWidget: Padding(
@@ -102,11 +109,12 @@ class AboutUs extends StatelessWidget {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
+                                color: iconTileColor,
                                 borderRadius: BorderRadius.circular(10)),
                             child: Image.asset(
                               "assets/icons/web.png",
                               height: 18,
+                              color: iconTint,
                             ),
                           ),
                           const SizedBox(
@@ -123,11 +131,12 @@ class AboutUs extends StatelessWidget {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
+                                color: iconTileColor,
                                 borderRadius: BorderRadius.circular(10)),
                             child: Image.asset(
                               "assets/icons/twitter.png",
                               height: 18,
+                              color: iconTint,
                             ),
                           ),
                           const SizedBox(

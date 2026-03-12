@@ -375,28 +375,19 @@ class _PersonalDetailsState extends State<PersonalDetails> {
           context.read<UserBloc>().add(UpdateUser(state.data));
           service<Talker>().info('Profile updated');
           //show success snackbar
-          SnackbarService.show(
-            'Profile updated',
-            backgroundColor: AppColors.blackColor,
-          );
+          SnackbarService.showSuccess('Profile updated');
         }
         if (state.status == AuthStatus.uploadSuccess) {
           context.read<UserBloc>().add(UpdateUser(state.data));
           service<Talker>().info('Profile updated');
           //show success snackbar
-          SnackbarService.show(
-            'Profile photo uploaded',
-            backgroundColor: AppColors.primaryColor,
-          );
+          SnackbarService.showSuccess('Profile photo uploaded');
         }
         if (state.status == AuthStatus.failure) {
           service<Talker>().error('Profile update failed');
           service<Talker>().error(state.failure!.error);
           //show snackbar
-          SnackbarService.show(
-            state.failure!.error,
-            backgroundColor: AppColors.primaryColor,
-          );
+          SnackbarService.showError(state.failure!.error);
         }
         if (state.status == AuthStatus.loading) {
           service<Talker>().info('Loading');

@@ -61,20 +61,14 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
             context.read<UserBloc>().add(UpdateUser(state.data));
             service<Talker>().info('Login Success');
             //show success snackbar
-            SnackbarService.show(
-              'Registration Successful',
-              backgroundColor: AppColors.blackColor,
-            );
+            SnackbarService.showSuccess('Registration Successful');
           }
           if (state.status == AuthStatus.failure) {
             service<Talker>().error('Register Failed');
             service<Talker>().error(state.failure!.error);
             await GoogleSignIn(scopes: ['profile', 'email']).signOut();
             //show snackbar
-            SnackbarService.show(
-              state.failure!.error,
-              backgroundColor: AppColors.dangerColor,
-            );
+            SnackbarService.showError(state.failure!.error);
           }
         },
         builder: (context, state) {

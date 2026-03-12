@@ -12,7 +12,6 @@ import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/constants/constants.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/models/stripe_checkout/stripe_checkout.dart';
-import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/data/services/upgrade_service.dart';
 import 'package:sports_app/features/app/blocs/matches/match_bloc.dart';
@@ -50,7 +49,6 @@ class _HomePageState extends State<HomePage> {
   late HideCubit _hideCubit;
   Map<String, dynamic>? user;
   bool loading = false;
-  User currentUser = service<AppPreferencesManager>().currentUserValue!;
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -137,7 +135,10 @@ class _HomePageState extends State<HomePage> {
                           );
                         case MatchStatus.failure:
                           return Center(
-                            child: Text(state.failure!.error),
+                            child: Text(
+                              state.failure?.error ??
+                                  "Unable to load matches right now.",
+                            ),
                           );
                         case MatchStatus.success:
                           context.read<ScheduleBloc>().add(LoadSchedules(
@@ -345,6 +346,13 @@ class _HomePageState extends State<HomePage> {
                             ),
                             GestureDetector(
                               onTap: () {
+                                final isGuest = service<AppPreferencesManager>()
+                                        .currentUserValue ==
+                                    null;
+                                if (isGuest) {
+                                  context.go('/signIn');
+                                  return;
+                                }
                                 _stripeBloc.add(const StripeEvent.stripe(
                                     email: "john@gmail.com", price: 500));
                               },
@@ -474,6 +482,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Row headerSection(BuildContext context) {
+    final currentUser = service<AppPreferencesManager>().currentUserValue;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -495,7 +504,7 @@ class _HomePageState extends State<HomePage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Hi ${truncateText(limit: 16, currentUser.name)}",
+            Text("Hi ${truncateText(limit: 16, currentUser?.name ?? 'Guest')}",
                 style: TextStyle(
                     color: AppColors.whiteColor,
                     fontSize: 20,

@@ -17,6 +17,11 @@ class TeamMediaPage extends StatefulWidget {
 class _TeamMediaPageState extends State<TeamMediaPage> {
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 768;
+    final horizontalPadding = isTablet ? kXLMedium : kMedium;
+    final sectionGap = isTablet ? kLarge : kMedium;
+
     return Scaffold(
       body: Container(
         height: double.infinity,
@@ -26,85 +31,95 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
               image: AssetImage("assets/background.png"), fit: BoxFit.cover),
         ),
         child: SafeArea(
+            child: LayoutBuilder(builder: (context, constraints) {
+          return SingleChildScrollView(
             child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: kMedium),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: kMedium),
-                headerSection(),
-                const SizedBox(height: kMedium),
-                searchField(),
-                const SizedBox(height: kMedium),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Recent Highlights",
-                      style: TextStyle(
-                          fontSize: kMedium,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.whiteColor),
-                    ),
-                    TextButton(
-                        onPressed: () {},
-                        child: Text("See All",
-                            style: TextStyle(color: AppColors.whiteColor)))
-                  ],
-                ),
-                const SizedBox(height: kMedium),
-                Row(
-                  children: List.generate(5, (index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: kSmall),
-                      child: Column(
-                        children: [
-                          const CircleAvatar(
-                            backgroundImage:
-                                AssetImage("assets/images/shirt.png"),
-                          ),
-                          const SizedBox(
-                            height: kXSmall,
-                          ),
-                          Text(
-                            "Buckets",
-                            style: TextStyle(color: AppColors.whiteColor),
-                          )
-                        ],
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: isTablet ? 900 : constraints.maxWidth,
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: sectionGap),
+                      headerSection(isTablet),
+                      SizedBox(height: sectionGap),
+                      searchField(isTablet),
+                      SizedBox(height: sectionGap),
+                      _sectionTitle("Recent Highlights"),
+                      SizedBox(height: sectionGap),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: isTablet ? kMedium : kSmall,
+                        runSpacing: kSmall,
+                        children: List.generate(6, (index) {
+                          return SizedBox(
+                            width: isTablet ? 100 : 78,
+                            child: Column(
+                              children: [
+                                CircleAvatar(
+                                  radius: isTablet ? 28 : 22,
+                                  backgroundImage: const AssetImage(
+                                    "assets/images/shirt.png",
+                                  ),
+                                ),
+                                const SizedBox(height: kXSmall),
+                                Text(
+                                  "Buckets",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: AppColors.whiteColor,
+                                    fontSize: isTablet ? 14 : 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
                       ),
-                    );
-                  }),
+                      SizedBox(height: sectionGap),
+                      _sectionTitle("Season Highlights"),
+                      SizedBox(height: sectionGap),
+                      ...List.generate(4, (index) {
+                        return const SeasonHightlightCard();
+                      }),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: kMedium),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Season Highlights",
-                      style: TextStyle(
-                          fontSize: kMedium,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.whiteColor),
-                    ),
-                    TextButton(
-                        onPressed: () {},
-                        child: Text("See All",
-                            style: TextStyle(color: AppColors.whiteColor)))
-                  ],
-                ),
-                const SizedBox(height: kMedium),
-                ...List.generate(4, (index) {
-                  return const SeasonHightlightCard();
-                })
-              ],
+              ),
             ),
-          ),
-        )),
+          );
+        })),
       ),
     );
   }
 
-  TextField searchField() {
+  Widget _sectionTitle(String title) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: kMedium,
+            fontWeight: FontWeight.w700,
+            color: AppColors.whiteColor,
+          ),
+        ),
+        TextButton(
+          onPressed: () {},
+          child: Text(
+            "See All",
+            style: TextStyle(color: AppColors.whiteColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  TextField searchField(bool isTablet) {
     return TextField(
       decoration: InputDecoration(
           suffixIcon: Container(
@@ -116,16 +131,20 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
               borderSide: BorderSide(
                 color: AppColors.whiteColor,
               ),
-              borderRadius: BorderRadius.circular(kLarge)),
-          contentPadding: const EdgeInsets.symmetric(
-              horizontal: kMedium, vertical: kXLMedium * 0.9),
+              borderRadius:
+                  BorderRadius.circular(isTablet ? kXLMedium : kLarge)),
+          contentPadding: EdgeInsets.symmetric(
+              horizontal: isTablet ? kLarge : kMedium,
+              vertical: isTablet ? kLarge : kXLMedium * 0.9),
           enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(kLarge),
+              borderRadius:
+                  BorderRadius.circular(isTablet ? kXLMedium : kLarge),
               borderSide: BorderSide(
                 color: AppColors.whiteColor,
               )),
           focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(kLarge),
+              borderRadius:
+                  BorderRadius.circular(isTablet ? kXLMedium : kLarge),
               borderSide: BorderSide(
                 color: AppColors.whiteColor,
               )),
@@ -136,7 +155,7 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
     );
   }
 
-  Row headerSection() {
+  Row headerSection(bool isTablet) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -155,20 +174,24 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
             ),
           ),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text("Team Media!",
-                style: TextStyle(
-                    color: AppColors.whiteColor,
-                    fontSize: kLarge,
-                    fontWeight: FontWeight.bold)),
-            Text("All Media Highlights",
-                style: TextStyle(
-                    color: AppColors.whiteColor,
-                    fontSize: kMedium,
-                    fontWeight: FontWeight.normal)),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("Team Media!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: AppColors.whiteColor,
+                      fontSize: isTablet ? kXLMedium : kLarge,
+                      fontWeight: FontWeight.bold)),
+              Text("All Media Highlights",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: AppColors.whiteColor,
+                      fontSize: isTablet ? kMedium : kSMedium,
+                      fontWeight: FontWeight.normal)),
+            ],
+          ),
         ),
         GestureDetector(
           onTap: () {

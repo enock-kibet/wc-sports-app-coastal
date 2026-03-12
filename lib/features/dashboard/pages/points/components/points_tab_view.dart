@@ -18,43 +18,44 @@ class CustomTabBarView extends StatelessWidget {
           children: pointsHistoryList
               .map((data) => PointsCard(pointsCardData: data))
               .toList()),
-      Column(
-        children: [
-          const PointsDistributionBreakDown(
-              title: 'Point Gain Breakdown',
-              breakdown: [
-                ['Follow social media page', '2', 'Points'],
-                ['Buy a game ticket', '2', 'Points per ticket'],
-                ['Share team media', '2', 'Points']
-              ]),
-          const PointsDistributionBreakDown(
-              title: 'Point Redeeming',
-              breakdown: [
-                ['For merchandize:', '250', 'Minimum'],
-                ['For game ticket:', '100', 'Minimum'],
-              ]),
-          const PointsDistributionBreakDown(
-              title: 'Point Transfer',
-              breakdown: [
-                ['To Friends', '100', 'Minimum'],
-              ]),
-          Spacer(),
-          Row(
-            children: [
-              Expanded(
-                  child: GradientFilledButton(
-                text: "Transfer",
-                onPressed: () {
-                  showTransferPointsBottomSheet(context, balance);
-                },
-                radius: 18,
-              ))
-            ],
-          ),
-          SizedBox(
-            height: 24,
-          )
-        ],
+      SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const PointsDistributionBreakDown(
+                title: 'Point Gain Breakdown',
+                breakdown: [
+                  ['Follow social media page', '2', 'Points'],
+                  ['Buy a game ticket', '2', 'Points per ticket'],
+                  ['Share team media', '2', 'Points']
+                ]),
+            const PointsDistributionBreakDown(
+                title: 'Point Redeeming',
+                breakdown: [
+                  ['For merchandize:', '250', 'Minimum'],
+                  ['For game ticket:', '100', 'Minimum'],
+                ]),
+            const PointsDistributionBreakDown(
+                title: 'Point Transfer',
+                breakdown: [
+                  ['To Friends', '100', 'Minimum'],
+                ]),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                    child: GradientFilledButton(
+                  text: "Transfer",
+                  onPressed: () {
+                    showTransferPointsBottomSheet(context, balance);
+                  },
+                  radius: 18,
+                ))
+              ],
+            ),
+          ],
+        ),
       )
     ]);
   }

@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,17 +35,21 @@ class MatchDetailsPage extends StatefulWidget {
 class _MatchDetailsPageState extends State<MatchDetailsPage> {
   SharedPreferencesAsync get asyncPrefs => SharedPreferencesAsync();
   final ValueNotifier<int> numberOfTickets = ValueNotifier(1);
+  static const LatLng _fallbackLocation = LatLng(-1.3044, 36.8254);
 
   late PointsBloc _pointsBloc;
+  bool _ownsPointsBloc = false;
   String? userID;
-
-  static const CameraPosition _cameraPosition =
-      CameraPosition(target: LatLng(-1.3044, 36.8254), zoom: 16);
 
   @override
   void initState() {
     super.initState();
-    _pointsBloc = context.read<PointsBloc>();
+    try {
+      _pointsBloc = context.read<PointsBloc>();
+    } catch (_) {
+      _pointsBloc = PointsBloc();
+      _ownsPointsBloc = true;
+    }
     _loadUserData();
   }
 
@@ -60,14 +65,19 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
 
   @override
   void dispose() {
+    if (_ownsPointsBloc) {
+      _pointsBloc.close();
+    }
     numberOfTickets.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final location =
-        GoRouter.of(context).routeInformationProvider.value.uri.toString();
+    final venue = widget.match.recap?.venue;
+    final venueLatLng = venue != null
+        ? LatLng(venue.latitude, venue.longitude)
+        : _fallbackLocation;
 
     return BlocConsumer<ProductBloc, ProductState>(
       bloc: context.read<ProductBloc>(),
@@ -139,7 +149,17 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                     child: GradientFilledButton(
                       radius: 16,
                       onPressed: () async {
-                        final bloc = context.read<PointsBloc>();
+                        final currentUser =
+                            service<AppPreferencesManager>().currentUserValue;
+                        final userEmail = currentUser?.email;
+                        if (userEmail == null || userEmail.isEmpty) {
+                          if (context.mounted) {
+                            context.go('/signIn');
+                          }
+                          return;
+                        }
+
+                        final bloc = _pointsBloc;
 
                         // Step 1: Trigger loading of points
                         bloc.add(const PointsEvent.points());
@@ -151,6 +171,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                           final state = bloc.state;
                           return state.status == PointsStatus.loading;
                         });
+                        if (!context.mounted) return;
 
                         final pointsState = bloc.state;
 
@@ -168,9 +189,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                                   ProductEvent.buyProducts(request: {
                                     "amount": widget.match.matchPrice *
                                         numberOfTickets.value,
-                                    "email": service<AppPreferencesManager>()
-                                        .currentUserValue!
-                                        .email,
+                                    "email": userEmail,
                                     "productID":
                                         "20d802f0-1557-49a5-9fcf-7de02e570c57",
                                     "category": "",
@@ -310,6 +329,20 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                               ),
                             ),
                             const SizedBox(height: kSmall),
+                            if (venue != null) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                venue.location,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                            ],
                             Container(
                               height: 300,
                               width: double.infinity,
@@ -319,10 +352,40 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(kMedium),
-                                child: const GoogleMap(
-                                  mapType: MapType.normal,
-                                  trafficEnabled: true,
-                                  initialCameraPosition: _cameraPosition,
+                                child: FlutterMap(
+                                  options: MapOptions(
+                                    initialCenter: venueLatLng,
+                                    initialZoom: 16,
+                                    interactionOptions:
+                                        const InteractionOptions(
+                                      flags: InteractiveFlag.drag |
+                                          InteractiveFlag.pinchZoom |
+                                          InteractiveFlag.doubleTapZoom,
+                                    ),
+                                  ),
+                                  children: [
+                                    TileLayer(
+                                      urlTemplate:
+                                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                      userAgentPackageName: 'com.wtl.dvsavio',
+                                    ),
+                                    MarkerLayer(
+                                      markers: [
+                                        Marker(
+                                          point: venueLatLng,
+                                          width: 44,
+                                          height: 44,
+                                          child: Icon(
+                                            Icons.location_on,
+                                            size: 40,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

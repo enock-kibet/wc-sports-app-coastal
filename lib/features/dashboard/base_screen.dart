@@ -19,10 +19,6 @@ import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/theme.dart';
 
-import 'package:upgrader/upgrader.dart';
-
-import '../../main.dart';
-
 class BaseScreen extends StatefulWidget {
   const BaseScreen({super.key, required this.navigationShell});
   final StatefulNavigationShell navigationShell;
@@ -32,15 +28,14 @@ class BaseScreen extends StatefulWidget {
 }
 
 class _BaseScreenState extends State<BaseScreen> {
-  User currentUser = service<AppPreferencesManager>().currentUserValue!;
-
   @override
   Widget build(BuildContext context) {
+    final currentUser = service<AppPreferencesManager>().currentUserValue;
+    final isGuest = currentUser == null;
+
     return BlocBuilder<SideMenuCubit, GlobalKey<ScaffoldState>>(
       builder: (context, state) {
-        return UpgradeAlert(
-          navigatorKey: router.routerDelegate.navigatorKey,
-          child: Scaffold(
+        return Scaffold(
             key: state,
             drawer: Drawer(
               child: Column(
@@ -73,7 +68,9 @@ class _BaseScreenState extends State<BaseScreen> {
                                       child: BlocBuilder<UserBloc, User?>(
                                           builder: (context, user) {
                                         return CachedNetworkImage(
-                                          imageUrl: user?.picture ?? "",
+                                          imageUrl: user?.picture ??
+                                              currentUser?.picture ??
+                                              "",
                                           errorWidget: (context, url, error) =>
                                               Icon(
                                             Icons.person,
@@ -91,13 +88,13 @@ class _BaseScreenState extends State<BaseScreen> {
                                     height: 12,
                                   ),
                                   Text(
-                                    currentUser.name,
+                                    currentUser?.name ?? "Guest",
                                     style: TextStyle(
                                         color: AppColors.inputFillColor,
                                         fontSize: kMedium,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  Text(currentUser.email,
+                                  Text(currentUser?.email ?? "Sign in to sync",
                                       style: TextStyle(
                                         color: AppColors.inputFillColor,
                                         fontSize: kSMedium,
@@ -144,9 +141,13 @@ class _BaseScreenState extends State<BaseScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                context.pushNamed(
-                                    AppRoute.pointsManagement.name,
-                                    extra: true);
+                                if (isGuest) {
+                                  context.go('/signIn');
+                                } else {
+                                  context.pushNamed(
+                                      AppRoute.pointsManagement.name,
+                                      extra: true);
+                                }
                                 context.pop();
                               },
                               child: RowIconButton(Icons.people, "Membership"),
@@ -158,12 +159,18 @@ class _BaseScreenState extends State<BaseScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      logoutDialog(context);
+                      if (isGuest) {
+                        context.go('/signIn');
+                      } else {
+                        logoutDialog(context);
+                      }
                     },
                     child: Padding(
                       padding: EdgeInsets.symmetric(
                           horizontal: kXLMedium, vertical: kXLMedium),
-                      child: RowIconButton(Icons.logout, "Logout"),
+                      child: RowIconButton(
+                          isGuest ? Icons.login : Icons.logout,
+                          isGuest ? "Sign In" : "Logout"),
                     ),
                   )
                 ],
@@ -254,13 +261,17 @@ class _BaseScreenState extends State<BaseScreen> {
                     label: 'Profile',
                   ),
                 ]),
-          ),
-        );
+          );
       },
     );
   }
 
   void _onTap(int index) {
+    if (service<AppPreferencesManager>().currentUserValue == null &&
+        index == 4) {
+      context.go('/signIn');
+      return;
+    }
     widget.navigationShell.goBranch(
       index,
       initialLocation: index == widget.navigationShell.currentIndex,

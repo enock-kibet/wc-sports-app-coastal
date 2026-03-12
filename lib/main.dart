@@ -23,6 +23,7 @@ import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:upgrader/upgrader.dart';
 
 import 'data/services/service.dart';
+import 'data/services/upgrade_service.dart';
 import 'features/app/blocs/matches/match_bloc.dart';
 import 'features/app/blocs/products/product_bloc.dart';
 import 'router/router.dart';
@@ -104,6 +105,15 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final prefs = AppPreferences();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AndroidInAppUpdates.checkAndUpdate(immediate: true);
+    });
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -141,15 +151,21 @@ class _MyAppState extends State<MyApp> {
             ),
         ),
         BlocProvider<CartBloc>(
-          create: (_) => CartBloc()
-            ..add(
-              CartEvent.getCartItems(
-                request: {
-                  "email":
-                      service<AppPreferencesManager>().currentUserValue!.email,
-                },
-              ),
-            ),
+          create: (_) {
+            final cartBloc = CartBloc();
+            final currentUser =
+                service<AppPreferencesManager>().currentUserValue;
+            if (currentUser?.email != null && currentUser!.email.isNotEmpty) {
+              cartBloc.add(
+                CartEvent.getCartItems(
+                  request: {
+                    "email": currentUser.email,
+                  },
+                ),
+              );
+            }
+            return cartBloc;
+          },
         ),
         BlocProvider<AddressBloc>(
           create: (_) => AddressBloc()
@@ -165,22 +181,28 @@ class _MyAppState extends State<MyApp> {
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
-          return UpgradeAlert(
-            upgrader: Upgrader(
-              debugLogging: true,
-              minAppVersion: '99.0.0',
-              // optional:
-              durationUntilAlertAgain: Duration.zero,
-              // durationUntilAlertAgain: Duration.zero,
-            ),
-            child: MaterialApp.router(
-              scaffoldMessengerKey: SnackbarService.messengerKey,
-              title: 'Sports App',
-              debugShowCheckedModeBanner: false,
-              darkTheme: darkMode,
-              themeMode: themeMode,
-              routerConfig: router,
-            ),
+          return MaterialApp.router(
+            scaffoldMessengerKey: SnackbarService.messengerKey,
+            title: 'DB Savio',
+            debugShowCheckedModeBanner: false,
+            theme: lightMode,
+            darkTheme: darkMode,
+            themeMode: themeMode,
+            routerConfig: router,
+            builder: (context, child) {
+              return UpgradeAlert(
+                navigatorKey: router.routerDelegate.navigatorKey,
+                showIgnore: false,
+                showLater: false,
+                barrierDismissible: false,
+                shouldPopScope: () => false,
+                upgrader: Upgrader(
+                  debugLogging: true,
+                  durationUntilAlertAgain: Duration.zero,
+                ),
+                child: child ?? const SizedBox.shrink(),
+              );
+            },
           );
         },
       ),

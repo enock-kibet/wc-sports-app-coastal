@@ -81,58 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
           padding: const EdgeInsets.only(bottom: kXSmall),
           child: Column(
             children: [
-              Stack(
-                children: [
-                  imageStack(context),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    left: 0,
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.whiteColor,
-                              width: 1.4,
-                            ),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(88),
-                            child: CachedNetworkImage(
-                              imageUrl: currentUser?.picture ?? "",
-                              width: 88,
-                              height: 88,
-                              fit: BoxFit.cover,
-                              errorWidget: (context, url, error) => Icon(
-                                Icons.person,
-                                size: 48,
-                                color: AppColors.defaultAppPurple,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          currentUser?.name ?? "",
-                          style: const TextStyle(
-                            fontSize: kMedium,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        BlocBuilder<PointsBloc, PointsState>(
-                          builder: (context, state) {
-                            return Text(
-                              "${state.balance} points",
-                            );
-                          },
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              _profileTopCard(context, formatWithCommas),
               const SizedBox(height: kMedium),
 
               // Menu Cards
@@ -186,48 +135,121 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Stack imageStack(BuildContext context) {
-    return Stack(
-      children: [
-        Column(
+  Widget _profileTopCard(
+    BuildContext context,
+    String Function(num value) formatWithCommas,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(kSmall, kSmall, kSmall, 0),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(28),
+        ),
+        child: Column(
           children: [
-            Image.asset(
-              "assets/images/Rectangle2.png",
-              fit: BoxFit.cover,
-              height: 200,
-              width: context.width,
+            Container(
+              height: 122,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFFF1A8C),
+                    Color(0xFFF25CA2),
+                    Color(0xFF45E0D1),
+                  ],
+                ),
+              ),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(kMedium),
+                    child: GestureDetector(
+                      onTap: () => context.go('/home'),
+                      child: Container(
+                        padding: const EdgeInsets.all(kSmall),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.22),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          LucideIcons.arrowLeft,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            SizedBox(
-              height: 80,
-            )
+            Transform.translate(
+              offset: const Offset(0, -42),
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.whiteColor,
+                        width: 2,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(44),
+                      child: CachedNetworkImage(
+                        imageUrl: currentUser.picture ?? "",
+                        width: 88,
+                        height: 88,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Icon(
+                          Icons.person,
+                          size: 48,
+                          color: AppColors.defaultAppPurple,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    currentUser.name,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.4,
+                    ),
+                  ),
+                  BlocBuilder<PointsBloc, PointsState>(
+                    builder: (context, state) {
+                      final balance = int.tryParse(state.balance) ?? 0;
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
+                      return Text(
+                        "${formatWithCommas(balance)} Points",
+                        style: TextStyle(
+                          color: isDark
+                              ? Colors.white70
+                              : Colors.black.withOpacity(0.55),
+                          fontSize: kMedium,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
           ],
         ),
-        Positioned(
-          top: kSmall,
-          left: kMedium,
-          child: SafeArea(
-            child: GestureDetector(
-              onTap: () {
-                context.pop();
-              },
-              child: Container(
-                  padding: const EdgeInsets.all(kSmall),
-                  decoration: BoxDecoration(
-                      color: AppColors.whiteColor.withOpacity(0.3),
-                      shape: BoxShape.circle),
-                  child: GestureDetector(
-                    onTap: () {
-                      context.go('/home');
-                    },
-                    child: Icon(
-                      LucideIcons.arrowLeft,
-                      color: AppColors.whiteColor,
-                    ),
-                  )),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

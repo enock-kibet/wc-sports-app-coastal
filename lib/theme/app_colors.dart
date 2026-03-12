@@ -12,7 +12,7 @@ class AppColors {
   static Color scaffoldBackground = const Color(0xFFF7F6F9);
   static Color darkColor = const Color(0xFF333333);
   static Color whiteColor = const Color(0xFFFFFFFF);
-  static Color greenColor = const Color(0xFF00AD8F);
+  static Color greenColor = const Color(0xFF22BB33);
   static Color dangerColor = Colors.red;
   static Color warningColor = Colors.orange;
   static Color hintTextColor = const Color(0xFF4D4D4D);

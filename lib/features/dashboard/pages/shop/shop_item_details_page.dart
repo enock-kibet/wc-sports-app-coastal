@@ -47,15 +47,11 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
             );
             //AnimatedOverlaySnackbar.show(context, "Success: ${state.authorizationUrl??"didn't get"}",color:const Color(0xff2E7D32));
           } else if (state.status == ProductStatus.failure) {
-            SnackbarService.show(
+            SnackbarService.showError(
               "failed: ${state.failure?.error ?? "failed"}",
-              backgroundColor: AppColors.dangerColor,
             );
           } else if (state.status == ProductStatus.success) {
-            SnackbarService.show(
-              'Added to cart successfully',
-              backgroundColor: AppColors.blackColor,
-            );
+            SnackbarService.showSuccess('Added to cart successfully');
           }
         },
         builder: (context, state) {
@@ -101,6 +97,14 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                       );
                                     }
                                   : () async {
+                                      final currentUser = service<
+                                              AppPreferencesManager>()
+                                          .currentUserValue;
+                                      if (currentUser == null) {
+                                        context.go('/signIn');
+                                        return;
+                                      }
+
                                       // value.$2 is Map<String, int> of sizes and quantities
                                       final sizeCounts = value.$2;
 
@@ -168,6 +172,16 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                       );
                                     }
                                   : () async {
+                                      final currentUser = service<
+                                              AppPreferencesManager>()
+                                          .currentUserValue;
+                                      final userEmail = currentUser?.email;
+                                      if (userEmail == null ||
+                                          userEmail.isEmpty) {
+                                        context.go('/signIn');
+                                        return;
+                                      }
+
                                       showShopBottomSheet(
                                         context,
                                         value,
@@ -177,10 +191,7 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                                 ProductEvent.buyProducts(
                                                     request: {
                                                       "amount": value.$1,
-                                                      "email": service<
-                                                              AppPreferencesManager>()
-                                                          .currentUserValue!
-                                                          .email,
+                                                      "email": userEmail,
                                                       "productID":
                                                           widget.product.id,
                                                       "category": ""

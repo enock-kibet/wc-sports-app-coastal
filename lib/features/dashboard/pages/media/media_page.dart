@@ -5,14 +5,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/buildcontext.dart';
-import 'package:sports_app/data/models/user/user.dart';
-import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/media/media_bloc.dart';
 import 'package:sports_app/features/app/blocs/stripe/stripe_bloc.dart';
 import 'package:sports_app/features/app/side_menu_cubit.dart';
-import 'package:sports_app/features/dashboard/pages/media/widget/recent_highlights_list.dart';
 import 'package:sports_app/features/dashboard/pages/media/widget/season_highlights_list.dart';
-import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/theme/app_colors.dart';
 
 import '../../../../router/router.dart';
@@ -29,8 +25,6 @@ class _MediaPageState extends State<MediaPage> {
   late TextEditingController searchText;
   late VoidCallback _focusListener;
   final FocusNode _focusNode = FocusNode();
-
-  User currentUser = service<AppPreferencesManager>().currentUserValue!;
 
   @override
   void initState() {
@@ -89,7 +83,12 @@ class _MediaPageState extends State<MediaPage> {
                                   child: CircularProgressIndicator());
 
                             case MediaStatus.failure:
-                              return Center(child: Text(state.failure!.error));
+                              return Center(
+                                child: Text(
+                                  state.failure?.error ??
+                                      "Unable to load media right now.",
+                                ),
+                              );
 
                             case MediaStatus.success:
                               if (state.media.isEmpty) {

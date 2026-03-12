@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sports_app/theme/app_colors.dart';
 
 class SnackbarService {
   static final GlobalKey<ScaffoldMessengerState> messengerKey =
@@ -36,6 +37,36 @@ class SnackbarService {
               )
             : null,
       ),
+    );
+  }
+
+  static void showSuccess(
+    String message, {
+    int seconds = 3,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    show(
+      message,
+      backgroundColor: AppColors.greenColor,
+      seconds: seconds,
+      actionLabel: actionLabel,
+      onAction: onAction,
+    );
+  }
+
+  static void showError(
+    String message, {
+    int seconds = 3,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    show(
+      message,
+      backgroundColor: AppColors.dangerColor,
+      seconds: seconds,
+      actionLabel: actionLabel,
+      onAction: onAction,
     );
   }
 

@@ -7,6 +7,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:sports_app/common/custom_text_form_field.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/huge_icon_button.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
@@ -68,17 +69,13 @@ class _EditProfileMainState extends State<EditProfileMain> {
         if (state.status == AuthStatus.success &&
             state.data is String &&
             context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.data as String)),
-          );
+          SnackbarService.showSuccess(state.data as String);
         }
 
         if (state.status == AuthStatus.failure &&
             state.failure != null &&
             context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.failure!.error)),
-          );
+          SnackbarService.showError(state.failure!.error);
         }
       },
       child: Scaffold(

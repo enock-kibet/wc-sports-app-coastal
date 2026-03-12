@@ -65,9 +65,11 @@ Widget build(BuildContext context) {
                         return MatchCard(
                           match: matches[index].recap,
                           homeTeam: matches[index].teamOne,
+                          homePic: matches[index].recap?.clubOne.pic,
                           homeAbbr: "AP",
                           homeColor: Colors.indigo,
                           awayTeam: matches[index].teamTwo,
+                          awayPic: matches[index].recap?.clubTwo.pic,
                           awayAbbr: "M",
                           awayColor: Colors.black87,
                           homeScore: matches[index].teamOneScore,

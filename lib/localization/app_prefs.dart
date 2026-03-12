@@ -8,6 +8,7 @@ import '../data/services/service.dart';
 class AppPreferences {
   SharedPreferencesAsync get asyncPrefs => SharedPreferencesAsync();
   static const _keyThemeMode = 'theme_mode';
+  static const _keySkippedLogin = 'skipped_login';
 
   /// Store data whether the app is running for the first time
   Future<void> storeFirstTimeRun(bool isFirstTime) async {
@@ -17,6 +18,14 @@ class AppPreferences {
   /// Get data whether the app is running for the first time
   Future<bool> getFirstTimeRun() async {
     return await asyncPrefs.getBool("firstTimeRun") ?? true;
+  }
+
+  Future<void> setSkippedLogin(bool skipped) async {
+    await asyncPrefs.setBool(_keySkippedLogin, skipped);
+  }
+
+  Future<bool> getSkippedLogin() async {
+    return await asyncPrefs.getBool(_keySkippedLogin) ?? false;
   }
 
   /// Store User data in shared preferences

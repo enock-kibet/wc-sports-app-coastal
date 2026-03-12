@@ -397,27 +397,56 @@ final router = GoRouter(
   refreshListenable:
       StreamToListenable([service<AppPreferencesManager>().stream]),
   redirect: (context, state) {
-    AuthenticationStatus authenticationStatus =
-        service<AppPreferencesManager>().currentAuthStateValue;
+    final appPrefs = service<AppPreferencesManager>();
+    final AuthenticationStatus authenticationStatus =
+        appPrefs.currentAuthStateValue;
+    final hasSkippedLogin = appPrefs.hasSkippedLogin;
+    final location = state.matchedLocation;
+    final isPublicRoute = location == "/home" ||
+        location.startsWith("/home/") ||
+        location == "/schedule" ||
+        location.startsWith("/schedule/") ||
+        location == "/shop" ||
+        location.startsWith("/shop/") ||
+        location == "/team" ||
+        location.startsWith("/team/") ||
+        location == "/media" ||
+        location.startsWith("/media/") ||
+        location == "/standing" ||
+        location.startsWith("/standing/") ||
+        location == "/game-recap";
+    final isAuthRoute = location == "/signIn" || location == "/signUp";
+    final isProtectedRoute = location == "/otp" ||
+        location.startsWith("/profile") ||
+        location.startsWith("/notifications");
+
     debugPrint(state.matchedLocation);
     if (authenticationStatus == AuthenticationStatus.firstTime) {
-      return "/onboarding";
+      if (location == "/splash" ||
+          location == "/onboarding" ||
+          isPublicRoute ||
+          isAuthRoute) {
+        return null;
+      }
+      if (isProtectedRoute) return "/signIn";
+      return "/home";
     }
-    if (authenticationStatus == AuthenticationStatus.notAuthenticated &&
-        state.matchedLocation != "/signUp") {
-      return "/signIn";
-    }
-    if (authenticationStatus == AuthenticationStatus.notAuthenticated &&
-        state.matchedLocation == "/signUp") {
-      return "/signUp";
+    if (authenticationStatus == AuthenticationStatus.notAuthenticated) {
+      if (location == "/splash") return hasSkippedLogin ? "/home" : "/signIn";
+      if (isProtectedRoute) return "/signIn";
+      if (hasSkippedLogin && (isPublicRoute || isAuthRoute)) return null;
+      if (!hasSkippedLogin && isAuthRoute) return null;
+      return hasSkippedLogin ? "/home" : "/signIn";
     }
     if (authenticationStatus == AuthenticationStatus.notVerified) {
       return "/otp";
     }
     if (authenticationStatus == AuthenticationStatus.verified &&
-        (state.matchedLocation == "/signUp" ||
-            state.matchedLocation == "/signIn" ||
-            state.matchedLocation == "/otp")) {
+        (location == "/signUp" ||
+            location == "/signIn" ||
+            location == "/otp" ||
+            location == "/onboarding" ||
+            location == "/splash")) {
       return "/home";
     }
     return null;

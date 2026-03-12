@@ -14,6 +14,7 @@ import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
+import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/main.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:upgrader/upgrader.dart';
@@ -64,7 +65,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
 
             SnackbarService.show(
               'Login Successful',
-              backgroundColor: AppColors.dangerColor,
+              backgroundColor: AppColors.greenColor,
             );
           }
           if (state.status == AuthStatus.failure) {
@@ -72,9 +73,8 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
             service<Talker>().error(state.failure!.error);
             await GoogleSignIn(scopes: ['profile', 'email']).signOut();
             //show snackbar
-            SnackbarService.show(
+            SnackbarService.showError(
               state.failure!.error,
-              backgroundColor: AppColors.dangerColor,
               actionLabel: 'Dismiss',
             );
           }
@@ -157,23 +157,28 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                           });
                         }),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Row(
-                          children: [
-                            // Checkbox(value: false, onChanged: (onChanged) {}),
-                            // const Text(
-                            //   'Remember Me',
-                            //   style: TextStyle(fontSize: kSMedium),
-                            // )
-                          ],
+                        TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            "Forgot Password",
+                            style: TextStyle(fontSize: kSMedium),
+                          ),
                         ),
                         TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              "Forgot Password",
-                              style: TextStyle(fontSize: kSMedium),
-                            ))
+                          onPressed: () async {
+                            await service<AppPreferencesManager>()
+                                .setSkippedLogin(true);
+                            if (context.mounted) {
+                              context.go('/home');
+                            }
+                          },
+                          child: const Text(
+                            "Skip Login",
+                            style: TextStyle(fontSize: kSMedium),
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(
@@ -486,10 +491,23 @@ CustomOutlinedButton(String buttonText) {
 }
 
 LoginSignUpSwitch(BuildContext context, bool isSignInPage) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final trackColor =
+      isDark ? const Color(0xFFECE8E6) : const Color(0xFFF0F0F0);
+  final activeColor =
+      isDark ? const Color(0xFF6B6664) : const Color(0xFF656060);
+  final inactiveColor = trackColor;
+  final activeTextColor =
+      isDark ? const Color(0xFFF6F3F2) : AppColors.inputFillColor;
+  final inactiveTextColor =
+      isDark ? const Color(0xFF56504D) : const Color(0xFF292323);
+
   return Container(
-    padding: EdgeInsets.all(6),
+    padding: const EdgeInsets.all(6),
     decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(kLarge), color: Color(0xFFF0F0F0)),
+      borderRadius: BorderRadius.circular(kLarge),
+      color: trackColor,
+    ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -503,16 +521,16 @@ LoginSignUpSwitch(BuildContext context, bool isSignInPage) {
             height: 32,
             width: 101,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(kLarge),
-                color: isSignInPage ? Color(0xFF656060) : Color(0xFFF0F0F0)),
+              borderRadius: BorderRadius.circular(kLarge),
+              color: isSignInPage ? activeColor : inactiveColor,
+            ),
             child: Text(
               "Login",
               style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.normal,
-                  color: isSignInPage
-                      ? AppColors.inputFillColor
-                      : Color(0xFF292323)),
+                fontSize: 13,
+                fontWeight: FontWeight.normal,
+                color: isSignInPage ? activeTextColor : inactiveTextColor,
+              ),
             ),
           ),
         ),
@@ -525,16 +543,16 @@ LoginSignUpSwitch(BuildContext context, bool isSignInPage) {
             height: 34,
             width: 101,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(kLarge),
-                color: isSignInPage ? Color(0xFFF0F0F0) : Color(0xFF656060)),
+              borderRadius: BorderRadius.circular(kLarge),
+              color: isSignInPage ? inactiveColor : activeColor,
+            ),
             child: Text(
               "Sign Up",
               style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.normal,
-                  color: isSignInPage
-                      ? Color(0xFF292323)
-                      : AppColors.inputFillColor),
+                fontSize: 13,
+                fontWeight: FontWeight.normal,
+                color: isSignInPage ? inactiveTextColor : activeTextColor,
+              ),
             ),
           ),
         )

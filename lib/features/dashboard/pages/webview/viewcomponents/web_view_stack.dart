@@ -49,10 +49,7 @@ class _WebViewStackState extends State<WebViewStack>
           //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Successful Purchase")));
           //AnimatedOverlaySnackbar.show(context, "Successfull Purchase",color:Colors.green);
 
-          SnackbarService.show(
-            'Payment Successful',
-            backgroundColor: AppColors.blackColor,
-          );
+          SnackbarService.showSuccess('Payment Successful');
           return NavigationDecision.prevent;
         }
         return NavigationDecision.navigate;

@@ -21,16 +21,12 @@ void showTransferPointsBottomSheet(BuildContext context, String userPoints) {
         listener: (context, state) {
           if (state.status == PointsStatus.success) {
             Navigator.of(context).pop();
-            SnackbarService.show(
-              'Points transferred successfully',
-              backgroundColor: AppColors.blackColor,
-            );
+            SnackbarService.showSuccess('Points transferred successfully');
           }
           if (state.status == PointsStatus.failure) {
             Navigator.of(context).pop();
-            SnackbarService.show(
+            SnackbarService.showError(
               'Something went wrong. Please try again later',
-              backgroundColor: AppColors.dangerColor,
             );
           }
         },

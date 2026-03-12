@@ -11,6 +11,7 @@ import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/buildcontext.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/matches/match_bloc.dart';
+import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/theme/app_colors.dart';
 import 'package:sports_app/theme/theme.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -56,6 +57,18 @@ class _SchedulePageState extends State<SchedulePage> {
   bool _isUpcoming(DateTime d) {
     final local = d.toLocal();
     return !local.isBefore(_startOfToday());
+  }
+
+  void _handleBuyTicketTap(MatchType match) {
+    final isGuest = service<AppPreferencesManager>().currentUserValue == null;
+    if (isGuest) {
+      context.go('/signIn');
+      return;
+    }
+    context.pushNamed(
+      AppRoute.matchDetails.name,
+      extra: match,
+    );
   }
 
   @override
@@ -145,28 +158,24 @@ class _SchedulePageState extends State<SchedulePage> {
                               titleCentered: true,
                               leftChevronIcon: Icon(
                                 Icons.chevron_left,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                               rightChevronIcon: Icon(
                                 Icons.chevron_right,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                               titleTextStyle: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
                                   .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                             ),
                             calendarStyle: CalendarStyle(
                               outsideDaysVisible: false,
                               selectedDecoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).colorScheme.primary,
+                                color: Theme.of(context).colorScheme.primary,
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(4),
                               ),
@@ -180,12 +189,10 @@ class _SchedulePageState extends State<SchedulePage> {
                             ),
                             daysOfWeekStyle: DaysOfWeekStyle(
                               weekdayStyle: TextStyle(
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                               weekendStyle: TextStyle(
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             calendarBuilders: CalendarBuilders(
@@ -206,8 +213,7 @@ class _SchedulePageState extends State<SchedulePage> {
                                       color: match.matchVenue.contains("Home")
                                           ? Colors.yellow[700]
                                           : const Color(0xFFD50B36),
-                                      borderRadius:
-                                          BorderRadius.circular(4),
+                                      borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.all(4.0),
@@ -247,8 +253,7 @@ class _SchedulePageState extends State<SchedulePage> {
                                 return Container(
                                   margin: const EdgeInsets.all(2),
                                   decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.black26),
+                                    border: Border.all(color: Colors.black26),
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                   child: Align(
@@ -279,7 +284,8 @@ class _SchedulePageState extends State<SchedulePage> {
                                     );
                               } else {
                                 context.read<MatchBloc>().add(
-                                      MatchEvent.monthMatches(month: focusedDay),
+                                      MatchEvent.monthMatches(
+                                          month: focusedDay),
                                     );
                               }
                             },
@@ -294,8 +300,7 @@ class _SchedulePageState extends State<SchedulePage> {
                 BlocBuilder<MatchBloc, MatchState>(
                   builder: (context, state) {
                     if (state.status == MatchStatus.loading) {
-                      return const Center(
-                          child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     }
                     if (state.status == MatchStatus.failure) {
                       service<Talker>().error(state.failure!.error);
@@ -303,220 +308,237 @@ class _SchedulePageState extends State<SchedulePage> {
                     }
 
                     if (state.status == MatchStatus.success) {
-  List<MatchType> matchesToShow;
+                      List<MatchType> matchesToShow;
 
-  if (_selectedDay == null) {
-    final isCurrentMonth = _focusedDay.month == DateTime.now().month &&
-        _focusedDay.year == DateTime.now().year;
+                      if (_selectedDay == null) {
+                        final isCurrentMonth =
+                            _focusedDay.month == DateTime.now().month &&
+                                _focusedDay.year == DateTime.now().year;
 
-    if (state.monthMatches.isEmpty) {
-      if (isCurrentMonth && !_usedFutureFallback) {
-        // Fallback (raw matches)
-        matchesToShow = state.matches;
-        _usedFutureFallback = true;
-      } else {
-        matchesToShow = [];
-      }
-    } else {
-      // monthMatches should be ALL month matches (past + future) for calendar markers
-      matchesToShow = state.monthMatches;
-    }
-  } else {
-    // Day view -> show all matches for that day (past allowed)
-    matchesToShow = state.datedMatches;
-  }
+                        if (state.monthMatches.isEmpty) {
+                          if (isCurrentMonth && !_usedFutureFallback) {
+                            // Fallback (raw matches)
+                            matchesToShow = state.matches;
+                            _usedFutureFallback = true;
+                          } else {
+                            matchesToShow = [];
+                          }
+                        } else {
+                          // monthMatches should be ALL month matches (past + future) for calendar markers
+                          matchesToShow = state.monthMatches;
+                        }
+                      } else {
+                        // Day view -> show all matches for that day (past allowed)
+                        matchesToShow = state.datedMatches;
+                      }
 
-  // ✅ LIST FILTER RULE:
-  // - No selected day => Upcoming only
-  // - Selected day => Show all (past allowed)
-  // final listMatches = (_selectedDay == null)
-  //     ? matchesToShow.where((m) => _isUpcoming(m.matchDate)).toList()
-  //     : List<MatchType>.from(matchesToShow);
+                      // ✅ LIST FILTER RULE:
+                      // - No selected day => Upcoming only
+                      // - Selected day => Show all (past allowed)
+                      // final listMatches = (_selectedDay == null)
+                      //     ? matchesToShow.where((m) => _isUpcoming(m.matchDate)).toList()
+                      //     : List<MatchType>.from(matchesToShow);
 
-      final listMatches = (_selectedDay == null)
-    // ✅ Month view: show ALL matches for that month (past + future)
-    ? List<MatchType>.from(matchesToShow)
-    // ✅ Day view: show ALL matches for that day (past + future)
-    : List<MatchType>.from(matchesToShow);
+                      final listMatches = (_selectedDay == null)
+                          // ✅ Month view: show ALL matches for that month (past + future)
+                          ? List<MatchType>.from(matchesToShow)
+                          // ✅ Day view: show ALL matches for that day (past + future)
+                          : List<MatchType>.from(matchesToShow);
 
-  listMatches.sort((a, b) => a.matchDate.compareTo(b.matchDate));
+                      listMatches
+                          .sort((a, b) => a.matchDate.compareTo(b.matchDate));
 
-  String title;
+                      String title;
 
-final now = DateTime.now();
-final isPastMonth = _focusedDay.year < now.year ||
-    (_focusedDay.year == now.year && _focusedDay.month < now.month);
+                      final now = DateTime.now();
+                      final isPastMonth = _focusedDay.year < now.year ||
+                          (_focusedDay.year == now.year &&
+                              _focusedDay.month < now.month);
 
+                      if (_selectedDay != null) {
+                        title = "Matches";
+                      } else if (isPastMonth) {
+                        title = "Matches";
+                      } else {
+                        title = "Upcoming Matches";
+                      }
 
-  if (_selectedDay != null) {
-  title = "Matches";
-} else if (isPastMonth) {
-  title = "Matches";
-} else {
-  title = "Upcoming Matches";
-}
+                      if (listMatches.isEmpty) {
+                        final message = _selectedDay == null
+                            ? "No upcoming schedules found for this month"
+                            : "No schedules found for this date";
 
-  if (listMatches.isEmpty) {
-    final message = _selectedDay == null
-        ? "No upcoming schedules found for this month"
-        : "No schedules found for this date";
-
-    return Padding(
-      padding: const EdgeInsets.all(kLarge),
-      child: Text(
-        message,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  return Expanded(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Text(
-            title,
-            style: const TextStyle(color: Colors.white),
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            padding: EdgeInsets.zero,
-            shrinkWrap: true,
-            itemCount: listMatches.length,
-            itemBuilder: (context, index) {
-              final match = listMatches[index];
-
-              return Container(
-                margin: const EdgeInsets.symmetric(
-                    horizontal: kSmall, vertical: kSmall),
-                padding: const EdgeInsets.all(kMedium),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(kMedium),
-                  color: Theme.of(context).colorScheme.surface,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      match.matchName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: kSmall),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: kSMedium),
-                        const SizedBox(width: kXSmall),
-                        Text(
-                          match.matchVenue,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: kMedium),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(kSmall),
-                          decoration: BoxDecoration(
-                            color: AppColors.greyColor.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(kMedium),
-                          ),
+                        return Padding(
+                          padding: const EdgeInsets.all(kLarge),
                           child: Text(
-                            getStringDate(match.matchDate),
-                            style: context.textTheme.bodySmall
-                                ?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        Text(
-                          "Ksh ${match.matchPrice}",
-                          style: context.textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: kLarge),
-
-                    // ✅ Buttons:
-                    // - In month view: only show for upcoming matches
-                    // - In day view: still only show for upcoming matches
-                    if (_isUpcoming(match.matchDate))
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              context.pushNamed(
-                                AppRoute.matchDetails.name,
-                                extra: match,
-                              );
-                            },
-                            icon: Icon(
-                              LucideIcons.bookmark,
-                              color: AppColors.purpleColor,
+                            message,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
-                          const SizedBox(width: kLarge * 3),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                context.pushNamed(
-                                  AppRoute.matchDetails.name,
-                                  extra: match,
-                                );
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                alignment: Alignment.center,
-                                height: 50,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: kMedium,
-                                  vertical: kXSmall,
-                                ),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      AppColors.pinkColor,
-                                      AppColors.purpleColor,
-                                    ],
-                                  ),
-                                  borderRadius:
-                                      BorderRadius.circular(kMedium),
-                                ),
-                                child: Text(
-                                  "Buy Ticket",
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
-                                  ),
-                                ),
+                        );
+                      }
+
+                      return Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: Text(
+                                title,
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    ),
-  );
-}
+                            Expanded(
+                              child: ListView.builder(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                itemCount: listMatches.length,
+                                itemBuilder: (context, index) {
+                                  final match = listMatches[index];
+
+                                  return Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: kSmall, vertical: kSmall),
+                                    padding: const EdgeInsets.all(kMedium),
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.circular(kMedium),
+                                      color:
+                                          Theme.of(context).colorScheme.surface,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          match.matchName,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: kSmall),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.location_on,
+                                                size: kSMedium),
+                                            const SizedBox(width: kXSmall),
+                                            Text(
+                                              match.matchVenue,
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w300,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: kMedium),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.all(kSmall),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.greyColor
+                                                    .withOpacity(0.3),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        kMedium),
+                                              ),
+                                              child: Text(
+                                                getStringDate(match.matchDate),
+                                                style: context
+                                                    .textTheme.bodySmall
+                                                    ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w700),
+                                              ),
+                                            ),
+                                            Text(
+                                              "Ksh ${match.matchPrice}",
+                                              style: context
+                                                  .textTheme.titleLarge
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: kLarge),
+
+                                        // ✅ Buttons:
+                                        // - In month view: only show for upcoming matches
+                                        // - In day view: still only show for upcoming matches
+                                        if (_isUpcoming(match.matchDate))
+                                          Row(
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  // context.pushNamed(
+                                                  //   AppRoute.matchDetails.name,
+                                                  //   extra: match,
+                                                  // );
+                                                },
+                                                icon: Icon(
+                                                  LucideIcons.bookmark,
+                                                  color: AppColors.purpleColor,
+                                                ),
+                                              ),
+                                              const SizedBox(width: kLarge * 3),
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    _handleBuyTicketTap(match);
+                                                  },
+                                                  child: Container(
+                                                    width: double.infinity,
+                                                    alignment: Alignment.center,
+                                                    height: 50,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                      horizontal: kMedium,
+                                                      vertical: kXSmall,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        colors: [
+                                                          AppColors.pinkColor,
+                                                          AppColors.purpleColor,
+                                                        ],
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              kMedium),
+                                                    ),
+                                                    child: Text(
+                                                      "Buy Ticket",
+                                                      style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurface,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
 
                     return const SizedBox.shrink();
                   },

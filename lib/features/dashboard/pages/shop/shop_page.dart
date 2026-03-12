@@ -16,7 +16,6 @@ import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/addresses/pickupaddress.dart';
 import 'package:sports_app/data/models/products/cart.dart';
 import 'package:sports_app/data/models/products/product.dart';
-import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/products/cart_bloc.dart';
@@ -57,8 +56,6 @@ class ShopPage extends StatefulWidget {
 }
 
 class _ShopPageState extends State<ShopPage> {
-  User currentUser = service<AppPreferencesManager>().currentUserValue!;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,7 +128,9 @@ class _ShopPageState extends State<ShopPage> {
               ));
             case ProductStatus.failure:
               return Center(
-                child: Text(state.failure!.error),
+                child: Text(
+                  state.failure?.error ?? "Unable to load shop items right now.",
+                ),
               );
             case ProductStatus.loading:
               return const Center(
@@ -178,6 +177,7 @@ class _ShopPageState extends State<ShopPage> {
   }
 
   Row headerSection() {
+    final currentUser = service<AppPreferencesManager>().currentUserValue;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -198,7 +198,7 @@ class _ShopPageState extends State<ShopPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Hi ${truncateText(currentUser.name, limit: 16)}",
+            Text("Hi ${truncateText(currentUser?.name ?? 'Guest', limit: 16)}",
                 style: TextStyle(
                     color: AppColors.whiteColor,
                     fontSize: 20,

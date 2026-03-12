@@ -6,16 +6,12 @@ import 'package:sports_app/data/models/stats/stat.dart';
 
 import 'package:sports_app/data/services/service.dart';
 
-import '../../../../localization/app_prefs_manager.dart';
-
 part 'media_event.dart';
 part 'media_state.dart';
 part 'media_bloc.freezed.dart';
 
 class MediaBloc extends Bloc<MediaEvent, MediaState> {
   late MediaService _mediaService;
-
-  final token = service<AppPreferencesManager>().currentUserValue!.token;
 
   MediaBloc() : super(const MediaState()) {
     _mediaService = service<MediaService>();

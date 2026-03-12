@@ -20,7 +20,15 @@ class ScheduledTiles extends StatelessWidget {
     final secondaryTextColor = colorScheme.onSurface.withOpacity(0.7);
 
     return GestureDetector(
-      onTap: () => context.pushNamed(AppRoute.matchDetails.name, extra: match),
+      onTap: () {
+        final isGuest = service<AppPreferencesManager>().currentUserValue ==
+            null;
+        if (isGuest) {
+          context.go('/signIn');
+          return;
+        }
+        context.pushNamed(AppRoute.matchDetails.name, extra: match);
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(8),

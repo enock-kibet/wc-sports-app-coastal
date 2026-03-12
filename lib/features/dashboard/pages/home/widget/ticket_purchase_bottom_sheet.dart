@@ -7,8 +7,6 @@ void showTicketBottomSheet(
   required MatchType match,
   required PointsState pointsState,
 }) {
-  final pointsState = context.read<PointsBloc>().state;
-
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,

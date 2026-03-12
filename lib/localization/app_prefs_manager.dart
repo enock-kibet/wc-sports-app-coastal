@@ -25,11 +25,13 @@ class AppPreferencesManager {
   // Example cached data
   late User? _currentUser;
   late AuthenticationStatus _status;
+  bool _hasSkippedLogin = false;
 
   Future<void> init() async {
     bool firstTimerun;
     _prefs = AppPreferences();
     firstTimerun = await _prefs.getFirstTimeRun();
+    _hasSkippedLogin = await _prefs.getSkippedLogin();
 
     // Load and cache data from SharedPreferences
     _currentUser = await _prefs.getUserData();
@@ -58,10 +60,13 @@ class AppPreferencesManager {
   // Synchronous access
   User? get currentUserValue => _currentUser;
   AuthenticationStatus get currentAuthStateValue => _status;
+  bool get hasSkippedLogin => _hasSkippedLogin;
 
   // Save a value and update the cache
   Future<void> saveValue(User user) async {
     await _prefs.storeUserData(user);
+    await _prefs.storeFirstTimeRun(false);
+    await _prefs.setSkippedLogin(false);
 
     // Decode JWT expiry (if token exists)
     if (user.token != null && user.token!.isNotEmpty) {
@@ -75,6 +80,7 @@ class AppPreferencesManager {
     }
 
     _currentUser = await _prefs.getUserData(); // Update the cache
+    _hasSkippedLogin = await _prefs.getSkippedLogin();
     _status = _verificationStatus(_currentUser);
     _controller.add(_status);
   }
@@ -108,6 +114,17 @@ class AppPreferencesManager {
 
   Future<void> clearFirstTime() async {
     await _prefs.storeFirstTimeRun(false);
+    _currentUser = await _prefs.getUserData();
+    _status = _verificationStatus(_currentUser);
+    _controller.add(_status);
+  }
+
+  Future<void> setSkippedLogin(bool skipped) async {
+    await _prefs.setSkippedLogin(skipped);
+    if (skipped) {
+      await _prefs.storeFirstTimeRun(false);
+    }
+    _hasSkippedLogin = await _prefs.getSkippedLogin();
     _currentUser = await _prefs.getUserData();
     _status = _verificationStatus(_currentUser);
     _controller.add(_status);

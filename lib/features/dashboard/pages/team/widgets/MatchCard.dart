@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_app/data/models/match/match-recarp.dart';
 import 'package:sports_app/features/dashboard/pages/team/game-recarp.dart';
@@ -7,6 +8,8 @@ class MatchCard extends StatelessWidget {
 
   final String homeTeam;
   final String awayTeam;
+  final String? homePic;
+  final String? awayPic;
   final String homeAbbr;
   final String awayAbbr;
   final Color homeColor;
@@ -20,6 +23,8 @@ class MatchCard extends StatelessWidget {
     required this.match, // 👈 add this
     required this.homeTeam,
     required this.awayTeam,
+    this.homePic,
+    this.awayPic,
     required this.homeAbbr,
     required this.awayAbbr,
     required this.homeColor,
@@ -82,7 +87,13 @@ class MatchCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _teamInfo(abbreviationFromName(homeTeam), homeTeam, homeColor, homeScore ?? ""),
+                _teamInfo(
+                  abbr: abbreviationFromName(homeTeam),
+                  name: homeTeam,
+                  color: homeColor,
+                  score: homeScore ?? "",
+                  pic: homePic,
+                ),
                 Column(
                   children: [
                     const Text("Final",
@@ -96,7 +107,13 @@ class MatchCard extends StatelessWidget {
                             const TextStyle(fontSize: 10, color: Colors.grey)),
                   ],
                 ),
-                _teamInfo(abbreviationFromName(awayTeam), awayTeam, awayColor, awayScore ?? ""),
+                _teamInfo(
+                  abbr: abbreviationFromName(awayTeam),
+                  name: awayTeam,
+                  color: awayColor,
+                  score: awayScore ?? "",
+                  pic: awayPic,
+                ),
               ],
             ),
           ),
@@ -105,19 +122,31 @@ class MatchCard extends StatelessWidget {
     );
   }
 
-  Widget _teamInfo(String abbr, String name, Color color, String score) {
+  Widget _teamInfo({
+    required String abbr,
+    required String name,
+    required Color color,
+    required String score,
+    String? pic,
+  }) {
+    final hasPic = pic != null && pic.isNotEmpty;
+
     return Column(
       children: [
         CircleAvatar(
+          radius: 20,
           backgroundColor: color,
-          child: Text(
-            abbr,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 11,
-            ),
-          ),
+          child: hasPic
+              ? ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: pic,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) => _abbrText(abbr),
+                  ),
+                )
+              : _abbrText(abbr),
         ),
         const SizedBox(height: 6),
         SizedBox(
@@ -137,6 +166,17 @@ class MatchCard extends StatelessWidget {
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ],
+    );
+  }
+
+  Widget _abbrText(String abbr) {
+    return Text(
+      abbr,
+      style: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        fontSize: 11,
+      ),
     );
   }
 }

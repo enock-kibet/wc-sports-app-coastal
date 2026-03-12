@@ -8,6 +8,7 @@ import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
 import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../common/dimens.dart';
@@ -52,38 +53,16 @@ class _OtpPageState extends State<OtpPage> {
                 message = state.data;
               }
               service<Talker>().info(message);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(message),
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  behavior: SnackBarBehavior.floating,
-                  duration: const Duration(seconds: 3),
-                  action: SnackBarAction(
-                    label: 'Dismiss',
-                    textColor: Theme.of(context).colorScheme.onSurface,
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    },
-                  ),
-                ),
+              SnackbarService.showSuccess(
+                message,
+                actionLabel: 'Dismiss',
               );
             }
             if (state.status == AuthStatus.failure) {
               service<Talker>().error(state.failure!.error);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.failure!.error),
-                  backgroundColor: AppColors.dangerColor,
-                  behavior: SnackBarBehavior.floating,
-                  duration: const Duration(seconds: 3),
-                  action: SnackBarAction(
-                    label: 'Dismiss',
-                    textColor: AppColors.whiteColor,
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    },
-                  ),
-                ),
+              SnackbarService.showError(
+                state.failure!.error,
+                actionLabel: 'Dismiss',
               );
             }
           },
