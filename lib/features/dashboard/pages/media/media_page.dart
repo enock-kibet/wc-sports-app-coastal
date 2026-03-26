@@ -133,6 +133,16 @@ class _MediaPageState extends State<MediaPage> {
   }
 
   Row headerSection(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final chipColor =
+        isDark ? AppColors.whiteColor.withValues(alpha: 0.3) : Colors.white;
+    final iconColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
+    final titleColor =
+        isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
+    final subtitleColor = isDark
+        ? Colors.white70
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -141,25 +151,25 @@ class _MediaPageState extends State<MediaPage> {
           child: Container(
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
-              color: AppColors.whiteColor.withOpacity(0.3),
+              color: chipColor,
               shape: BoxShape.circle,
             ),
-            child: Icon(LucideIcons.arrowLeft, color: AppColors.whiteColor),
+            child: Icon(LucideIcons.arrowLeft, color: iconColor),
           ),
         ),
-        const Column(
+        Column(
           children: [
             Text(
               'Team Media',
               style: TextStyle(
-                color: Colors.white,
+                color: titleColor,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               'All Media Highlights',
-              style: TextStyle(color: Colors.white70, fontSize: 12),
+              style: TextStyle(color: subtitleColor, fontSize: 12),
             ),
           ],
         ),
@@ -168,10 +178,10 @@ class _MediaPageState extends State<MediaPage> {
           child: Container(
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
-              color: AppColors.whiteColor.withOpacity(0.3),
+              color: chipColor,
               shape: BoxShape.circle,
             ),
-            child: Icon(LucideIcons.bell, color: AppColors.whiteColor),
+            child: Icon(LucideIcons.bell, color: iconColor),
           ),
         )
       ],
@@ -182,6 +192,13 @@ class _MediaPageState extends State<MediaPage> {
     required FocusNode focusNode,
     required TextEditingController controller,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor =
+        isDark ? AppColors.whiteColor : const Color(0xFFDADADA);
+    final fillColor =
+        isDark ? AppColors.whiteColor.withValues(alpha: 0.2) : Colors.white;
+    final iconColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
     return TextField(
       focusNode: focusNode,
       controller: controller,
@@ -189,12 +206,12 @@ class _MediaPageState extends State<MediaPage> {
       decoration: InputDecoration(
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: kSmall),
-          child: Icon(LucideIcons.search, color: AppColors.whiteColor),
+          child: Icon(LucideIcons.search, color: iconColor),
         ),
-        fillColor: AppColors.whiteColor.withOpacity(0.2),
+        fillColor: fillColor,
         filled: true,
         border: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.whiteColor),
+          borderSide: BorderSide(color: borderColor),
           borderRadius: BorderRadius.circular(kXXXXLarge),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -203,15 +220,15 @@ class _MediaPageState extends State<MediaPage> {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(kXXXXLarge),
-          borderSide: BorderSide(color: AppColors.whiteColor),
+          borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(kXXXXLarge),
-          borderSide: BorderSide(color: AppColors.whiteColor),
+          borderSide: BorderSide(color: borderColor),
         ),
         hintText: "Search",
         hintStyle: context.textTheme.bodyMedium?.copyWith(
-          color: const Color(0xffcfcdcd),
+          color: isDark ? const Color(0xffcfcdcd) : const Color(0xFF9A9A9A),
         ),
       ),
     );

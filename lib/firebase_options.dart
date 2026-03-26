@@ -56,7 +56,7 @@ class DefaultFirebaseOptions {
     storageBucket: 'wence-sports-d6c49.firebasestorage.app',
     androidClientId: '555382788437-44mo9hsfqo5gmo8706mb0tp1d88665q6.apps.googleusercontent.com',
     iosClientId: '555382788437-pfp82hsv807i9ugrs9f9n3jig57s407n.apps.googleusercontent.com',
-    iosBundleId: 'com.wtl.dvsavio',
+    iosBundleId: 'com.wtl.siel',
   );
 
   static const FirebaseOptions web = FirebaseOptions(
@@ -77,7 +77,7 @@ class DefaultFirebaseOptions {
     storageBucket: 'wence-sports-d6c49.firebasestorage.app',
     androidClientId: '555382788437-44mo9hsfqo5gmo8706mb0tp1d88665q6.apps.googleusercontent.com',
     iosClientId: '555382788437-p9ef6e7lq5oo7nb1aesgr658m5v2ckpf.apps.googleusercontent.com',
-    iosBundleId: 'com.wtl.dvsavio',
+    iosBundleId: 'com.wtl.siel',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

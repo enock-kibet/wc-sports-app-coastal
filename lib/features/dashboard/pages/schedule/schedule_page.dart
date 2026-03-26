@@ -552,6 +552,16 @@ class _SchedulePageState extends State<SchedulePage> {
   }
 
   Row headerSection(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final chipColor =
+        isDark ? Colors.white.withValues(alpha: 0.3) : Colors.white;
+    final iconColor =
+        isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
+    final titleColor =
+        isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
+    final subtitleColor = isDark
+        ? Colors.white70
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -562,28 +572,28 @@ class _SchedulePageState extends State<SchedulePage> {
           child: Container(
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: chipColor,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               LucideIcons.menu,
-              color: Colors.white,
+              color: iconColor,
             ),
           ),
         ),
-        const Column(
+        Column(
           children: [
             Text(
               'Team Schedule',
               style: TextStyle(
-                color: Colors.white,
+                color: titleColor,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               'All Upcoming Matches',
-              style: TextStyle(color: Colors.white70, fontSize: 12),
+              style: TextStyle(color: subtitleColor, fontSize: 12),
             ),
           ],
         ),
@@ -592,12 +602,12 @@ class _SchedulePageState extends State<SchedulePage> {
           child: Container(
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: chipColor,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               LucideIcons.bell,
-              color: Colors.white,
+              color: iconColor,
             ),
           ),
         ),

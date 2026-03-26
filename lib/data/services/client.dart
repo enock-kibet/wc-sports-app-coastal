@@ -3,7 +3,7 @@ part of 'service.dart';
 class ProductService {
   HttpResult<List<Product>> getProducts() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/SportApp/api/Product?clubid=804f0bac-11f1-4981-b67f-51f33efe1d5d",
+      "https://backend.wencetechnologies.com/SportApp/api/Product?leagueid=cf43b214-c667-4e99-8718-7b0dcfb4cd43",
       //"https://wencesportswebapplication.vercel.app/api/shop/products",
       deserializer: (data) {
         List<Product> productList = [];
@@ -186,7 +186,7 @@ class PickupAddressService {
 class MatchService {
   HttpResult<List<MatchType>> getMatches() async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Match/leagueMatches/804f0bac-11f1-4981-b67f-51f33efe1d5d/cf43b214-c667-4e99-8718-7b0dcfb4cd43?playStatus=false&fromNow=true",
+      "https://backend.wencetechnologies.com/sportapp/api/Match?leagueid=cf43b214-c667-4e99-8718-7b0dcfb4cd43&playStatus=false&fromNow=true",
       deserializer: (data) {
         List<MatchType> matchList = [];
 
@@ -220,9 +220,12 @@ class MatchService {
     );
   }
 
-  HttpResult<List<MatchType>> getMatchStats() async {
+  HttpResult<List<MatchType>> getMatchStats(String? clubId) async {
+    final endpoint = (clubId == null || clubId.isEmpty)
+        ? "https://backend.wencetechnologies.com/sportapp/api/Match?leagueid=cf43b214-c667-4e99-8718-7b0dcfb4cd43&playStatus=true&fromNow=false"
+        : "https://backend.wencetechnologies.com/sportapp/api/Match/leagueMatches/$clubId/cf43b214-c667-4e99-8718-7b0dcfb4cd43";
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Match/leagueMatches/804f0bac-11f1-4981-b67f-51f33efe1d5d/cf43b214-c667-4e99-8718-7b0dcfb4cd43?playStatus=true&fromNow=false",
+      endpoint,
       deserializer: (data) {
         List<MatchType> matchList = [];
 
@@ -269,6 +272,8 @@ class MatchService {
     final clubTwoJson = (record["clubTwo"] as Map<String, dynamic>? ?? {});
     final matchDateJson = (record["matchDate"] as Map<String, dynamic>? ?? {});
     final venueJson = (record["venue"] as Map<String, dynamic>? ?? {});
+    final intervalScoresJson =
+        (record["intervalscores"] as Map<String, dynamic>? ?? {});
 
     return MatchModel(
       id: (record["id"] ?? "").toString(),
@@ -302,6 +307,7 @@ class MatchService {
         latitude: _toDouble(venueJson["latitude"]),
         longitude: _toDouble(venueJson["longitude"]),
       ),
+      intervalScores: _parseIntervalScores(intervalScoresJson["stats"]),
     );
   }
 
@@ -312,6 +318,21 @@ class MatchService {
       return StatModel(
         stat: (mm["stat"] ?? "").toString(),
         statValue: _toInt(mm["statValue"]),
+      );
+    }).toList();
+  }
+
+  List<IntervalScoreModel> _parseIntervalScores(dynamic raw) {
+    if (raw is! List) return const [];
+    return raw.whereType<Map>().map((m) {
+      final mm = Map<String, dynamic>.from(m);
+      return IntervalScoreModel(
+        sequencePosition: _toInt(mm["sequencePosition"]),
+        interval: (mm["interval"] ?? "").toString(),
+        clubOne: (mm["clubOne"] ?? "").toString(),
+        homeTeamScore: (mm["homeTeamScore"] ?? "0").toString(),
+        clubTwo: (mm["clubTwo"] ?? "").toString(),
+        awayTeamScore: (mm["awayTeamScore"] ?? "0").toString(),
       );
     }).toList();
   }
@@ -533,7 +554,7 @@ class MediaService {
 
       // API call
       return await Http.get<List<MediaData>>(
-        "https://backend.wencetechnologies.com/sportapp/api/MediaItem/GetMediaById?teamid=804f0bac-11f1-4981-b67f-51f33efe1d5d",
+        "https://backend.wencetechnologies.com/sportapp/api/MediaItem?leagueid=cf43b214-c667-4e99-8718-7b0dcfb4cd43",
         deserializer: (data) {
           try {
             // Parse API highlights
@@ -589,7 +610,7 @@ class MediaService {
   Future<MultipleResult<List<HighlightReel>>> getHomeMedia() async {
     try {
       return await Http.get(
-        "https://backend.wencetechnologies.com/sportapp/api/Bannnermedium?teamid=804f0bac-11f1-4981-b67f-51f33efe1d5d",
+        "https://backend.wencetechnologies.com/sportapp/api/Bannnermedium?leagueid=cf43b214-c667-4e99-8718-7b0dcfb4cd43",
         deserializer: (data) {
           final Map<String, dynamic> json = data as Map<String, dynamic>;
           final response = HighlightReelsResponse.fromJson(json);
@@ -610,10 +631,57 @@ class MediaService {
   }
 }
 
-class StatService {
-  HttpResult<Map<String, List<Stats>>> getStats() async {
+class RoasterService {
+  HttpResult<List<RoasterData>> getRoasters(String? clubid) async {
     return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/PlayerStat/RankStats/155f166c-320c-47f0-9d26-10d89b6587c1?clubid=804f0bac-11f1-4981-b67f-51f33efe1d5d&minGames=0",
+      "https://backend.wencetechnologies.com/sportapp/api/Player/teamplayers/$clubid",
+      deserializer: (data) {
+        // Extract the list from the API response
+        final players = (data['data'] as List)
+            .map((json) => RoasterData.fromJson(json))
+            .toList();
+
+        return players;
+      },
+    );
+  }
+
+  HttpResult<List<ClubRoasterData>> getLeagueRoasters() async {
+    return Http.get(
+      "https://backend.wencetechnologies.com/sportapp/api/Club?leagueId=cf43b214-c667-4e99-8718-7b0dcfb4cd43",
+      deserializer: (data) {
+        log(data.runtimeType.toString()); // 👈 debug once
+
+        final teams = (data as List)
+            .map((json) => ClubRoasterData.fromJson(json))
+            .toList();
+
+        return teams;
+      },
+    );
+  }
+
+  HttpResult<List<RoasterData>> getTeamRoasters() async {
+    return Http.get(
+      "https://backend.wencetechnologies.com/sportapp/api/Club?leagueId=cf43b214-c667-4e99-8718-7b0dcfb4cd43",
+      deserializer: (data) {
+        // Extract the list from the API response
+        final players = (data['data'] as List)
+            .map((json) => RoasterData.fromJson(json))
+            .toList();
+
+        return players;
+      },
+    );
+  }
+}
+
+class StatService {
+  HttpResult<Map<String, List<Stats>>> getStats(String? clubId) async {
+    final clubQuery =
+        (clubId == null || clubId.isEmpty) ? "" : "&clubid=$clubId";
+    return Http.get(
+      "https://backend.wencetechnologies.com/sportapp/api/PlayerStat/RankStats/155f166c-320c-47f0-9d26-10d89b6587c1?minGames=0$clubQuery",
       deserializer: (data) {
         final Map<String, List<Stats>> statsByCategory = {};
 
@@ -624,6 +692,41 @@ class StatService {
         });
 
         return statsByCategory;
+      },
+    );
+  }
+
+  HttpResult<Map<String, Map<String, List<MatchStatLeader>>>>
+      getMatchStatLeaders(
+    String matchId,
+  ) async {
+    return Http.get(
+      "https://backend.wencetechnologies.com/sportapp/api/PlayerStat/PlayerStatRanksByMatch/$matchId",
+      deserializer: (data) {
+        final leadersByCategory =
+            <String, Map<String, List<MatchStatLeader>>>{};
+
+        (data as Map<String, dynamic>).forEach((category, clubs) {
+          final leadersByClub = <String, List<MatchStatLeader>>{};
+
+          (clubs as Map<String, dynamic>).forEach((clubName, entries) {
+            final leaders = (entries as List<dynamic>)
+                .map((entry) =>
+                    MatchStatLeader.fromJson(entry as Map<String, dynamic>))
+                .toList()
+              ..sort((a, b) {
+                final rankCompare = a.rank.compareTo(b.rank);
+                if (rankCompare != 0) return rankCompare;
+                return b.stat.compareTo(a.stat);
+              });
+
+            leadersByClub[clubName] = leaders;
+          });
+
+          leadersByCategory[category] = leadersByClub;
+        });
+
+        return leadersByCategory;
       },
     );
   }
@@ -656,22 +759,6 @@ class StatService {
 
         // ✅ Extract and return just the list
         return response.highlightReels;
-      },
-    );
-  }
-}
-
-class RoasterService {
-  HttpResult<List<RoasterData>> getRoasters() async {
-    return Http.get(
-      "https://backend.wencetechnologies.com/sportapp/api/Player/teamplayers/804f0bac-11f1-4981-b67f-51f33efe1d5d?seasonid=155f166c-320c-47f0-9d26-10d89b6587c1",
-      deserializer: (data) {
-        // Extract the list from the API response
-        final players = (data['data'] as List)
-            .map((json) => RoasterData.fromJson(json))
-            .toList();
-
-        return players;
       },
     );
   }

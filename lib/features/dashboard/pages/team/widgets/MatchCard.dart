@@ -170,12 +170,17 @@ class MatchCard extends StatelessWidget {
   }
 
   Widget _abbrText(String abbr) {
-    return Text(
-      abbr,
-      style: const TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-        fontSize: 11,
+    return SizedBox.expand(
+      child: Center(
+        child: Text(
+          abbr,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 11,
+          ),
+        ),
       ),
     );
   }

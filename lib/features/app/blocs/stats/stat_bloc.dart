@@ -11,13 +11,14 @@ part 'stat_bloc.freezed.dart';
 
 class StatBloc extends Bloc<StatEvent, StatState> {
   late StatService _statService;
+  final String? clubId;
 
-  StatBloc() : super(const StatState()) {
+  StatBloc({this.clubId}) : super(const StatState()) {
     _statService = service<StatService>();
 
     on<_StatsFetched>((event, emit) async {
       emit(state.copyWith(status: StatStatus.loading));
-      final recordResponse = await _statService.getStats();
+      final recordResponse = await _statService.getStats(clubId);
       recordResponse.when(
         onError: (error) {
           emit(state.copyWith(

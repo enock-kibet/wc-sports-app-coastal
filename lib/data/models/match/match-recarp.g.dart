@@ -20,6 +20,11 @@ _$MatchModelImpl _$$MatchModelImplFromJson(Map<String, dynamic> json) =>
       clubOneScore: json['clubOneScore'] as String,
       clubTwoScore: json['clubTwoScore'] as String,
       matchStatus: json['matchStatus'] as bool,
+      intervalScores: (json['intervalScores'] as List<dynamic>?)
+              ?.map(
+                  (e) => IntervalScoreModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$MatchModelImplToJson(_$MatchModelImpl instance) =>
@@ -35,6 +40,7 @@ Map<String, dynamic> _$$MatchModelImplToJson(_$MatchModelImpl instance) =>
       'clubOneScore': instance.clubOneScore,
       'clubTwoScore': instance.clubTwoScore,
       'matchStatus': instance.matchStatus,
+      'intervalScores': instance.intervalScores,
     };
 
 _$ClubModelImpl _$$ClubModelImplFromJson(Map<String, dynamic> json) =>
@@ -97,4 +103,26 @@ Map<String, dynamic> _$$VenueModelImplToJson(_$VenueModelImpl instance) =>
       'location': instance.location,
       'latitude': instance.latitude,
       'longitude': instance.longitude,
+    };
+
+_$IntervalScoreModelImpl _$$IntervalScoreModelImplFromJson(
+        Map<String, dynamic> json) =>
+    _$IntervalScoreModelImpl(
+      sequencePosition: (json['sequencePosition'] as num).toInt(),
+      interval: json['interval'] as String,
+      clubOne: json['clubOne'] as String,
+      homeTeamScore: json['homeTeamScore'] as String,
+      clubTwo: json['clubTwo'] as String,
+      awayTeamScore: json['awayTeamScore'] as String,
+    );
+
+Map<String, dynamic> _$$IntervalScoreModelImplToJson(
+        _$IntervalScoreModelImpl instance) =>
+    <String, dynamic>{
+      'sequencePosition': instance.sequencePosition,
+      'interval': instance.interval,
+      'clubOne': instance.clubOne,
+      'homeTeamScore': instance.homeTeamScore,
+      'clubTwo': instance.clubTwo,
+      'awayTeamScore': instance.awayTeamScore,
     };

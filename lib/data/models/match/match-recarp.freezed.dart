@@ -31,6 +31,8 @@ mixin _$MatchModel {
   String get clubOneScore => throw _privateConstructorUsedError;
   String get clubTwoScore => throw _privateConstructorUsedError;
   bool get matchStatus => throw _privateConstructorUsedError;
+  List<IntervalScoreModel> get intervalScores =>
+      throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -55,7 +57,8 @@ abstract class $MatchModelCopyWith<$Res> {
       String matchWinner,
       String clubOneScore,
       String clubTwoScore,
-      bool matchStatus});
+      bool matchStatus,
+      List<IntervalScoreModel> intervalScores});
 
   $ClubModelCopyWith<$Res> get clubOne;
   $ClubModelCopyWith<$Res> get clubTwo;
@@ -87,6 +90,7 @@ class _$MatchModelCopyWithImpl<$Res, $Val extends MatchModel>
     Object? clubOneScore = null,
     Object? clubTwoScore = null,
     Object? matchStatus = null,
+    Object? intervalScores = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -133,6 +137,10 @@ class _$MatchModelCopyWithImpl<$Res, $Val extends MatchModel>
           ? _value.matchStatus
           : matchStatus // ignore: cast_nullable_to_non_nullable
               as bool,
+      intervalScores: null == intervalScores
+          ? _value.intervalScores
+          : intervalScores // ignore: cast_nullable_to_non_nullable
+              as List<IntervalScoreModel>,
     ) as $Val);
   }
 
@@ -188,7 +196,8 @@ abstract class _$$MatchModelImplCopyWith<$Res>
       String matchWinner,
       String clubOneScore,
       String clubTwoScore,
-      bool matchStatus});
+      bool matchStatus,
+      List<IntervalScoreModel> intervalScores});
 
   @override
   $ClubModelCopyWith<$Res> get clubOne;
@@ -222,6 +231,7 @@ class __$$MatchModelImplCopyWithImpl<$Res>
     Object? clubOneScore = null,
     Object? clubTwoScore = null,
     Object? matchStatus = null,
+    Object? intervalScores = null,
   }) {
     return _then(_$MatchModelImpl(
       id: null == id
@@ -268,6 +278,10 @@ class __$$MatchModelImplCopyWithImpl<$Res>
           ? _value.matchStatus
           : matchStatus // ignore: cast_nullable_to_non_nullable
               as bool,
+      intervalScores: null == intervalScores
+          ? _value._intervalScores
+          : intervalScores // ignore: cast_nullable_to_non_nullable
+              as List<IntervalScoreModel>,
     ));
   }
 }
@@ -286,7 +300,9 @@ class _$MatchModelImpl implements _MatchModel {
       required this.matchWinner,
       required this.clubOneScore,
       required this.clubTwoScore,
-      required this.matchStatus});
+      required this.matchStatus,
+      final List<IntervalScoreModel> intervalScores = const []})
+      : _intervalScores = intervalScores;
 
   factory _$MatchModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$MatchModelImplFromJson(json);
@@ -313,10 +329,18 @@ class _$MatchModelImpl implements _MatchModel {
   final String clubTwoScore;
   @override
   final bool matchStatus;
+  final List<IntervalScoreModel> _intervalScores;
+  @override
+  @JsonKey()
+  List<IntervalScoreModel> get intervalScores {
+    if (_intervalScores is EqualUnmodifiableListView) return _intervalScores;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_intervalScores);
+  }
 
   @override
   String toString() {
-    return 'MatchModel(id: $id, name: $name, clubOne: $clubOne, clubTwo: $clubTwo, matchDate: $matchDate, venue: $venue, description: $description, matchWinner: $matchWinner, clubOneScore: $clubOneScore, clubTwoScore: $clubTwoScore, matchStatus: $matchStatus)';
+    return 'MatchModel(id: $id, name: $name, clubOne: $clubOne, clubTwo: $clubTwo, matchDate: $matchDate, venue: $venue, description: $description, matchWinner: $matchWinner, clubOneScore: $clubOneScore, clubTwoScore: $clubTwoScore, matchStatus: $matchStatus, intervalScores: $intervalScores)';
   }
 
   @override
@@ -340,7 +364,9 @@ class _$MatchModelImpl implements _MatchModel {
             (identical(other.clubTwoScore, clubTwoScore) ||
                 other.clubTwoScore == clubTwoScore) &&
             (identical(other.matchStatus, matchStatus) ||
-                other.matchStatus == matchStatus));
+                other.matchStatus == matchStatus) &&
+            const DeepCollectionEquality()
+                .equals(other._intervalScores, _intervalScores));
   }
 
   @JsonKey(ignore: true)
@@ -357,7 +383,8 @@ class _$MatchModelImpl implements _MatchModel {
       matchWinner,
       clubOneScore,
       clubTwoScore,
-      matchStatus);
+      matchStatus,
+      const DeepCollectionEquality().hash(_intervalScores));
 
   @JsonKey(ignore: true)
   @override
@@ -385,7 +412,8 @@ abstract class _MatchModel implements MatchModel {
       required final String matchWinner,
       required final String clubOneScore,
       required final String clubTwoScore,
-      required final bool matchStatus}) = _$MatchModelImpl;
+      required final bool matchStatus,
+      final List<IntervalScoreModel> intervalScores}) = _$MatchModelImpl;
 
   factory _MatchModel.fromJson(Map<String, dynamic> json) =
       _$MatchModelImpl.fromJson;
@@ -412,6 +440,8 @@ abstract class _MatchModel implements MatchModel {
   String get clubTwoScore;
   @override
   bool get matchStatus;
+  @override
+  List<IntervalScoreModel> get intervalScores;
   @override
   @JsonKey(ignore: true)
   _$$MatchModelImplCopyWith<_$MatchModelImpl> get copyWith =>
@@ -1147,5 +1177,251 @@ abstract class _VenueModel implements VenueModel {
   @override
   @JsonKey(ignore: true)
   _$$VenueModelImplCopyWith<_$VenueModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+IntervalScoreModel _$IntervalScoreModelFromJson(Map<String, dynamic> json) {
+  return _IntervalScoreModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$IntervalScoreModel {
+  int get sequencePosition => throw _privateConstructorUsedError;
+  String get interval => throw _privateConstructorUsedError;
+  String get clubOne => throw _privateConstructorUsedError;
+  String get homeTeamScore => throw _privateConstructorUsedError;
+  String get clubTwo => throw _privateConstructorUsedError;
+  String get awayTeamScore => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $IntervalScoreModelCopyWith<IntervalScoreModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $IntervalScoreModelCopyWith<$Res> {
+  factory $IntervalScoreModelCopyWith(
+          IntervalScoreModel value, $Res Function(IntervalScoreModel) then) =
+      _$IntervalScoreModelCopyWithImpl<$Res, IntervalScoreModel>;
+  @useResult
+  $Res call(
+      {int sequencePosition,
+      String interval,
+      String clubOne,
+      String homeTeamScore,
+      String clubTwo,
+      String awayTeamScore});
+}
+
+/// @nodoc
+class _$IntervalScoreModelCopyWithImpl<$Res, $Val extends IntervalScoreModel>
+    implements $IntervalScoreModelCopyWith<$Res> {
+  _$IntervalScoreModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sequencePosition = null,
+    Object? interval = null,
+    Object? clubOne = null,
+    Object? homeTeamScore = null,
+    Object? clubTwo = null,
+    Object? awayTeamScore = null,
+  }) {
+    return _then(_value.copyWith(
+      sequencePosition: null == sequencePosition
+          ? _value.sequencePosition
+          : sequencePosition // ignore: cast_nullable_to_non_nullable
+              as int,
+      interval: null == interval
+          ? _value.interval
+          : interval // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubOne: null == clubOne
+          ? _value.clubOne
+          : clubOne // ignore: cast_nullable_to_non_nullable
+              as String,
+      homeTeamScore: null == homeTeamScore
+          ? _value.homeTeamScore
+          : homeTeamScore // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubTwo: null == clubTwo
+          ? _value.clubTwo
+          : clubTwo // ignore: cast_nullable_to_non_nullable
+              as String,
+      awayTeamScore: null == awayTeamScore
+          ? _value.awayTeamScore
+          : awayTeamScore // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$IntervalScoreModelImplCopyWith<$Res>
+    implements $IntervalScoreModelCopyWith<$Res> {
+  factory _$$IntervalScoreModelImplCopyWith(_$IntervalScoreModelImpl value,
+          $Res Function(_$IntervalScoreModelImpl) then) =
+      __$$IntervalScoreModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int sequencePosition,
+      String interval,
+      String clubOne,
+      String homeTeamScore,
+      String clubTwo,
+      String awayTeamScore});
+}
+
+/// @nodoc
+class __$$IntervalScoreModelImplCopyWithImpl<$Res>
+    extends _$IntervalScoreModelCopyWithImpl<$Res, _$IntervalScoreModelImpl>
+    implements _$$IntervalScoreModelImplCopyWith<$Res> {
+  __$$IntervalScoreModelImplCopyWithImpl(_$IntervalScoreModelImpl _value,
+      $Res Function(_$IntervalScoreModelImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sequencePosition = null,
+    Object? interval = null,
+    Object? clubOne = null,
+    Object? homeTeamScore = null,
+    Object? clubTwo = null,
+    Object? awayTeamScore = null,
+  }) {
+    return _then(_$IntervalScoreModelImpl(
+      sequencePosition: null == sequencePosition
+          ? _value.sequencePosition
+          : sequencePosition // ignore: cast_nullable_to_non_nullable
+              as int,
+      interval: null == interval
+          ? _value.interval
+          : interval // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubOne: null == clubOne
+          ? _value.clubOne
+          : clubOne // ignore: cast_nullable_to_non_nullable
+              as String,
+      homeTeamScore: null == homeTeamScore
+          ? _value.homeTeamScore
+          : homeTeamScore // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubTwo: null == clubTwo
+          ? _value.clubTwo
+          : clubTwo // ignore: cast_nullable_to_non_nullable
+              as String,
+      awayTeamScore: null == awayTeamScore
+          ? _value.awayTeamScore
+          : awayTeamScore // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$IntervalScoreModelImpl implements _IntervalScoreModel {
+  const _$IntervalScoreModelImpl(
+      {required this.sequencePosition,
+      required this.interval,
+      required this.clubOne,
+      required this.homeTeamScore,
+      required this.clubTwo,
+      required this.awayTeamScore});
+
+  factory _$IntervalScoreModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$IntervalScoreModelImplFromJson(json);
+
+  @override
+  final int sequencePosition;
+  @override
+  final String interval;
+  @override
+  final String clubOne;
+  @override
+  final String homeTeamScore;
+  @override
+  final String clubTwo;
+  @override
+  final String awayTeamScore;
+
+  @override
+  String toString() {
+    return 'IntervalScoreModel(sequencePosition: $sequencePosition, interval: $interval, clubOne: $clubOne, homeTeamScore: $homeTeamScore, clubTwo: $clubTwo, awayTeamScore: $awayTeamScore)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$IntervalScoreModelImpl &&
+            (identical(other.sequencePosition, sequencePosition) ||
+                other.sequencePosition == sequencePosition) &&
+            (identical(other.interval, interval) ||
+                other.interval == interval) &&
+            (identical(other.clubOne, clubOne) || other.clubOne == clubOne) &&
+            (identical(other.homeTeamScore, homeTeamScore) ||
+                other.homeTeamScore == homeTeamScore) &&
+            (identical(other.clubTwo, clubTwo) || other.clubTwo == clubTwo) &&
+            (identical(other.awayTeamScore, awayTeamScore) ||
+                other.awayTeamScore == awayTeamScore));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, sequencePosition, interval,
+      clubOne, homeTeamScore, clubTwo, awayTeamScore);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$IntervalScoreModelImplCopyWith<_$IntervalScoreModelImpl> get copyWith =>
+      __$$IntervalScoreModelImplCopyWithImpl<_$IntervalScoreModelImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$IntervalScoreModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _IntervalScoreModel implements IntervalScoreModel {
+  const factory _IntervalScoreModel(
+      {required final int sequencePosition,
+      required final String interval,
+      required final String clubOne,
+      required final String homeTeamScore,
+      required final String clubTwo,
+      required final String awayTeamScore}) = _$IntervalScoreModelImpl;
+
+  factory _IntervalScoreModel.fromJson(Map<String, dynamic> json) =
+      _$IntervalScoreModelImpl.fromJson;
+
+  @override
+  int get sequencePosition;
+  @override
+  String get interval;
+  @override
+  String get clubOne;
+  @override
+  String get homeTeamScore;
+  @override
+  String get clubTwo;
+  @override
+  String get awayTeamScore;
+  @override
+  @JsonKey(ignore: true)
+  _$$IntervalScoreModelImplCopyWith<_$IntervalScoreModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

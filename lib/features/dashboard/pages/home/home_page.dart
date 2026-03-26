@@ -168,7 +168,9 @@ class _HomePageState extends State<HomePage> {
                                         style: context.textTheme.headlineLarge
                                             ?.copyWith(
                                           fontSize: 18,
-                                          color: AppColors.whiteColor,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
                                         ),
                                       ),
                                     ),
@@ -192,7 +194,10 @@ class _HomePageState extends State<HomePage> {
                                               entryTitle,
                                               style: context.textTheme.bodySmall
                                                   ?.copyWith(
-                                                color: AppColors.whiteColor,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withValues(alpha: 0.65),
                                               ),
                                             ),
                                           ),
@@ -215,7 +220,9 @@ class _HomePageState extends State<HomePage> {
                                         style: context.textTheme.headlineLarge
                                             ?.copyWith(
                                           fontSize: 18,
-                                          color: AppColors.whiteColor,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
                                         ),
                                       ),
                                     ),
@@ -226,13 +233,18 @@ class _HomePageState extends State<HomePage> {
                                   // --- If both are empty ---
                                   if (categorized.isEmpty &&
                                       statsMatches.isEmpty)
-                                    const Center(
+                                    Center(
                                       child: Padding(
-                                        padding: EdgeInsets.only(top: 40.0),
+                                        padding:
+                                            const EdgeInsets.only(top: 40.0),
                                         child: Text(
                                           "No matches available",
-                                          style:
-                                              TextStyle(color: Colors.white70),
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.7),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -445,6 +457,14 @@ class _HomePageState extends State<HomePage> {
 
   TextField searchField(
       {required onChanged, required focusNode, required controller}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor =
+        isDark ? AppColors.whiteColor : const Color(0xFFDADADA);
+    final iconColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
+    final fillColor =
+        isDark ? AppColors.whiteColor.withOpacity(0.2) : Colors.white;
+
     return TextField(
         onChanged: onChanged,
         focusNode: focusNode,
@@ -455,12 +475,12 @@ class _HomePageState extends State<HomePage> {
         decoration: InputDecoration(
           suffixIcon: Container(
               padding: const EdgeInsets.only(right: kSmall),
-              child: Icon(LucideIcons.search, color: AppColors.whiteColor)),
-          fillColor: AppColors.whiteColor.withOpacity(0.2),
+              child: Icon(LucideIcons.search, color: iconColor)),
+          fillColor: fillColor,
           filled: true,
           border: OutlineInputBorder(
               borderSide: BorderSide(
-                color: AppColors.whiteColor,
+                color: borderColor,
               ),
               borderRadius: BorderRadius.circular(kXXXXLarge)),
           contentPadding: const EdgeInsets.symmetric(
@@ -468,21 +488,36 @@ class _HomePageState extends State<HomePage> {
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(kXXXXLarge),
               borderSide: BorderSide(
-                color: AppColors.whiteColor,
+                color: borderColor,
               )),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(kXXXXLarge),
               borderSide: BorderSide(
-                color: AppColors.whiteColor,
+                color: borderColor,
               )),
           hintText: "Search",
           hintStyle: context.textTheme.bodyMedium
-              ?.copyWith(color: const Color(0xffcfcdcd)),
+              ?.copyWith(
+                color: isDark
+                    ? const Color(0xffcfcdcd)
+                    : const Color(0xFF9A9A9A),
+              ),
         ));
   }
 
   Row headerSection(BuildContext context) {
     final currentUser = service<AppPreferencesManager>().currentUserValue;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final chipColor =
+        isDark ? AppColors.whiteColor.withOpacity(0.3) : Colors.white;
+    final iconColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
+    final titleColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
+    final subtitleColor = isDark
+        ? AppColors.whiteColor
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -493,11 +528,11 @@ class _HomePageState extends State<HomePage> {
           child: Container(
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
-                color: AppColors.whiteColor.withOpacity(0.3),
+                color: chipColor,
                 shape: BoxShape.circle),
             child: Icon(
               LucideIcons.menu,
-              color: AppColors.whiteColor,
+              color: iconColor,
             ),
           ),
         ),
@@ -506,12 +541,12 @@ class _HomePageState extends State<HomePage> {
           children: [
             Text("Hi ${truncateText(limit: 16, currentUser?.name ?? 'Guest')}",
                 style: TextStyle(
-                    color: AppColors.whiteColor,
+                    color: titleColor,
                     fontSize: 20,
                     fontWeight: FontWeight.w700)),
             Text("Nairobi, Kenya",
                 style: TextStyle(
-                    color: AppColors.whiteColor,
+                    color: subtitleColor,
                     fontSize: kMedium,
                     fontWeight: FontWeight.w400)),
           ],
@@ -523,11 +558,11 @@ class _HomePageState extends State<HomePage> {
           child: Container(
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
-                color: AppColors.whiteColor.withOpacity(0.3),
+                color: chipColor,
                 shape: BoxShape.circle),
             child: Icon(
               LucideIcons.bell,
-              color: AppColors.whiteColor,
+              color: iconColor,
             ),
           ),
         )

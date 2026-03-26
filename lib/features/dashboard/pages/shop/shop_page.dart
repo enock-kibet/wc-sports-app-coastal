@@ -103,25 +103,79 @@ class _ShopPageState extends State<ShopPage> {
                             style: TextStyle(
                                 fontSize: kMedium,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.whiteColor),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface),
                           ),
                         ],
                       ),
                       const SizedBox(height: kMedium),
-                      //TODO! Add upcoming matches
-                      AutoHeightGridView(
-                        itemCount: state.products.length,
-                        crossAxisCount: context.isTablet ? 3 : 2,
-                        mainAxisSpacing: kSmall,
-                        crossAxisSpacing: kSmall,
-                        physics: const BouncingScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        builder: (context, index) {
-                          final product = state.products[index];
-                          return TopSellersCard(product: product);
-                        },
-                      ),
+                      if (state.products.isEmpty)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: kMedium,
+                            vertical: kXLarge,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(kMedium),
+                            border: Border.all(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.08),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                LucideIcons.shoppingBag,
+                                size: 36,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.55),
+                              ),
+                              const SizedBox(height: kSmall),
+                              Text(
+                                "No products available right now.",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: kMedium,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: kXXSmall),
+                              Text(
+                                "Please check back again later.",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        AutoHeightGridView(
+                          itemCount: state.products.length,
+                          crossAxisCount: context.isTablet ? 3 : 2,
+                          mainAxisSpacing: kSmall,
+                          crossAxisSpacing: kSmall,
+                          physics: const BouncingScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          builder: (context, index) {
+                            final product = state.products[index];
+                            return TopSellersCard(product: product);
+                          },
+                        ),
                     ],
                   ),
                 ),
@@ -145,16 +199,25 @@ class _ShopPageState extends State<ShopPage> {
   }
 
   TextField searchField() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor =
+        isDark ? AppColors.whiteColor : const Color(0xFFDADADA);
     return TextField(
       decoration: InputDecoration(
           suffixIcon: Container(
               padding: const EdgeInsets.only(right: kSmall),
-              child: Icon(LucideIcons.search, color: AppColors.whiteColor)),
-          fillColor: AppColors.whiteColor.withOpacity(0.2),
+              child: Icon(
+                LucideIcons.search,
+                color: isDark
+                    ? AppColors.whiteColor
+                    : Theme.of(context).colorScheme.onSurface,
+              )),
+          fillColor:
+              isDark ? AppColors.whiteColor.withValues(alpha: 0.2) : Colors.white,
           filled: true,
           border: OutlineInputBorder(
               borderSide: BorderSide(
-                color: AppColors.whiteColor,
+                color: borderColor,
               ),
               borderRadius: BorderRadius.circular(kLarge)),
           contentPadding: const EdgeInsets.symmetric(
@@ -162,29 +225,41 @@ class _ShopPageState extends State<ShopPage> {
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(kLarge),
               borderSide: BorderSide(
-                color: AppColors.whiteColor,
+                color: borderColor,
               )),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(kLarge),
               borderSide: BorderSide(
-                color: AppColors.whiteColor,
+                color: borderColor,
               )),
           hintText: "Search merch",
           hintStyle: TextStyle(
               fontWeight: FontWeight.w300,
-              color: AppColors.whiteColor.withOpacity(0.8))),
+              color: isDark
+                  ? AppColors.whiteColor.withValues(alpha: 0.8)
+                  : const Color(0xFF9A9A9A))),
     );
   }
 
   Row headerSection() {
     final currentUser = service<AppPreferencesManager>().currentUserValue;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final chipColor =
+        isDark ? AppColors.whiteColor.withValues(alpha: 0.3) : Colors.white;
+    final iconColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
+    final titleColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
+    final subtitleColor = isDark
+        ? AppColors.whiteColor
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Container(
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
-                color: AppColors.whiteColor.withOpacity(0.3),
+                color: chipColor,
                 shape: BoxShape.circle),
             child: GestureDetector(
               onTap: () {
@@ -192,7 +267,7 @@ class _ShopPageState extends State<ShopPage> {
               },
               child: Icon(
                 LucideIcons.arrowLeft,
-                color: AppColors.whiteColor,
+                color: iconColor,
               ),
             )),
         Column(
@@ -200,12 +275,12 @@ class _ShopPageState extends State<ShopPage> {
           children: [
             Text("Hi ${truncateText(currentUser?.name ?? 'Guest', limit: 16)}",
                 style: TextStyle(
-                    color: AppColors.whiteColor,
+                    color: titleColor,
                     fontSize: 20,
                     fontWeight: FontWeight.w700)),
             Text("Nairobi, Kenya",
                 style: TextStyle(
-                    color: AppColors.whiteColor,
+                    color: subtitleColor,
                     fontSize: kMedium,
                     fontWeight: FontWeight.normal)),
           ],

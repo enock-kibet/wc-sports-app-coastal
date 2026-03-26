@@ -1478,3 +1478,254 @@ abstract class _HighlightReel implements HighlightReel {
   _$$HighlightReelImplCopyWith<_$HighlightReelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+MatchStatLeader _$MatchStatLeaderFromJson(Map<String, dynamic> json) {
+  return _MatchStatLeader.fromJson(json);
+}
+
+/// @nodoc
+mixin _$MatchStatLeader {
+  String get playerId => throw _privateConstructorUsedError;
+  String get playerName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'clubID')
+  String get clubId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'clubName')
+  String get clubName => throw _privateConstructorUsedError;
+  int get stat => throw _privateConstructorUsedError;
+  int get rank => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $MatchStatLeaderCopyWith<MatchStatLeader> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MatchStatLeaderCopyWith<$Res> {
+  factory $MatchStatLeaderCopyWith(
+          MatchStatLeader value, $Res Function(MatchStatLeader) then) =
+      _$MatchStatLeaderCopyWithImpl<$Res, MatchStatLeader>;
+  @useResult
+  $Res call(
+      {String playerId,
+      String playerName,
+      @JsonKey(name: 'clubID') String clubId,
+      @JsonKey(name: 'clubName') String clubName,
+      int stat,
+      int rank});
+}
+
+/// @nodoc
+class _$MatchStatLeaderCopyWithImpl<$Res, $Val extends MatchStatLeader>
+    implements $MatchStatLeaderCopyWith<$Res> {
+  _$MatchStatLeaderCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? playerId = null,
+    Object? playerName = null,
+    Object? clubId = null,
+    Object? clubName = null,
+    Object? stat = null,
+    Object? rank = null,
+  }) {
+    return _then(_value.copyWith(
+      playerId: null == playerId
+          ? _value.playerId
+          : playerId // ignore: cast_nullable_to_non_nullable
+              as String,
+      playerName: null == playerName
+          ? _value.playerName
+          : playerName // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubId: null == clubId
+          ? _value.clubId
+          : clubId // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubName: null == clubName
+          ? _value.clubName
+          : clubName // ignore: cast_nullable_to_non_nullable
+              as String,
+      stat: null == stat
+          ? _value.stat
+          : stat // ignore: cast_nullable_to_non_nullable
+              as int,
+      rank: null == rank
+          ? _value.rank
+          : rank // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$MatchStatLeaderImplCopyWith<$Res>
+    implements $MatchStatLeaderCopyWith<$Res> {
+  factory _$$MatchStatLeaderImplCopyWith(_$MatchStatLeaderImpl value,
+          $Res Function(_$MatchStatLeaderImpl) then) =
+      __$$MatchStatLeaderImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String playerId,
+      String playerName,
+      @JsonKey(name: 'clubID') String clubId,
+      @JsonKey(name: 'clubName') String clubName,
+      int stat,
+      int rank});
+}
+
+/// @nodoc
+class __$$MatchStatLeaderImplCopyWithImpl<$Res>
+    extends _$MatchStatLeaderCopyWithImpl<$Res, _$MatchStatLeaderImpl>
+    implements _$$MatchStatLeaderImplCopyWith<$Res> {
+  __$$MatchStatLeaderImplCopyWithImpl(
+      _$MatchStatLeaderImpl _value, $Res Function(_$MatchStatLeaderImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? playerId = null,
+    Object? playerName = null,
+    Object? clubId = null,
+    Object? clubName = null,
+    Object? stat = null,
+    Object? rank = null,
+  }) {
+    return _then(_$MatchStatLeaderImpl(
+      playerId: null == playerId
+          ? _value.playerId
+          : playerId // ignore: cast_nullable_to_non_nullable
+              as String,
+      playerName: null == playerName
+          ? _value.playerName
+          : playerName // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubId: null == clubId
+          ? _value.clubId
+          : clubId // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubName: null == clubName
+          ? _value.clubName
+          : clubName // ignore: cast_nullable_to_non_nullable
+              as String,
+      stat: null == stat
+          ? _value.stat
+          : stat // ignore: cast_nullable_to_non_nullable
+              as int,
+      rank: null == rank
+          ? _value.rank
+          : rank // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$MatchStatLeaderImpl implements _MatchStatLeader {
+  const _$MatchStatLeaderImpl(
+      {required this.playerId,
+      required this.playerName,
+      @JsonKey(name: 'clubID') required this.clubId,
+      @JsonKey(name: 'clubName') required this.clubName,
+      required this.stat,
+      required this.rank});
+
+  factory _$MatchStatLeaderImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MatchStatLeaderImplFromJson(json);
+
+  @override
+  final String playerId;
+  @override
+  final String playerName;
+  @override
+  @JsonKey(name: 'clubID')
+  final String clubId;
+  @override
+  @JsonKey(name: 'clubName')
+  final String clubName;
+  @override
+  final int stat;
+  @override
+  final int rank;
+
+  @override
+  String toString() {
+    return 'MatchStatLeader(playerId: $playerId, playerName: $playerName, clubId: $clubId, clubName: $clubName, stat: $stat, rank: $rank)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$MatchStatLeaderImpl &&
+            (identical(other.playerId, playerId) ||
+                other.playerId == playerId) &&
+            (identical(other.playerName, playerName) ||
+                other.playerName == playerName) &&
+            (identical(other.clubId, clubId) || other.clubId == clubId) &&
+            (identical(other.clubName, clubName) ||
+                other.clubName == clubName) &&
+            (identical(other.stat, stat) || other.stat == stat) &&
+            (identical(other.rank, rank) || other.rank == rank));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, playerId, playerName, clubId, clubName, stat, rank);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MatchStatLeaderImplCopyWith<_$MatchStatLeaderImpl> get copyWith =>
+      __$$MatchStatLeaderImplCopyWithImpl<_$MatchStatLeaderImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$MatchStatLeaderImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _MatchStatLeader implements MatchStatLeader {
+  const factory _MatchStatLeader(
+      {required final String playerId,
+      required final String playerName,
+      @JsonKey(name: 'clubID') required final String clubId,
+      @JsonKey(name: 'clubName') required final String clubName,
+      required final int stat,
+      required final int rank}) = _$MatchStatLeaderImpl;
+
+  factory _MatchStatLeader.fromJson(Map<String, dynamic> json) =
+      _$MatchStatLeaderImpl.fromJson;
+
+  @override
+  String get playerId;
+  @override
+  String get playerName;
+  @override
+  @JsonKey(name: 'clubID')
+  String get clubId;
+  @override
+  @JsonKey(name: 'clubName')
+  String get clubName;
+  @override
+  int get stat;
+  @override
+  int get rank;
+  @override
+  @JsonKey(ignore: true)
+  _$$MatchStatLeaderImplCopyWith<_$MatchStatLeaderImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}

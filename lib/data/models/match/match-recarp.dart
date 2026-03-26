@@ -17,6 +17,7 @@ class MatchModel with _$MatchModel {
     required String clubOneScore,
     required String clubTwoScore,
     required bool matchStatus,
+    @Default([]) List<IntervalScoreModel> intervalScores,
   }) = _MatchModel;
 
   factory MatchModel.fromJson(Map<String, dynamic> json) =>
@@ -70,4 +71,19 @@ class VenueModel with _$VenueModel {
 
   factory VenueModel.fromJson(Map<String, dynamic> json) =>
       _$VenueModelFromJson(json);
+}
+
+@freezed
+class IntervalScoreModel with _$IntervalScoreModel {
+  const factory IntervalScoreModel({
+    required int sequencePosition,
+    required String interval,
+    required String clubOne,
+    required String homeTeamScore,
+    required String clubTwo,
+    required String awayTeamScore,
+  }) = _IntervalScoreModel;
+
+  factory IntervalScoreModel.fromJson(Map<String, dynamic> json) =>
+      _$IntervalScoreModelFromJson(json);
 }

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sports_app/data/models/club/club.dart';
 import 'package:sports_app/data/models/match/match-recarp.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/models/player/player.dart';
@@ -12,6 +13,7 @@ import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/models/roaster/roaster.dart';
 
 import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/features/app/blocs/club/club_bloc.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/features/auth/onboarding.dart';
@@ -64,7 +66,8 @@ enum AppRoute {
   aboutUs,
   pointsManagement,
   paymentWebView,
-  playerProfile
+  playerProfile,
+  clubRoaster
 }
 
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -146,10 +149,13 @@ final router = GoRouter(
       parentNavigatorKey: rootNavigatorKey,
       pageBuilder: (context, state) {
         return MaterialPage(
+            child: BlocProvider(
+          create: (_) =>
+              ClubRoastersBloc()..add(const ClubRoasterEvent.roasters()),
           child: LoginPage(
             key: state.pageKey,
           ),
-        );
+        ));
       },
     ),
     GoRoute(
@@ -295,9 +301,26 @@ final router = GoRouter(
                 return MaterialPage(
                     child: TeamPage(
                   showBackNavigation: state.extra == null ? false : true,
+                  selectedClub: state.extra is ClubRoasterData
+                      ? state.extra as ClubRoasterData
+                      : null,
                 ));
               },
               routes: [
+                GoRoute(
+                  path: "clubRoaster",
+                  parentNavigatorKey: rootNavigatorKey,
+                  name: AppRoute.clubRoaster.name,
+                  pageBuilder: (context, state) {
+                    return MaterialPage(
+                      key: state.pageKey,
+                      child: TeamPage(
+                        showBackNavigation: true,
+                        selectedClub: state.extra as ClubRoasterData,
+                      ),
+                    );
+                  },
+                ),
                 GoRoute(
                   path: "playerProfile",
                   parentNavigatorKey: rootNavigatorKey,

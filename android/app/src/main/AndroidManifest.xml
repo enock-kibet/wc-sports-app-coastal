@@ -8,7 +8,7 @@
         android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="DB Savio"
+        android:label="SIEL"
 
         android:usesCleartextTraffic="true"
         >

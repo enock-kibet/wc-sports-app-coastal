@@ -13,6 +13,9 @@ class TeamRoster extends StatelessWidget {
           return Center(child: Text("Failed to load"));
         } else if (state.status.isSuccess && state.roasters != null) {
           final players = state.roasters!;
+          if (players.isEmpty) {
+            return const Center(child: Text("No players found"));
+          }
           return Padding(
             padding: const EdgeInsets.only(top: kMedium),
             child: SingleChildScrollView(
@@ -29,6 +32,8 @@ class TeamRoster extends StatelessWidget {
               ),
             ),
           );
+        } else if (state.roasters != null && state.roasters!.isEmpty) {
+          return const Center(child: Text("No players found"));
         } else {
           return const Center(child: Text("No players found"));
         }

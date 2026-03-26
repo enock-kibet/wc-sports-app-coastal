@@ -132,3 +132,25 @@ Map<String, dynamic> _$$HighlightReelImplToJson(_$HighlightReelImpl instance) =>
       'url': instance.url,
       'image': instance.image,
     };
+
+_$MatchStatLeaderImpl _$$MatchStatLeaderImplFromJson(
+        Map<String, dynamic> json) =>
+    _$MatchStatLeaderImpl(
+      playerId: json['playerId'] as String,
+      playerName: json['playerName'] as String,
+      clubId: json['clubID'] as String,
+      clubName: json['clubName'] as String,
+      stat: (json['stat'] as num).toInt(),
+      rank: (json['rank'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$$MatchStatLeaderImplToJson(
+        _$MatchStatLeaderImpl instance) =>
+    <String, dynamic>{
+      'playerId': instance.playerId,
+      'playerName': instance.playerName,
+      'clubID': instance.clubId,
+      'clubName': instance.clubName,
+      'stat': instance.stat,
+      'rank': instance.rank,
+    };

@@ -97,6 +97,9 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
   }
 
   Widget _sectionTitle(String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -105,14 +108,14 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
           style: TextStyle(
             fontSize: kMedium,
             fontWeight: FontWeight.w700,
-            color: AppColors.whiteColor,
+            color: titleColor,
           ),
         ),
         TextButton(
           onPressed: () {},
           child: Text(
             "See All",
-            style: TextStyle(color: AppColors.whiteColor),
+            style: TextStyle(color: titleColor),
           ),
         ),
       ],
@@ -120,16 +123,23 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
   }
 
   TextField searchField(bool isTablet) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor =
+        isDark ? AppColors.whiteColor : const Color(0xFFDADADA);
+    final fillColor =
+        isDark ? AppColors.whiteColor.withValues(alpha: 0.2) : Colors.white;
+    final iconColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
     return TextField(
       decoration: InputDecoration(
           suffixIcon: Container(
               padding: const EdgeInsets.only(right: kSmall),
-              child: Icon(LucideIcons.search, color: AppColors.whiteColor)),
-          fillColor: AppColors.whiteColor.withOpacity(0.2),
+              child: Icon(LucideIcons.search, color: iconColor)),
+          fillColor: fillColor,
           filled: true,
           border: OutlineInputBorder(
               borderSide: BorderSide(
-                color: AppColors.whiteColor,
+                color: borderColor,
               ),
               borderRadius:
                   BorderRadius.circular(isTablet ? kXLMedium : kLarge)),
@@ -140,22 +150,34 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
               borderRadius:
                   BorderRadius.circular(isTablet ? kXLMedium : kLarge),
               borderSide: BorderSide(
-                color: AppColors.whiteColor,
+                color: borderColor,
               )),
           focusedBorder: OutlineInputBorder(
               borderRadius:
                   BorderRadius.circular(isTablet ? kXLMedium : kLarge),
               borderSide: BorderSide(
-                color: AppColors.whiteColor,
+                color: borderColor,
               )),
           hintText: "Search HRBC events",
           hintStyle: TextStyle(
               fontWeight: FontWeight.w300,
-              color: AppColors.whiteColor.withOpacity(0.8))),
+              color: isDark
+                  ? AppColors.whiteColor.withValues(alpha: 0.8)
+                  : const Color(0xFF9A9A9A))),
     );
   }
 
   Row headerSection(bool isTablet) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final chipColor =
+        isDark ? AppColors.whiteColor.withValues(alpha: 0.3) : Colors.white;
+    final iconColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
+    final titleColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
+    final subtitleColor = isDark
+        ? AppColors.whiteColor
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -166,11 +188,11 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
           child: Container(
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
-                color: AppColors.whiteColor.withOpacity(0.3),
+                color: chipColor,
                 shape: BoxShape.circle),
             child: Icon(
               LucideIcons.arrowLeft,
-              color: AppColors.whiteColor,
+              color: iconColor,
             ),
           ),
         ),
@@ -181,13 +203,13 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
               Text("Team Media!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: AppColors.whiteColor,
+                      color: titleColor,
                       fontSize: isTablet ? kXLMedium : kLarge,
                       fontWeight: FontWeight.bold)),
               Text("All Media Highlights",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: AppColors.whiteColor,
+                      color: subtitleColor,
                       fontSize: isTablet ? kMedium : kSMedium,
                       fontWeight: FontWeight.normal)),
             ],
@@ -200,11 +222,11 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
           child: Container(
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
-                color: AppColors.whiteColor.withOpacity(0.3),
+                color: chipColor,
                 shape: BoxShape.circle),
             child: Icon(
               LucideIcons.bell,
-              color: AppColors.whiteColor,
+              color: iconColor,
             ),
           ),
         )

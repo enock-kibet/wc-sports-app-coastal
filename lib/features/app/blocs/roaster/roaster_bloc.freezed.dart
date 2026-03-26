@@ -18,33 +18,39 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$RoasterEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() roasters,
+    required TResult Function(String? clubid) roasters,
+    required TResult Function() teamRoasters,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? roasters,
+    TResult? Function(String? clubid)? roasters,
+    TResult? Function()? teamRoasters,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? roasters,
+    TResult Function(String? clubid)? roasters,
+    TResult Function()? teamRoasters,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_RoastersFetched value) roasters,
+    required TResult Function(_TeamsRoastersFetched value) teamRoasters,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_RoastersFetched value)? roasters,
+    TResult? Function(_TeamsRoastersFetched value)? teamRoasters,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_RoastersFetched value)? roasters,
+    TResult Function(_TeamsRoastersFetched value)? teamRoasters,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -73,6 +79,8 @@ abstract class _$$RoastersFetchedImplCopyWith<$Res> {
   factory _$$RoastersFetchedImplCopyWith(_$RoastersFetchedImpl value,
           $Res Function(_$RoastersFetchedImpl) then) =
       __$$RoastersFetchedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String? clubid});
 }
 
 /// @nodoc
@@ -82,51 +90,79 @@ class __$$RoastersFetchedImplCopyWithImpl<$Res>
   __$$RoastersFetchedImplCopyWithImpl(
       _$RoastersFetchedImpl _value, $Res Function(_$RoastersFetchedImpl) _then)
       : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? clubid = freezed,
+  }) {
+    return _then(_$RoastersFetchedImpl(
+      freezed == clubid
+          ? _value.clubid
+          : clubid // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
 }
 
 /// @nodoc
 
 class _$RoastersFetchedImpl implements _RoastersFetched {
-  const _$RoastersFetchedImpl();
+  const _$RoastersFetchedImpl(this.clubid);
+
+  @override
+  final String? clubid;
 
   @override
   String toString() {
-    return 'RoasterEvent.roasters()';
+    return 'RoasterEvent.roasters(clubid: $clubid)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$RoastersFetchedImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$RoastersFetchedImpl &&
+            (identical(other.clubid, clubid) || other.clubid == clubid));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, clubid);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RoastersFetchedImplCopyWith<_$RoastersFetchedImpl> get copyWith =>
+      __$$RoastersFetchedImplCopyWithImpl<_$RoastersFetchedImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() roasters,
+    required TResult Function(String? clubid) roasters,
+    required TResult Function() teamRoasters,
   }) {
-    return roasters();
+    return roasters(clubid);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? roasters,
+    TResult? Function(String? clubid)? roasters,
+    TResult? Function()? teamRoasters,
   }) {
-    return roasters?.call();
+    return roasters?.call(clubid);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? roasters,
+    TResult Function(String? clubid)? roasters,
+    TResult Function()? teamRoasters,
     required TResult orElse(),
   }) {
     if (roasters != null) {
-      return roasters();
+      return roasters(clubid);
     }
     return orElse();
   }
@@ -135,6 +171,7 @@ class _$RoastersFetchedImpl implements _RoastersFetched {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_RoastersFetched value) roasters,
+    required TResult Function(_TeamsRoastersFetched value) teamRoasters,
   }) {
     return roasters(this);
   }
@@ -143,6 +180,7 @@ class _$RoastersFetchedImpl implements _RoastersFetched {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_RoastersFetched value)? roasters,
+    TResult? Function(_TeamsRoastersFetched value)? teamRoasters,
   }) {
     return roasters?.call(this);
   }
@@ -151,6 +189,7 @@ class _$RoastersFetchedImpl implements _RoastersFetched {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_RoastersFetched value)? roasters,
+    TResult Function(_TeamsRoastersFetched value)? teamRoasters,
     required TResult orElse(),
   }) {
     if (roasters != null) {
@@ -161,7 +200,115 @@ class _$RoastersFetchedImpl implements _RoastersFetched {
 }
 
 abstract class _RoastersFetched implements RoasterEvent {
-  const factory _RoastersFetched() = _$RoastersFetchedImpl;
+  const factory _RoastersFetched(final String? clubid) = _$RoastersFetchedImpl;
+
+  String? get clubid;
+  @JsonKey(ignore: true)
+  _$$RoastersFetchedImplCopyWith<_$RoastersFetchedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$TeamsRoastersFetchedImplCopyWith<$Res> {
+  factory _$$TeamsRoastersFetchedImplCopyWith(_$TeamsRoastersFetchedImpl value,
+          $Res Function(_$TeamsRoastersFetchedImpl) then) =
+      __$$TeamsRoastersFetchedImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$TeamsRoastersFetchedImplCopyWithImpl<$Res>
+    extends _$RoasterEventCopyWithImpl<$Res, _$TeamsRoastersFetchedImpl>
+    implements _$$TeamsRoastersFetchedImplCopyWith<$Res> {
+  __$$TeamsRoastersFetchedImplCopyWithImpl(_$TeamsRoastersFetchedImpl _value,
+      $Res Function(_$TeamsRoastersFetchedImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$TeamsRoastersFetchedImpl implements _TeamsRoastersFetched {
+  const _$TeamsRoastersFetchedImpl();
+
+  @override
+  String toString() {
+    return 'RoasterEvent.teamRoasters()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TeamsRoastersFetchedImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String? clubid) roasters,
+    required TResult Function() teamRoasters,
+  }) {
+    return teamRoasters();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String? clubid)? roasters,
+    TResult? Function()? teamRoasters,
+  }) {
+    return teamRoasters?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String? clubid)? roasters,
+    TResult Function()? teamRoasters,
+    required TResult orElse(),
+  }) {
+    if (teamRoasters != null) {
+      return teamRoasters();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_RoastersFetched value) roasters,
+    required TResult Function(_TeamsRoastersFetched value) teamRoasters,
+  }) {
+    return teamRoasters(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_RoastersFetched value)? roasters,
+    TResult? Function(_TeamsRoastersFetched value)? teamRoasters,
+  }) {
+    return teamRoasters?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_RoastersFetched value)? roasters,
+    TResult Function(_TeamsRoastersFetched value)? teamRoasters,
+    required TResult orElse(),
+  }) {
+    if (teamRoasters != null) {
+      return teamRoasters(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _TeamsRoastersFetched implements RoasterEvent {
+  const factory _TeamsRoastersFetched() = _$TeamsRoastersFetchedImpl;
 }
 
 /// @nodoc

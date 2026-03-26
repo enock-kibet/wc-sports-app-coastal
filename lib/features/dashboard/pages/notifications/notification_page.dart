@@ -90,7 +90,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         headerSection(context),
                         const SizedBox(height: kMedium),
                         reveal?Container():const SizedBox(height: kMedium),
-                        reveal?Container(): Align(alignment:Alignment.centerRight,child: Text("Clear All",style: context.textTheme.headlineSmall?.copyWith(fontSize: 14,color: AppColors.whiteColor),)),
+                        reveal?Container(): Align(alignment:Alignment.centerRight,child: Text("Clear All",style: context.textTheme.headlineSmall?.copyWith(fontSize: 14,color: Theme.of(context).colorScheme.onSurface),)),
                         Expanded(
                           child: BlocBuilder<NotificationBloc, NotificationState>(
                             builder: (context, state) {
@@ -174,6 +174,11 @@ class _NotificationPageState extends State<NotificationPage> {
 
 
   Row headerSection(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final chipColor =
+        isDark ? AppColors.whiteColor.withValues(alpha: 0.3) : Colors.white;
+    final iconColor =
+        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -184,18 +189,18 @@ class _NotificationPageState extends State<NotificationPage> {
           child: Container(
             padding: const EdgeInsets.all(kSmall),
             decoration: BoxDecoration(
-                color: AppColors.whiteColor.withOpacity(0.3),
+                color: chipColor,
                 shape: BoxShape.circle),
             child: Icon(
               LucideIcons.arrowLeft,
-              color: AppColors.whiteColor,
+              color: iconColor,
             ),
           ),
         ),
         Text(
           "Notifications",
           style: context.textTheme.headlineSmall?.copyWith(
-            color: AppColors.whiteColor,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
           ),
         ),

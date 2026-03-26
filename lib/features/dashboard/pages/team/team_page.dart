@@ -2,8 +2,13 @@ part of "team.dart";
 
 class TeamPage extends StatefulWidget {
   final bool showBackNavigation;
+  final ClubRoasterData? selectedClub;
 
-  const TeamPage({super.key, this.showBackNavigation = false});
+  const TeamPage({
+    super.key,
+    this.showBackNavigation = false,
+    this.selectedClub,
+  });
 
   @override
   State<TeamPage> createState() => _TeamPageState();
@@ -11,11 +16,34 @@ class TeamPage extends StatefulWidget {
 
 class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
   late TabController tabController;
+  int _statsRefreshTick = 0;
+
   @override
   void initState() {
     tabController = TabController(initialIndex: 2, length: 3, vsync: this);
     super.initState();
-    context.read<MatchBloc>().add(const MatchEvent.matchstats());
+    tabController.addListener(_handleTabChange);
+    context.read<MatchBloc>().add(
+          MatchEvent.matchstats(clubId: widget.selectedClub?.id),
+        );
+  }
+
+  void _handleTabChange() {
+    if (tabController.indexIsChanging || tabController.index != 1) return;
+
+    context.read<MatchBloc>().add(
+          MatchEvent.matchstats(clubId: widget.selectedClub?.id),
+        );
+    setState(() {
+      _statsRefreshTick++;
+    });
+  }
+
+  @override
+  void dispose() {
+    tabController.removeListener(_handleTabChange);
+    tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -39,7 +67,7 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
                       height: 39,
                     ),
                     Text(
-                      "Team",
+                      widget.selectedClub?.name ?? "Team",
                       style: context.textTheme.headlineLarge
                           ?.copyWith(fontSize: 16),
                     ),
@@ -78,19 +106,42 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
                           Tab(text: 'STANDINGS'),
                         ]),
                     Expanded(
-                        child: TabBarView(controller: tabController, children: [
-                      BlocProvider(
-                        create: (_) =>
-                            RoasterBloc()..add(const RoasterEvent.roasters()),
-                        child: const TeamRoster(),
+                      child: TabBarView(
+                        controller: tabController,
+                        children: [
+                          widget.selectedClub == null
+                              ? MultiBlocProvider(
+                                  providers: [
+                                    BlocProvider(
+                                      create: (_) => ClubRoastersBloc()
+                                        ..add(
+                                            const ClubRoasterEvent.roasters()),
+                                    ),
+                                    BlocProvider(create: (_) => RoasterBloc()),
+                                  ],
+                                  child: const LeagueRoaster(),
+                                )
+                              : BlocProvider(
+                                  create: (_) => RoasterBloc()
+                                    ..add(RoasterEvent.roasters(
+                                      widget.selectedClub!.id,
+                                    )),
+                                  child: const TeamRoster(),
+                                ),
+                          TeamStats(
+                            key: ValueKey(
+                              '${widget.selectedClub?.id ?? "league"}-$_statsRefreshTick',
+                            ),
+                            selectedClubId: widget.selectedClub?.id,
+                          ),
+                          BlocProvider(
+                            create: (_) => TeamStatsBloc()
+                              ..add(const TeamStatsEvent.standings()),
+                            child: const TeamStandings(),
+                          ),
+                        ],
                       ),
-                      TeamStats(),
-                      BlocProvider(
-                        create: (_) => TeamStatsBloc()
-                          ..add(const TeamStatsEvent.standings()),
-                        child: const TeamStandings(),
-                      ),
-                    ]))
+                    )
                   ],
                 ),
               ),

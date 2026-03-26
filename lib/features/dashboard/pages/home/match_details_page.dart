@@ -138,7 +138,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
           💸 Ticket Price: ${match.matchPrice}
           📍 Location: ${match.matchVenue}
           Get your tickets now from the Wence Sports app!
-          https://play.google.com/store/apps/details?id=com.wtl.dvsavio''';
+          https://play.google.com/store/apps/details?id=com.wtl.siel''';
 
                       Share.share(shareText, subject: 'Check out this event!');
                     },
@@ -367,7 +367,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                                     TileLayer(
                                       urlTemplate:
                                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                      userAgentPackageName: 'com.wtl.dvsavio',
+                                      userAgentPackageName: 'com.wtl.siel',
                                     ),
                                     MarkerLayer(
                                       markers: [

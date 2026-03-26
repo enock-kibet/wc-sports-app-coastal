@@ -27,13 +27,13 @@ if (flutterVersionName == null) {
 }
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = file('/Users/kibet/Documents/Code/WTL/Sports App/wc-sports-app-don/key/key.properties')
+def keystorePropertiesFile = rootProject.file('../key/key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
 android {
-    namespace "com.example.sports_app"
+    namespace "com.wtl.siel"
     compileSdk 36
     ndkVersion "26.1.10909125"
 
@@ -52,7 +52,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.wtl.dvsavio"
+        applicationId "com.wtl.siel"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 26
@@ -64,7 +64,7 @@ android {
         release {
             keyAlias = keystoreProperties['keyAlias']
             keyPassword = keystoreProperties['keyPassword']
-            storeFile = file('../wcsports-release-key.keystore')
+            storeFile = rootProject.file('../android/siel-key.jks')
             storePassword = keystoreProperties['storePassword']
         }
     }

@@ -4,12 +4,29 @@ import 'package:go_router/go_router.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/data/models/match/match-recarp.dart';
+import 'package:sports_app/data/models/stats/stat.dart';
+import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/dashboard/pages/points/points_page.dart';
 
-class GameRecapPage extends StatelessWidget {
+class GameRecapPage extends StatefulWidget {
   final MatchModel match;
 
   const GameRecapPage({super.key, required this.match});
+
+  @override
+  State<GameRecapPage> createState() => _GameRecapPageState();
+}
+
+class _GameRecapPageState extends State<GameRecapPage> {
+  late final Future<List<_LeaderCategory>> _statLeadersFuture;
+
+  MatchModel get match => widget.match;
+
+  @override
+  void initState() {
+    super.initState();
+    _statLeadersFuture = _loadStatLeaders();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +51,7 @@ class GameRecapPage extends StatelessWidget {
 
     final team1Totals = _aggregateStats(clubOneStats);
     final team2Totals = _aggregateStats(clubTwoStats);
-    final quarterRows = _dummyQuarterRows(
-      clubOneScore,
-      clubTwoScore,
-    );
-    final statLeaders = _dummyStatLeaders();
+    final quarterBreakdown = _buildQuarterBreakdown();
 
     // choose the stat keys you want to show (expand later)
     final statRows = <String>[
@@ -89,10 +102,25 @@ class GameRecapPage extends StatelessWidget {
                           score2: clubTwoScore,
                           dateLabel: formattedDate,
                           venue: venueName,
-                          quarterRows: quarterRows,
+                          quarterBreakdown: quarterBreakdown,
                         ),
                         const SizedBox(height: 18),
-            _gameStatLeaders(context, statLeaders),
+                        FutureBuilder<List<_LeaderCategory>>(
+                          future: _statLeadersFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return _gameStatLeadersLoading(context);
+                            }
+
+                            final leaders = snapshot.data ?? const [];
+                            if (leaders.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+
+                            return _gameStatLeaders(context, leaders);
+                          },
+                        ),
                         const SizedBox(height: 18),
                         Align(
                           alignment: Alignment.centerLeft,
@@ -164,14 +192,15 @@ class GameRecapPage extends StatelessWidget {
     required String score2,
     required String dateLabel,
     required String venue,
-    required List<_QuarterRow> quarterRows,
+    required _QuarterBreakdown? quarterBreakdown,
   }) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final borderColor =
         theme.brightness == Brightness.dark ? Colors.white24 : Colors.black12;
-    final mutedColor =
-        theme.brightness == Brightness.dark ? Colors.white60 : const Color(0xFF8A8A8A);
+    final mutedColor = theme.brightness == Brightness.dark
+        ? Colors.white60
+        : const Color(0xFF8A8A8A);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -242,20 +271,26 @@ class GameRecapPage extends StatelessWidget {
           const SizedBox(height: 14),
           Divider(color: borderColor, height: 1),
           const SizedBox(height: 14),
-          _quarterBreakdown(context, quarterRows),
+          if (quarterBreakdown != null)
+            _quarterBreakdown(context, quarterBreakdown),
         ],
       ),
     );
   }
 
-  Widget _quarterBreakdown(BuildContext context, List<_QuarterRow> quarterRows) {
-    const headers = ["Q1", "Q2", "Q3", "Q4", "T"];
+  Widget _quarterBreakdown(
+    BuildContext context,
+    _QuarterBreakdown quarterBreakdown,
+  ) {
+    final headers = [...quarterBreakdown.headers, "T"];
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final headerColor =
-        theme.brightness == Brightness.dark ? Colors.white60 : const Color(0xFF8A8A8A);
-    final valueColor =
-        theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF4A4A4A);
+    final headerColor = theme.brightness == Brightness.dark
+        ? Colors.white60
+        : const Color(0xFF8A8A8A);
+    final valueColor = theme.brightness == Brightness.dark
+        ? Colors.white70
+        : const Color(0xFF4A4A4A);
 
     Widget statCell(
       String value, {
@@ -281,16 +316,11 @@ class GameRecapPage extends StatelessWidget {
         Row(
           children: [
             const SizedBox(width: 140),
-            for (final header in headers)
-              statCell(
-                header,
-                bold: false,
-                color: headerColor,
-              ),
+            for (final header in headers) statCell(header, color: headerColor),
           ],
         ),
         const SizedBox(height: 12),
-        ...quarterRows.map((row) {
+        ...quarterBreakdown.rows.map((row) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: Row(
@@ -306,10 +336,7 @@ class GameRecapPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                statCell(row.q1),
-                statCell(row.q2),
-                statCell(row.q3),
-                statCell(row.q4),
+                for (final value in row.intervalScores) statCell(value),
                 statCell(row.total),
               ],
             ),
@@ -319,97 +346,134 @@ class GameRecapPage extends StatelessWidget {
     );
   }
 
-  List<_QuarterRow> _dummyQuarterRows(
-    String homeTotal,
-    String awayTotal,
-  ) {
-    return [
-      _QuarterRow(
-        teamName: match.clubOne.name,
-        q1: "21",
-        q2: "16",
-        q3: "08",
-        q4: "19",
-        total: homeTotal,
-      ),
-      _QuarterRow(
-        teamName: match.clubTwo.name,
-        q1: "25",
-        q2: "02",
-        q3: "05",
-        q4: "26",
-        total: awayTotal,
-      ),
-    ];
+  _QuarterBreakdown? _buildQuarterBreakdown() {
+    if (match.intervalScores.isEmpty) return null;
+
+    final sortedIntervals = [...match.intervalScores]
+      ..sort((a, b) => a.sequencePosition.compareTo(b.sequencePosition));
+
+    return _QuarterBreakdown(
+      headers: sortedIntervals
+          .map((score) => _intervalLabel(
+                sequencePosition: score.sequencePosition,
+                interval: score.interval,
+              ))
+          .toList(),
+      rows: [
+        _QuarterRow(
+          teamName: match.clubOne.name,
+          intervalScores:
+              sortedIntervals.map((score) => score.homeTeamScore).toList(),
+          total: match.clubOneScore,
+        ),
+        _QuarterRow(
+          teamName: match.clubTwo.name,
+          intervalScores:
+              sortedIntervals.map((score) => score.awayTeamScore).toList(),
+          total: match.clubTwoScore,
+        ),
+      ],
+    );
   }
 
-  List<_LeaderCategory> _dummyStatLeaders() {
-    return const [
-      _LeaderCategory(
-        title: "Points",
-        leftLeader: _LeaderEntry(
-          name: "Jamal Kibet",
-          value: "23 PTS",
-        ),
-        rightLeader: _LeaderEntry(
-          name: "Tom Obiri",
-          value: "18 PTS",
-        ),
-      ),
-      _LeaderCategory(
-        title: "Assists",
-        leftLeader: _LeaderEntry(
-          name: "Jamal Kibet",
-          value: "5 Assists",
-        ),
-        rightLeader: _LeaderEntry(
-          name: "Tom Obiri",
-          value: "6 Assists",
-        ),
-      ),
-      _LeaderCategory(
-        title: "Rebounds",
-        leftLeader: _LeaderEntry(
-          name: "Jamal Kibet",
-          value: "8 Rebounds",
-        ),
-        rightLeader: _LeaderEntry(
-          name: "Tom Obiri",
-          value: "14 Rebounds",
-        ),
-      ),
-      _LeaderCategory(
-        title: "Steals",
-        leftLeader: _LeaderEntry(
-          name: "Jamal Kibet",
-          value: "5 Steals",
-        ),
-        rightLeader: _LeaderEntry(
-          name: "Tom Obiri",
-          value: "7 Steals",
-        ),
-      ),
-      _LeaderCategory(
-        title: "Blocks",
-        leftLeader: _LeaderEntry(
-          name: "Jamal Kibet",
-          value: "4 Blocks",
-        ),
-        rightLeader: _LeaderEntry(
-          name: "Tom Obiri",
-          value: "2 Blocks",
-        ),
-      ),
-    ];
+  String _intervalLabel({
+    required int sequencePosition,
+    required String interval,
+  }) {
+    final normalizedInterval = interval.trim().toLowerCase();
+    if (normalizedInterval.contains('first')) return 'Q1';
+    if (normalizedInterval.contains('second')) return 'Q2';
+    if (normalizedInterval.contains('third')) return 'Q3';
+    if (normalizedInterval.contains('fourth')) return 'Q4';
+    if (normalizedInterval.contains('overtime')) {
+      final overtimeNumber = sequencePosition - 4;
+      return overtimeNumber > 0 ? 'OT$overtimeNumber' : 'OT';
+    }
+    if (sequencePosition >= 1 && sequencePosition <= 4) {
+      return 'Q$sequencePosition';
+    }
+    return 'P$sequencePosition';
+  }
+
+  Future<List<_LeaderCategory>> _loadStatLeaders() async {
+    final response = await service<StatService>().getMatchStatLeaders(match.id);
+
+    return response.when(
+      onError: (_) => const [],
+      onSuccess: (leadersByCategory) {
+        final categories = <_LeaderCategory>[];
+
+        leadersByCategory.forEach((category, clubs) {
+          final leftLeader = _toLeaderEntry(
+            clubs[match.clubOne.name],
+            category,
+          );
+          final rightLeader = _toLeaderEntry(
+            clubs[match.clubTwo.name],
+            category,
+          );
+
+          if (leftLeader == null && rightLeader == null) {
+            return;
+          }
+
+          categories.add(
+            _LeaderCategory(
+              title: category,
+              leftLeader: leftLeader ??
+                  const _LeaderEntry(name: 'No leader', value: '--'),
+              rightLeader: rightLeader ??
+                  const _LeaderEntry(name: 'No leader', value: '--'),
+            ),
+          );
+        });
+
+        return categories;
+      },
+    );
+  }
+
+  _LeaderEntry? _toLeaderEntry(
+    List<MatchStatLeader>? leaders,
+    String category,
+  ) {
+    if (leaders == null || leaders.isEmpty) return null;
+
+    final leader = leaders.first;
+    return _LeaderEntry(
+      name: leader.playerName.trim().isEmpty
+          ? 'Unknown Player'
+          : leader.playerName.trim(),
+      value: '${leader.stat} ${_statValueLabel(category)}',
+    );
+  }
+
+  String _statValueLabel(String category) {
+    switch (category) {
+      case 'Field Goal':
+        return 'FG';
+      case 'Free Throw (FT)':
+        return 'FT';
+      case 'Three Pointer (3 PT)':
+        return '3PT';
+      case 'Personal Fouls':
+        return 'PF';
+      case 'Technical Fouls':
+        return 'TF';
+      default:
+        return category;
+    }
   }
 
   Widget _gameStatLeaders(BuildContext context, List<_LeaderCategory> leaders) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final borderColor =
-        theme.brightness == Brightness.dark ? Colors.white24 : const Color(0xFFD5D5D5);
-    final dividerColor =
-        theme.brightness == Brightness.dark ? Colors.white12 : const Color(0xFFDCDCDC);
+    final borderColor = theme.brightness == Brightness.dark
+        ? Colors.white24
+        : const Color(0xFFD5D5D5);
+    final dividerColor = theme.brightness == Brightness.dark
+        ? Colors.white12
+        : const Color(0xFFDCDCDC);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -467,6 +531,63 @@ class GameRecapPage extends StatelessWidget {
     );
   }
 
+  Widget _gameStatLeadersLoading(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final borderColor = theme.brightness == Brightness.dark
+        ? Colors.white24
+        : const Color(0xFFD5D5D5);
+
+    Widget placeholderTile() {
+      return Expanded(
+        child: Container(
+          height: 46,
+          decoration: BoxDecoration(
+            color: theme.brightness == Brightness.dark
+                ? Colors.white10
+                : Colors.black.withValues(alpha: 0.04),
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Game Stat Leaders",
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            color: scheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 14),
+        ...List.generate(3, (index) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: scheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: borderColor),
+              ),
+              child: Row(
+                children: [
+                  placeholderTile(),
+                  const SizedBox(width: 14),
+                  placeholderTile(),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
   Widget _leaderTile(BuildContext context, _LeaderEntry leader) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
@@ -476,8 +597,9 @@ class GameRecapPage extends StatelessWidget {
     final avatarFg = theme.brightness == Brightness.dark
         ? scheme.primary
         : const Color(0xFF4A4372);
-    final mutedColor =
-        theme.brightness == Brightness.dark ? Colors.white60 : const Color(0xFF777777);
+    final mutedColor = theme.brightness == Brightness.dark
+        ? Colors.white60
+        : const Color(0xFF777777);
 
     final initials = leader.name
         .trim()
@@ -539,8 +661,9 @@ class GameRecapPage extends StatelessWidget {
   Widget _teamMini(BuildContext context, String name, {String? pic}) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final mutedColor =
-        theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF5B5B5B);
+    final mutedColor = theme.brightness == Brightness.dark
+        ? Colors.white70
+        : const Color(0xFF5B5B5B);
     final abbr = name
         .trim()
         .split(RegExp(r'\s+'))
@@ -549,6 +672,23 @@ class GameRecapPage extends StatelessWidget {
         .map((e) => e.substring(0, 1).toUpperCase())
         .join();
     final hasPic = pic != null && pic.isNotEmpty;
+    final fallbackAbbr = abbr.isEmpty ? "?" : abbr;
+
+    Widget fallbackAvatarText() {
+      return SizedBox(
+        width: 44,
+        height: 44,
+        child: Center(
+          child: Text(
+            fallbackAbbr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: scheme.onSurface,
+            ),
+          ),
+        ),
+      );
+    }
 
     return Column(
       children: [
@@ -564,17 +704,10 @@ class GameRecapPage extends StatelessWidget {
                     width: 44,
                     height: 44,
                     fit: BoxFit.cover,
-                    errorWidget: (context, url, error) =>
-                        Text(
-                          abbr.isEmpty ? "?" : abbr,
-                          style: TextStyle(color: scheme.onSurface),
-                        ),
+                    errorWidget: (context, url, error) => fallbackAvatarText(),
                   ),
                 )
-              : Text(
-                  abbr.isEmpty ? "?" : abbr,
-                  style: TextStyle(color: scheme.onSurface),
-                ),
+              : fallbackAvatarText(),
         ),
         const SizedBox(height: 6),
         SizedBox(
@@ -684,19 +817,23 @@ class GameRecapPage extends StatelessWidget {
 
 class _QuarterRow {
   final String teamName;
-  final String q1;
-  final String q2;
-  final String q3;
-  final String q4;
+  final List<String> intervalScores;
   final String total;
 
   const _QuarterRow({
     required this.teamName,
-    required this.q1,
-    required this.q2,
-    required this.q3,
-    required this.q4,
+    required this.intervalScores,
     required this.total,
+  });
+}
+
+class _QuarterBreakdown {
+  final List<String> headers;
+  final List<_QuarterRow> rows;
+
+  const _QuarterBreakdown({
+    required this.headers,
+    required this.rows,
   });
 }
 

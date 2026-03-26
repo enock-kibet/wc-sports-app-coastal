@@ -1,7 +1,9 @@
 part of 'team.dart';
 
 class TeamStats extends StatelessWidget {
-  const TeamStats({super.key});
+  final String? selectedClubId;
+
+  const TeamStats({super.key, this.selectedClubId});
 
   @override
 Widget build(BuildContext context) {
@@ -80,7 +82,7 @@ Widget build(BuildContext context) {
                     ),
 
                     /// Personal Stats
-                    PlayerStats(context),
+                    PlayerStats(context, selectedClubId: selectedClubId),
                   ],
                 ),
               ),
@@ -93,9 +95,10 @@ Widget build(BuildContext context) {
   }
 }
 
-Widget PlayerStats(BuildContext context) {
+Widget PlayerStats(BuildContext context, {String? selectedClubId}) {
   return BlocProvider(
-    create: (_) => StatBloc()..add(const StatEvent.stats()),
+    create: (_) => StatBloc(clubId: selectedClubId)
+      ..add(const StatEvent.stats()),
     child: BlocBuilder<StatBloc, StatState>(
       builder: (context, state) {
         if (state.status.isLoading) {

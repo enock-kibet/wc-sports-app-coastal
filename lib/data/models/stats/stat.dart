@@ -93,3 +93,18 @@ class HighlightReel with _$HighlightReel {
   factory HighlightReel.fromJson(Map<String, dynamic> json) =>
       _$HighlightReelFromJson(json);
 }
+
+@freezed
+class MatchStatLeader with _$MatchStatLeader {
+  const factory MatchStatLeader({
+    required String playerId,
+    required String playerName,
+    @JsonKey(name: 'clubID') required String clubId,
+    @JsonKey(name: 'clubName') required String clubName,
+    required int stat,
+    required int rank,
+  }) = _MatchStatLeader;
+
+  factory MatchStatLeader.fromJson(Map<String, dynamic> json) =>
+      _$MatchStatLeaderFromJson(json);
+}

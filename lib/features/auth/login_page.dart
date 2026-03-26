@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,13 +10,13 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/mixin/input_validation_mixin.dart';
 import 'package:sports_app/core/snackbar_service.dart';
+import 'package:sports_app/data/models/club/club.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
+import 'package:sports_app/features/app/blocs/club/club_bloc.dart';
 import 'package:sports_app/features/app/blocs/user_profile/user_bloc.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
-import 'package:sports_app/main.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:upgrader/upgrader.dart';
 
 import '../../common/dimens.dart';
 import '../../theme/app_colors.dart';
@@ -38,6 +37,8 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
       TextEditingController(text: kDebugMode ? 'xtriimgamer3@gmail.com' : '');
   final TextEditingController _passwordController =
       TextEditingController(text: kDebugMode ? 'Qwerty123456' : '');
+  String? _selectedClubId;
+  String? _selectedClubName;
   bool hidePassword = true;
   @override
   void initState() {
@@ -55,6 +56,9 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
 
   @override
   Widget build(BuildContext context) {
+    final labelColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.68);
+    final outlinedBorderColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.22);
+    final secondaryTextColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75);
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: authBloc,
@@ -99,23 +103,23 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                     const SizedBox(
                       height: kLarge,
                     ),
-                    const Text(
+                    Text(
                       "Welcome Back!",
                       style: TextStyle(
                           fontSize: kMedium,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF696565)),
+                          color: labelColor),
                     ),
                     const SizedBox(
                       height: kLarge,
                     ),
-                    const Align(
+                    Align(
                         alignment: Alignment.centerLeft,
                         child: Text("Email",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF696565)))),
+                                color: labelColor))),
                     const SizedBox(
                       height: 9,
                     ),
@@ -131,13 +135,24 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                     const SizedBox(
                       height: 13,
                     ),
-                    const Align(
+                    if (_selectedClubName != null) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.shield, size: 16),
+                          const SizedBox(width: 6),
+                          Text("Team: $_selectedClubName"),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                    Align(
                         alignment: Alignment.centerLeft,
                         child: Text("Password",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF696565)))),
+                                color: labelColor))),
                     const SizedBox(
                       height: 9,
                     ),
@@ -189,11 +204,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                           if (validateSaveLogin()) {
                             if (state.status == AuthStatus.loading) {
                             } else {
-                              authBloc.add(AuthEvent.login(request: {
-                                "email": _emailController.text.trim(),
-                                "password": _passwordController.text.trim(),
-                                "clubid": '80e0e316-64a8-4708-9dd5-590f3b6bedff'
-                              }));
+                              _loginWithSelectedTeam();
                             }
                           }
                         },
@@ -207,10 +218,15 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                     OutlinedButton(
                         style: OutlinedButton.styleFrom(
                             minimumSize: const Size.fromHeight(56),
-                            side: BorderSide(color: Color(0xFF414141)),
+                            side: BorderSide(color: outlinedBorderColor),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(kMedium))),
                         onPressed: () async {
+                          if (state.status == AuthStatus.loading) return;
+
+                          final club = await _selectClubForAuth();
+                          if (club == null) return;
+
                           try {
                             // Initialize Google Sign-In
                             final GoogleSignIn googleSignIn =
@@ -226,15 +242,15 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                                 "email": googleUser.email,
                                 "googleId": googleUser.id,
                                 "picture": googleUser.photoUrl,
-                                "clubid": '80e0e316-64a8-4708-9dd5-590f3b6bedff'
+                                "clubid": club.id,
                               }));
                             } else {
                               print("Google Sign-In canceled by user.");
-                              return null;
+                              return;
                             }
                           } catch (e) {
                             print("Error during Google Sign-In: $e");
-                            return null;
+                            return;
                           }
                         },
                         child: Row(
@@ -251,8 +267,8 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                               state.status == AuthStatus.loading
                                   ? "Loading..."
                                   : 'Sign In with Google',
-                              style: const TextStyle(
-                                  color: Color(0xFF525252), fontSize: 13),
+                              style: TextStyle(
+                                  color: secondaryTextColor, fontSize: 13),
                             )
                           ],
                         )),
@@ -293,6 +309,32 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
     }
   }
 
+  Future<ClubRoasterData?> _selectClubForAuth() async {
+    final club =
+        await showClubPicker(context, initiallySelectedId: _selectedClubId);
+    if (club == null) return null;
+
+    if (mounted) {
+      setState(() {
+        _selectedClubId = club.id;
+        _selectedClubName = club.name;
+      });
+    }
+
+    return club;
+  }
+
+  Future<void> _loginWithSelectedTeam() async {
+    final club = await _selectClubForAuth();
+    if (club == null) return;
+
+    authBloc.add(AuthEvent.login(request: {
+      "email": _emailController.text.trim(),
+      "password": _passwordController.text.trim(),
+      "clubid": club.id,
+    }));
+  }
+
   // Future<void> _signInWithApple() async {
   //   try {
   //     final credential = await SignInWithApple.getAppleIDCredential(
@@ -322,6 +364,9 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
 
   Future<void> _signInWithApple() async {
     try {
+      final club = await _selectClubForAuth();
+      if (club == null) return;
+
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
@@ -369,7 +414,7 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
           if (storedEmail != null) "email": storedEmail,
           if (storedName != null) "name": storedName,
           "identityToken": identityToken,
-          "clubid": "80e0e316-64a8-4708-9dd5-590f3b6bedff"
+          "clubid": club.id,
         }),
       );
     } catch (e) {
@@ -413,14 +458,180 @@ CustomTextField(bool isEmail, String hintText,
             : const SizedBox(),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(kMedium),
-            borderSide: const BorderSide(color: Color(0xFFC6C6C6))),
+            borderSide: const BorderSide(color: Color(0xFFD0D0D0))),
         filled: false,
         hintText: hintText,
-        hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFC6C6C6)),
+        hintStyle:
+            const TextStyle(fontSize: 13, color: Color(0xFF9A9A9A)),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(kMedium),
             borderSide: BorderSide(color: AppColors.primaryColor))),
   );
+}
+
+Future<ClubRoasterData?> showClubPicker(
+  BuildContext parentContext, {
+  String? initiallySelectedId,
+}) {
+  return showModalBottomSheet<ClubRoasterData>(
+    context: parentContext,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    builder: (_) {
+      final bloc = parentContext.read<ClubRoastersBloc>();
+      final state = bloc.state;
+
+      if (!state.status.isSuccess && !state.status.isLoading) {
+        bloc.add(const ClubRoasterEvent.roasters());
+      }
+
+      return _ClubPickerSheet(
+        parentContext: parentContext,
+        initiallySelectedId: initiallySelectedId,
+      );
+    },
+  );
+}
+
+class _ClubPickerSheet extends StatefulWidget {
+  const _ClubPickerSheet({
+    required this.parentContext,
+    this.initiallySelectedId,
+  });
+
+  final BuildContext parentContext;
+  final String? initiallySelectedId;
+
+  @override
+  State<_ClubPickerSheet> createState() => _ClubPickerSheetState();
+}
+
+class _ClubPickerSheetState extends State<_ClubPickerSheet> {
+  String query = "";
+  ClubRoasterData? selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 16,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Select Team",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              decoration: const InputDecoration(
+                hintText: "Search team...",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) => setState(() => query = value),
+            ),
+            const SizedBox(height: 12),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 320),
+              child: BlocBuilder<ClubRoastersBloc, ClubRoastersState>(
+                bloc: widget.parentContext.read<ClubRoastersBloc>(),
+                builder: (_, state) {
+                  if (state.status.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state.status.isFailure) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text("Failed to load teams"),
+                          const SizedBox(height: 8),
+                          OutlinedButton(
+                            onPressed: () {
+                              widget.parentContext
+                                  .read<ClubRoastersBloc>()
+                                  .add(const ClubRoasterEvent.roasters());
+                            },
+                            child: const Text("Retry"),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  final teams = (state.clubRoasters ?? [])
+                      .where((team) => team.name
+                          .toLowerCase()
+                          .contains(query.toLowerCase()))
+                      .toList();
+
+                  if (selected == null && widget.initiallySelectedId != null) {
+                    for (final team in teams) {
+                      if (team.id == widget.initiallySelectedId) {
+                        selected = team;
+                        break;
+                      }
+                    }
+                  }
+
+                  if (teams.isEmpty) {
+                    return const Center(child: Text("No teams found"));
+                  }
+
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: teams.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (_, index) {
+                      final team = teams[index];
+                      final isSelected = selected?.id == team.id;
+
+                      return ListTile(
+                        title: Text(team.name),
+                        trailing: isSelected
+                            ? const Icon(Icons.check_circle)
+                            : const Icon(Icons.circle_outlined),
+                        onTap: () => setState(() => selected = team),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Cancel"),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: selected == null
+                        ? null
+                        : () => Navigator.pop(context, selected),
+                    child: const Text("Confirm"),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 //button with the app colors spanning entire width
