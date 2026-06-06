@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:sports_app/common/app_background.dart';
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
-import 'package:sports_app/common/huge_icon_button.dart';
-
-import '../../../../theme/app_colors.dart';
 
 class Help extends StatefulWidget {
   const Help({super.key});
@@ -22,8 +18,6 @@ class _HelpState extends State<Help> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
-
     return Scaffold(
       body: AppBackground(
         childWidget: Padding(
@@ -46,16 +40,7 @@ class _HelpState extends State<Help> {
                     Stack(
                       alignment: Alignment.centerLeft,
                       children: [
-                        IconButton.filledTonal(
-                          onPressed: () => context.pop(),
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: AppColors.inputFillColor,
-                          ),
-                          style: IconButton.styleFrom(
-                              backgroundColor: Color(0XFF999999),
-                              fixedSize: Size(48, 48)),
-                        ),
+                        const AppBackButton(),
                         Align(
                             alignment: Alignment.center,
                             child: Text(

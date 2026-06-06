@@ -6,17 +6,17 @@ part 'notification.g.dart';
 @freezed
 class Notifications with _$Notifications {
   const factory Notifications({
-    required int id,
-    required String userId,
+    @JsonKey(defaultValue: 0) required int id,
+    @JsonKey(defaultValue: '') required String userId,
     String? cartId,
-    required String notificationType,
-    required String channel,
+    @JsonKey(defaultValue: '') required String notificationType,
+    @JsonKey(defaultValue: '') required String channel,
     String? campaignId,
     String? attributionWindow,
-    required String notificationKey,
-    required String createdUtc,
-    required String updatedUtc,
-    required String notificationText,
+    @JsonKey(defaultValue: '') required String notificationKey,
+    @JsonKey(defaultValue: '') required String createdUtc,
+    @JsonKey(defaultValue: '') required String updatedUtc,
+    @JsonKey(defaultValue: '') required String notificationText,
   }) = _Notifications;
 
   factory Notifications.fromJson(Map<String, dynamic> json) =>

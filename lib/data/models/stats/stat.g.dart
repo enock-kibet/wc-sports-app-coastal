@@ -13,7 +13,7 @@ _$StatsImpl _$$StatsImplFromJson(Map<String, dynamic> json) => _$StatsImpl(
       clubId: json['clubId'] as String,
       clubname: json['clubname'] as String,
       seasonId: json['seasonId'] as String,
-      avg: (json['avg'] as num).toInt(),
+      avg: (json['avg'] as num).toDouble(),
       games: (json['games'] as num).toInt(),
       imageUrl: json['imageUrl'] as String?,
     );

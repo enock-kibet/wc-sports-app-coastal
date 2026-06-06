@@ -168,6 +168,7 @@ mixin _$ClubRoasterData {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get leagueId => throw _privateConstructorUsedError;
+  String? get imageUrl => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -181,7 +182,7 @@ abstract class $ClubRoasterDataCopyWith<$Res> {
           ClubRoasterData value, $Res Function(ClubRoasterData) then) =
       _$ClubRoasterDataCopyWithImpl<$Res, ClubRoasterData>;
   @useResult
-  $Res call({String id, String name, String leagueId});
+  $Res call({String id, String name, String leagueId, String? imageUrl});
 }
 
 /// @nodoc
@@ -200,6 +201,7 @@ class _$ClubRoasterDataCopyWithImpl<$Res, $Val extends ClubRoasterData>
     Object? id = null,
     Object? name = null,
     Object? leagueId = null,
+    Object? imageUrl = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -214,6 +216,10 @@ class _$ClubRoasterDataCopyWithImpl<$Res, $Val extends ClubRoasterData>
           ? _value.leagueId
           : leagueId // ignore: cast_nullable_to_non_nullable
               as String,
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -226,7 +232,7 @@ abstract class _$$ClubRoasterDataImplCopyWith<$Res>
       __$$ClubRoasterDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String name, String leagueId});
+  $Res call({String id, String name, String leagueId, String? imageUrl});
 }
 
 /// @nodoc
@@ -243,6 +249,7 @@ class __$$ClubRoasterDataImplCopyWithImpl<$Res>
     Object? id = null,
     Object? name = null,
     Object? leagueId = null,
+    Object? imageUrl = freezed,
   }) {
     return _then(_$ClubRoasterDataImpl(
       id: null == id
@@ -257,6 +264,10 @@ class __$$ClubRoasterDataImplCopyWithImpl<$Res>
           ? _value.leagueId
           : leagueId // ignore: cast_nullable_to_non_nullable
               as String,
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -265,7 +276,10 @@ class __$$ClubRoasterDataImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ClubRoasterDataImpl implements _ClubRoasterData {
   const _$ClubRoasterDataImpl(
-      {required this.id, required this.name, required this.leagueId});
+      {required this.id,
+      required this.name,
+      required this.leagueId,
+      this.imageUrl});
 
   factory _$ClubRoasterDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$ClubRoasterDataImplFromJson(json);
@@ -276,10 +290,12 @@ class _$ClubRoasterDataImpl implements _ClubRoasterData {
   final String name;
   @override
   final String leagueId;
+  @override
+  final String? imageUrl;
 
   @override
   String toString() {
-    return 'ClubRoasterData(id: $id, name: $name, leagueId: $leagueId)';
+    return 'ClubRoasterData(id: $id, name: $name, leagueId: $leagueId, imageUrl: $imageUrl)';
   }
 
   @override
@@ -290,12 +306,14 @@ class _$ClubRoasterDataImpl implements _ClubRoasterData {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.leagueId, leagueId) ||
-                other.leagueId == leagueId));
+                other.leagueId == leagueId) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, leagueId);
+  int get hashCode => Object.hash(runtimeType, id, name, leagueId, imageUrl);
 
   @JsonKey(ignore: true)
   @override
@@ -316,7 +334,8 @@ abstract class _ClubRoasterData implements ClubRoasterData {
   const factory _ClubRoasterData(
       {required final String id,
       required final String name,
-      required final String leagueId}) = _$ClubRoasterDataImpl;
+      required final String leagueId,
+      final String? imageUrl}) = _$ClubRoasterDataImpl;
 
   factory _ClubRoasterData.fromJson(Map<String, dynamic> json) =
       _$ClubRoasterDataImpl.fromJson;
@@ -327,6 +346,8 @@ abstract class _ClubRoasterData implements ClubRoasterData {
   String get name;
   @override
   String get leagueId;
+  @override
+  String? get imageUrl;
   @override
   @JsonKey(ignore: true)
   _$$ClubRoasterDataImplCopyWith<_$ClubRoasterDataImpl> get copyWith =>

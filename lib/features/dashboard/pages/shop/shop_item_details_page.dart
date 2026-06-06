@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/products/product.dart';
@@ -97,9 +98,9 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                       );
                                     }
                                   : () async {
-                                      final currentUser = service<
-                                              AppPreferencesManager>()
-                                          .currentUserValue;
+                                      final currentUser =
+                                          service<AppPreferencesManager>()
+                                              .currentUserValue;
                                       if (currentUser == null) {
                                         context.go('/signIn');
                                         return;
@@ -172,9 +173,9 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                       );
                                     }
                                   : () async {
-                                      final currentUser = service<
-                                              AppPreferencesManager>()
-                                          .currentUserValue;
+                                      final currentUser =
+                                          service<AppPreferencesManager>()
+                                              .currentUserValue;
                                       final userEmail = currentUser?.email;
                                       if (userEmail == null ||
                                           userEmail.isEmpty) {
@@ -352,23 +353,11 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                         ),
                       ),
                     ),
-                    Positioned(
-                        left: 20,
-                        top: 20,
-                        child: CustomIconButton(
-                          onButtonPress: () {
-                            context.pop();
-                          },
-                          icon: Icons.arrow_back,
-                          size: 40,
-                          borderColor: const Color(0xff828282),
-                          iconColor: Colors.white,
-                          backgroundColor: const Color(0xff828282),
-                        )),
+                    Positioned(left: 20, top: 20, child: const AppBackButton()),
                     Positioned(
                         right: 20,
                         top: 20,
-                        child: CustomIconButton(
+                        child: _TopCartButton(
                           onButtonPress: () async {
                             final bloc = context.read<PointsBloc>();
 
@@ -384,14 +373,10 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                             });
 
                             final pointsState = bloc.state;
-                            showCartShopBottomSheet(context,
+                            if (!context.mounted) return;
+                            await showCartShopBottomSheet(context,
                                 pointsState: pointsState);
                           },
-                          icon: LucideIcons.shoppingCart,
-                          size: 40,
-                          borderColor: const Color(0xff828282),
-                          iconColor: Colors.white,
-                          backgroundColor: const Color(0xff828282),
                         ))
 
                     //more hortz
@@ -399,6 +384,36 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                 ),
               ));
         });
+  }
+}
+
+class _TopCartButton extends StatelessWidget {
+  final VoidCallback onButtonPress;
+
+  const _TopCartButton({required this.onButtonPress});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final chipColor =
+        isDark ? AppColors.whiteColor.withValues(alpha: 0.3) : Colors.white;
+    final iconColor = isDark ? AppColors.whiteColor : colorScheme.onSurface;
+
+    return GestureDetector(
+      onTap: onButtonPress,
+      child: Container(
+        padding: const EdgeInsets.all(kSmall),
+        decoration: BoxDecoration(
+          color: chipColor,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          LucideIcons.shoppingCart,
+          color: iconColor,
+        ),
+      ),
+    );
   }
 }
 

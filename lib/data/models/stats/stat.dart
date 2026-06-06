@@ -12,7 +12,7 @@ class Stats with _$Stats {
     required String clubId,
     required String clubname,
     required String seasonId,
-    required int avg,
+    required double avg,
     required int games,
     String? imageUrl,
   }) = _Stats;

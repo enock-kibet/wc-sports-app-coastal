@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/features/app/blocs/stripe/stripe_bloc.dart';
+import 'package:sports_app/features/dashboard/pages/home/widget/previous_tiles.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/buildcontext.dart';
+import 'package:sports_app/common/utils/pull_to_refresh.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/matches/match_bloc.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
@@ -59,6 +61,25 @@ class _SchedulePageState extends State<SchedulePage> {
     return !local.isBefore(_startOfToday());
   }
 
+  List<MatchType> _combinedMatches(MatchState state) {
+    final matchesById = <String, MatchType>{};
+
+    for (final match in state.matches) {
+      matchesById[match.matchId] = match;
+    }
+
+    for (final match in state.statsMatches) {
+      matchesById[match.matchId] = match;
+    }
+
+    return matchesById.values.toList();
+  }
+
+  bool _isSameMonth(DateTime month, DateTime dateToCompare) {
+    final local = dateToCompare.toLocal();
+    return month.year == local.year && month.month == local.month;
+  }
+
   void _handleBuyTicketTap(MatchType match) {
     final isGuest = service<AppPreferencesManager>().currentUserValue == null;
     if (isGuest) {
@@ -68,6 +89,20 @@ class _SchedulePageState extends State<SchedulePage> {
     context.pushNamed(
       AppRoute.matchDetails.name,
       extra: match,
+    );
+  }
+
+  Future<void> _refreshScheduleData() {
+    final bloc = context.read<MatchBloc>();
+    _usedFutureFallback = false;
+    return refreshBlocState<MatchState>(
+      bloc: bloc,
+      dispatch: () {
+        bloc.add(const MatchEvent.matches());
+        bloc.add(const MatchEvent.matchstats());
+        bloc.add(MatchEvent.monthMatches(month: _focusedDay));
+      },
+      isLoading: (state) => state.status.isLoading,
     );
   }
 
@@ -90,6 +125,7 @@ class _SchedulePageState extends State<SchedulePage> {
     // Trigger month load after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final focusedDay = DateTime.now();
+      context.read<MatchBloc>().add(const MatchEvent.matchstats());
       context.read<MatchBloc>().add(MatchEvent.monthMatches(month: focusedDay));
     });
   }
@@ -104,6 +140,14 @@ class _SchedulePageState extends State<SchedulePage> {
   @override
   Widget build(BuildContext context) {
     service<Talker>().info(getStringDate(DateTime.now()));
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final pageTextColor = isDark ? Colors.white : colorScheme.onSurface;
+    final calendarBorderColor = isDark ? Colors.white24 : Colors.black26;
+    final todayForegroundColor =
+        isDark ? colorScheme.onSurface : const Color(0xFF5F4A00);
+    final matchState = context.watch<MatchBloc>().state;
 
     return Scaffold(
       body: AppBackground(
@@ -135,7 +179,7 @@ class _SchedulePageState extends State<SchedulePage> {
                               vertical: 15, horizontal: 0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(kMedium),
-                            color: Theme.of(context).colorScheme.surface,
+                            color: colorScheme.surface,
                           ),
                           child: TableCalendar(
                             firstDay: DateTime.utc(2020, 1, 1),
@@ -158,59 +202,75 @@ class _SchedulePageState extends State<SchedulePage> {
                               titleCentered: true,
                               leftChevronIcon: Icon(
                                 Icons.chevron_left,
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: colorScheme.onSurface,
                               ),
                               rightChevronIcon: Icon(
                                 Icons.chevron_right,
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: colorScheme.onSurface,
                               ),
                               titleTextStyle: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
                                   .copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
+                                    color: colorScheme.onSurface,
                                   ),
                             ),
                             calendarStyle: CalendarStyle(
                               outsideDaysVisible: false,
+                              defaultTextStyle: TextStyle(
+                                color: colorScheme.onSurface,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              weekendTextStyle: TextStyle(
+                                color: colorScheme.onSurface,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              selectedTextStyle: TextStyle(
+                                color: todayForegroundColor,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              todayTextStyle: TextStyle(
+                                color: todayForegroundColor,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                              ),
                               selectedDecoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
+                                color: colorScheme.primary,
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               todayDecoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withOpacity(0.3),
+                                color:
+                                    colorScheme.primary.withValues(alpha: 0.35),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
                             daysOfWeekStyle: DaysOfWeekStyle(
                               weekdayStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: colorScheme.onSurface,
                               ),
                               weekendStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                             calendarBuilders: CalendarBuilders(
                               defaultBuilder: (context, day, focusedDay) {
                                 // show markers from monthMatches (which should already be upcoming if you updated the Bloc)
-                                final matches = context
-                                    .read<MatchBloc>()
-                                    .state
-                                    .monthMatches
+                                final matches = _combinedMatches(matchState)
                                     .where((m) => isSameDay(m.matchDate, day))
                                     .toList();
 
                                 if (matches.isNotEmpty) {
                                   final match = matches.first;
+                                  final isHome =
+                                      match.matchVenue.contains("Home");
                                   return Container(
                                     margin: const EdgeInsets.all(2),
                                     decoration: BoxDecoration(
-                                      color: match.matchVenue.contains("Home")
+                                      color: isHome
                                           ? Colors.yellow[700]
                                           : const Color(0xFFD50B36),
                                       borderRadius: BorderRadius.circular(4),
@@ -226,9 +286,9 @@ class _SchedulePageState extends State<SchedulePage> {
                                             style: TextStyle(
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
+                                              color: isHome
+                                                  ? const Color(0xFF1B1F28)
+                                                  : Colors.white,
                                             ),
                                           ),
                                           const SizedBox(height: 2),
@@ -237,9 +297,9 @@ class _SchedulePageState extends State<SchedulePage> {
                                             style: TextStyle(
                                               fontSize: 10,
                                               fontWeight: FontWeight.w600,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
+                                              color: isHome
+                                                  ? const Color(0xFF1B1F28)
+                                                  : Colors.white,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -253,7 +313,8 @@ class _SchedulePageState extends State<SchedulePage> {
                                 return Container(
                                   margin: const EdgeInsets.all(2),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.black26),
+                                    border:
+                                        Border.all(color: calendarBorderColor),
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                   child: Align(
@@ -262,9 +323,10 @@ class _SchedulePageState extends State<SchedulePage> {
                                       padding: const EdgeInsets.all(4.0),
                                       child: Text(
                                         '${day.day}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 10,
                                           fontWeight: FontWeight.w400,
+                                          color: colorScheme.onSurface,
                                         ),
                                       ),
                                     ),
@@ -278,16 +340,9 @@ class _SchedulePageState extends State<SchedulePage> {
                                 _focusedDay = focusedDay;
                               });
 
-                              if (selectedDay != null) {
-                                context.read<MatchBloc>().add(
-                                      MatchEvent.datedMatch(date: selectedDay),
-                                    );
-                              } else {
-                                context.read<MatchBloc>().add(
-                                      MatchEvent.monthMatches(
-                                          month: focusedDay),
-                                    );
-                              }
+                              context.read<MatchBloc>().add(
+                                    MatchEvent.datedMatch(date: selectedDay),
+                                  );
                             },
                           ),
                         )
@@ -304,10 +359,22 @@ class _SchedulePageState extends State<SchedulePage> {
                     }
                     if (state.status == MatchStatus.failure) {
                       service<Talker>().error(state.failure!.error);
-                      return Center(child: Text(state.failure!.error));
+                      return RefreshIndicator.adaptive(
+                        onRefresh: _refreshScheduleData,
+                        child: ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(
+                              height: 220,
+                              child: Center(child: Text(state.failure!.error)),
+                            ),
+                          ],
+                        ),
+                      );
                     }
 
                     if (state.status == MatchStatus.success) {
+                      final allMatches = _combinedMatches(state);
                       List<MatchType> matchesToShow;
 
                       if (_selectedDay == null) {
@@ -315,21 +382,31 @@ class _SchedulePageState extends State<SchedulePage> {
                             _focusedDay.month == DateTime.now().month &&
                                 _focusedDay.year == DateTime.now().year;
 
-                        if (state.monthMatches.isEmpty) {
+                        final monthMatches = allMatches
+                            .where((match) =>
+                                _isSameMonth(_focusedDay, match.matchDate))
+                            .toList();
+
+                        if (monthMatches.isEmpty) {
                           if (isCurrentMonth && !_usedFutureFallback) {
                             // Fallback (raw matches)
-                            matchesToShow = state.matches;
+                            matchesToShow = allMatches;
                             _usedFutureFallback = true;
                           } else {
                             matchesToShow = [];
                           }
                         } else {
                           // monthMatches should be ALL month matches (past + future) for calendar markers
-                          matchesToShow = state.monthMatches;
+                          matchesToShow = monthMatches;
                         }
                       } else {
                         // Day view -> show all matches for that day (past allowed)
-                        matchesToShow = state.datedMatches;
+                        matchesToShow = allMatches
+                            .where((match) => isSameDay(
+                                  match.matchDate,
+                                  _selectedDay,
+                                ))
+                            .toList();
                       }
 
                       // ✅ LIST FILTER RULE:
@@ -360,21 +437,35 @@ class _SchedulePageState extends State<SchedulePage> {
                       } else if (isPastMonth) {
                         title = "Matches";
                       } else {
-                        title = "Upcoming Matches";
+                        title = "Matches";
                       }
 
                       if (listMatches.isEmpty) {
                         final message = _selectedDay == null
-                            ? "No upcoming schedules found for this month"
+                            ? "No matches found for this month"
                             : "No schedules found for this date";
 
                         return Padding(
-                          padding: const EdgeInsets.all(kLarge),
-                          child: Text(
-                            message,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: kLarge),
+                          child: RefreshIndicator.adaptive(
+                            onRefresh: _refreshScheduleData,
+                            child: ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                SizedBox(
+                                  height: 220,
+                                  child: Center(
+                                    child: Text(
+                                      message,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: pageTextColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         );
@@ -389,150 +480,32 @@ class _SchedulePageState extends State<SchedulePage> {
                                   horizontal: 10, vertical: 5),
                               child: Text(
                                 title,
-                                style: const TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                  color: pageTextColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                             Expanded(
-                              child: ListView.builder(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                itemCount: listMatches.length,
-                                itemBuilder: (context, index) {
-                                  final match = listMatches[index];
-
-                                  return Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: kSmall, vertical: kSmall),
-                                    padding: const EdgeInsets.all(kMedium),
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(kMedium),
-                                      color:
-                                          Theme.of(context).colorScheme.surface,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          match.matchName,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                              child: RefreshIndicator.adaptive(
+                                onRefresh: _refreshScheduleData,
+                                child: _isIpadLayout(context)
+                                    ? _buildIpadTwoColumnScheduleList(
+                                        context,
+                                        listMatches,
+                                      )
+                                    : ListView.builder(
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
+                                        padding: EdgeInsets.zero,
+                                        shrinkWrap: true,
+                                        itemCount: listMatches.length,
+                                        itemBuilder: (context, index) =>
+                                            _buildScheduleMatchTile(
+                                          context,
+                                          listMatches[index],
                                         ),
-                                        const SizedBox(height: kSmall),
-                                        Row(
-                                          children: [
-                                            const Icon(Icons.location_on,
-                                                size: kSMedium),
-                                            const SizedBox(width: kXSmall),
-                                            Text(
-                                              match.matchVenue,
-                                              style: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w300,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: kMedium),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.all(kSmall),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.greyColor
-                                                    .withOpacity(0.3),
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        kMedium),
-                                              ),
-                                              child: Text(
-                                                getStringDate(match.matchDate),
-                                                style: context
-                                                    .textTheme.bodySmall
-                                                    ?.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.w700),
-                                              ),
-                                            ),
-                                            Text(
-                                              "Ksh ${match.matchPrice}",
-                                              style: context
-                                                  .textTheme.titleLarge
-                                                  ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w700),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: kLarge),
-
-                                        // ✅ Buttons:
-                                        // - In month view: only show for upcoming matches
-                                        // - In day view: still only show for upcoming matches
-                                        if (_isUpcoming(match.matchDate))
-                                          Row(
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  // context.pushNamed(
-                                                  //   AppRoute.matchDetails.name,
-                                                  //   extra: match,
-                                                  // );
-                                                },
-                                                icon: Icon(
-                                                  LucideIcons.bookmark,
-                                                  color: AppColors.purpleColor,
-                                                ),
-                                              ),
-                                              const SizedBox(width: kLarge * 3),
-                                              Expanded(
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    _handleBuyTicketTap(match);
-                                                  },
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    alignment: Alignment.center,
-                                                    height: 50,
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: kMedium,
-                                                      vertical: kXSmall,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        colors: [
-                                                          AppColors.pinkColor,
-                                                          AppColors.purpleColor,
-                                                        ],
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              kMedium),
-                                                    ),
-                                                    child: Text(
-                                                      "Buy Ticket",
-                                                      style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onSurface,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                      ],
-                                    ),
-                                  );
-                                },
+                                      ),
                               ),
                             ),
                           ],
@@ -549,6 +522,183 @@ class _SchedulePageState extends State<SchedulePage> {
         ),
       ),
     );
+  }
+
+  Widget _buildIpadTwoColumnScheduleList(
+    BuildContext context,
+    List<MatchType> matches,
+  ) {
+    final rowCount = (matches.length / 2).ceil();
+
+    return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(kSmall),
+      itemCount: rowCount,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (context, rowIndex) {
+        final leftIndex = rowIndex * 2;
+        final rightIndex = leftIndex + 1;
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _buildScheduleMatchTile(
+                context,
+                matches[leftIndex],
+                useOuterMargin: false,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: rightIndex < matches.length
+                  ? _buildScheduleMatchTile(
+                      context,
+                      matches[rightIndex],
+                      useOuterMargin: false,
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildScheduleMatchTile(
+    BuildContext context,
+    MatchType match, {
+    bool useOuterMargin = true,
+  }) {
+    if (!_isUpcoming(match.matchDate)) {
+      final previous = PreviousTiles(match: match);
+      if (!useOuterMargin) return previous;
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: kSmall,
+          vertical: kSmall,
+        ),
+        child: previous,
+      );
+    }
+
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mutedTextColor =
+        isDark ? Colors.white70 : colorScheme.onSurface.withValues(alpha: 0.68);
+    final todayForegroundColor =
+        isDark ? colorScheme.onSurface : const Color(0xFF5F4A00);
+
+    return Container(
+      margin: useOuterMargin
+          ? const EdgeInsets.symmetric(horizontal: kSmall, vertical: kSmall)
+          : EdgeInsets.zero,
+      padding: const EdgeInsets.all(kMedium),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(kMedium),
+        color: colorScheme.surface,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            match.matchName,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: kSmall),
+          Row(
+            children: [
+              const Icon(Icons.location_on, size: kSMedium),
+              const SizedBox(width: kXSmall),
+              Text(
+                match.matchVenue,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w300,
+                  color: mutedTextColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: kMedium),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(kSmall),
+                decoration: BoxDecoration(
+                  color: AppColors.greyColor.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(kMedium),
+                ),
+                child: Text(
+                  getStringDate(match.matchDate),
+                  style: context.textTheme.bodySmall
+                      ?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
+              Text(
+                "Ksh ${match.matchPrice}",
+                style: context.textTheme.titleLarge
+                    ?.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+          const SizedBox(height: kLarge),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  LucideIcons.bookmark,
+                  color: AppColors.purpleColor,
+                ),
+              ),
+              const SizedBox(width: kLarge * 3),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _handleBuyTicketTap(match),
+                  child: Container(
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: kMedium,
+                      vertical: kXSmall,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.pinkColor,
+                          AppColors.purpleColor,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(kMedium),
+                    ),
+                    child: Text(
+                      "Buy Ticket",
+                      style: TextStyle(
+                        color: todayForegroundColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _isIpadLayout(BuildContext context) {
+    return Theme.of(context).platform == TargetPlatform.iOS &&
+        MediaQuery.of(context).size.shortestSide >= 600;
   }
 
   Row headerSection(BuildContext context) {

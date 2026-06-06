@@ -124,8 +124,8 @@ void showTransferPointsBottomSheet(BuildContext context, String userPoints) {
                                 );
                           },
                     child: isLoading
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
+                        ? CircularProgressIndicator(
+                            color: AppColors.darkColor,
                           )
                         : const Text('Confirm Transfer'),
                   ),

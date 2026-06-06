@@ -26,7 +26,7 @@ mixin _$Stats {
   String get clubId => throw _privateConstructorUsedError;
   String get clubname => throw _privateConstructorUsedError;
   String get seasonId => throw _privateConstructorUsedError;
-  int get avg => throw _privateConstructorUsedError;
+  double get avg => throw _privateConstructorUsedError;
   int get games => throw _privateConstructorUsedError;
   String? get imageUrl => throw _privateConstructorUsedError;
 
@@ -47,7 +47,7 @@ abstract class $StatsCopyWith<$Res> {
       String clubId,
       String clubname,
       String seasonId,
-      int avg,
+      double avg,
       int games,
       String? imageUrl});
 }
@@ -103,7 +103,7 @@ class _$StatsCopyWithImpl<$Res, $Val extends Stats>
       avg: null == avg
           ? _value.avg
           : avg // ignore: cast_nullable_to_non_nullable
-              as int,
+              as double,
       games: null == games
           ? _value.games
           : games // ignore: cast_nullable_to_non_nullable
@@ -130,7 +130,7 @@ abstract class _$$StatsImplCopyWith<$Res> implements $StatsCopyWith<$Res> {
       String clubId,
       String clubname,
       String seasonId,
-      int avg,
+      double avg,
       int games,
       String? imageUrl});
 }
@@ -184,7 +184,7 @@ class __$$StatsImplCopyWithImpl<$Res>
       avg: null == avg
           ? _value.avg
           : avg // ignore: cast_nullable_to_non_nullable
-              as int,
+              as double,
       games: null == games
           ? _value.games
           : games // ignore: cast_nullable_to_non_nullable
@@ -227,7 +227,7 @@ class _$StatsImpl implements _Stats {
   @override
   final String seasonId;
   @override
-  final int avg;
+  final double avg;
   @override
   final int games;
   @override
@@ -286,7 +286,7 @@ abstract class _Stats implements Stats {
       required final String clubId,
       required final String clubname,
       required final String seasonId,
-      required final int avg,
+      required final double avg,
       required final int games,
       final String? imageUrl}) = _$StatsImpl;
 
@@ -305,7 +305,7 @@ abstract class _Stats implements Stats {
   @override
   String get seasonId;
   @override
-  int get avg;
+  double get avg;
   @override
   int get games;
   @override

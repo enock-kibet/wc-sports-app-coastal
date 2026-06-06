@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:sports_app/constants/constants.dart';
 import 'package:sports_app/data/models/match/match-recarp.dart';
 import 'package:sports_app/features/dashboard/pages/team/game-recarp.dart';
 
@@ -46,16 +47,26 @@ class MatchCard extends StatelessWidget {
         ? "-"
         : "${parsedDate.hour.toString().padLeft(2, '0')}:${parsedDate.minute.toString().padLeft(2, '0')}";
 
-      String abbreviationFromName(String name) {
-        final parts = name.split(" ");
-        if (parts.length > 1) {
-          // single word → first 3 letters
-          return parts.first.substring(0, 3).toUpperCase();
-        } else {
-          // take only the first two words' initials
-          return parts.take(2).map((word) => word[0].toUpperCase()).join();
-        }
+    String abbreviationFromName(String name) {
+      final parts = name
+          .trim()
+          .split(RegExp(r'\s+'))
+          .where((part) => part.isNotEmpty)
+          .toList();
+
+      if (parts.isEmpty) return "-";
+
+      if (parts.length == 1) {
+        final word = parts.first;
+        final end = word.length < 3 ? word.length : 3;
+        return word.substring(0, end).toUpperCase();
       }
+
+      return parts
+          .take(2)
+          .map((word) => word.characters.first.toUpperCase())
+          .join();
+    }
 
     return Material(
       color: Colors.transparent,
@@ -129,13 +140,13 @@ class MatchCard extends StatelessWidget {
     required String score,
     String? pic,
   }) {
-    final hasPic = pic != null && pic.isNotEmpty;
+    final hasPic = !showTeamAbbrOnly && pic != null && pic.isNotEmpty;
 
     return Column(
       children: [
         CircleAvatar(
           radius: 20,
-          backgroundColor: color,
+          backgroundColor: showTeamAbbrOnly ? const Color(0xFFF9D96B) : color,
           child: hasPic
               ? ClipOval(
                   child: CachedNetworkImage(
@@ -175,8 +186,8 @@ class MatchCard extends StatelessWidget {
         child: Text(
           abbr,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: showTeamAbbrOnly ? Colors.black : Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 11,
           ),

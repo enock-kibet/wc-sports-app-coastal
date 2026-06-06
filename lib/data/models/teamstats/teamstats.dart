@@ -18,13 +18,17 @@ class TeamStatsData with _$TeamStatsData {
   const factory TeamStatsData({
     required String teamId,
     required String teamName,
-    required int wins,
-    required int losses,
-    required int draws,
-    required int points,
+    required int rank,
     required int gamesPlayed,
+    required int wins,
+    required int draws,
+    required int forfeits,
+    required int losses,
     required int pointsScored,
     required int pointsAgainst,
+    required int pointsDifference,
+    required int points,
+    required double winPercentage,
     required String season,
   }) = _TeamStatsData;
 

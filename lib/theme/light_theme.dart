@@ -9,6 +9,8 @@ final ColorScheme _lightScheme = ColorScheme.fromSeed(
   brightness: Brightness.light,
 ).copyWith(
   primary: AppColors.primaryColor,
+  onPrimary: AppColors.darkColor,
+  onPrimaryContainer: AppColors.darkColor,
   secondary: const Color(0xFF7D8AA3),
   surface: const Color(0xFFFFFFFF),
   onSurface: const Color(0xFF1B1F28),
@@ -20,6 +22,8 @@ final ColorScheme _darkScheme = ColorScheme.fromSeed(
   brightness: Brightness.dark,
 ).copyWith(
   primary: AppColors.primaryColor,
+  onPrimary: AppColors.darkColor,
+  onPrimaryContainer: AppColors.darkColor,
   secondary: const Color(0xFF9AA7BF),
   surface: const Color(0xFF151824),
   onSurface: const Color(0xFFF5F7FB),
@@ -92,7 +96,17 @@ ThemeData _buildTheme(ColorScheme colorScheme) {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.darkColor,
+        minimumSize: const Size.fromHeight(52),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(kSmall),
+        ),
+      ),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: AppColors.darkColor,
         minimumSize: const Size.fromHeight(52),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(kSmall),

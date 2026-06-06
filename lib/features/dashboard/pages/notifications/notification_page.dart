@@ -2,12 +2,12 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/buildcontext.dart';
 import 'package:sports_app/common/extension/extension.dart';
+import 'package:sports_app/common/utils/pull_to_refresh.dart';
 import 'package:sports_app/constants/constants.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/models/stripe_checkout/stripe_checkout.dart';
@@ -28,10 +28,6 @@ import 'package:sports_app/theme/theme.dart';
 import 'package:sports_app/utils/dotted.dart';
 import 'package:auto_height_grid_view/auto_height_grid_view.dart';
 
-
-
-
-
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
 
@@ -43,8 +39,8 @@ class _NotificationPageState extends State<NotificationPage> {
   late StripeBloc _stripeBloc;
   late TextEditingController searchText;
   late HideCubit _hideCubit;
-  Map<String,dynamic>? user;
-  bool loading=false;
+  Map<String, dynamic>? user;
+  bool loading = false;
   User currentUser = service<AppPreferencesManager>().currentUserValue!;
   final FocusNode _focusNode = FocusNode();
 
@@ -53,14 +49,13 @@ class _NotificationPageState extends State<NotificationPage> {
     _stripeBloc = StripeBloc();
     searchText = TextEditingController();
 
-    _focusNode.addListener((){
-      if(_focusNode.hasFocus){
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
         context.read<HideCubit>().reveal();
-      }else{
-        if(searchText.text==""){
+      } else {
+        if (searchText.text == "") {
           context.read<HideCubit>().hide();
-        }else{
-        }
+        } else {}
       }
       //context.read<HideCubit>().reveal;
     });
@@ -70,133 +65,144 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   void dispose() {
     _stripeBloc.close();
-    _focusNode.removeListener((){});
+    _focusNode.removeListener(() {});
     _focusNode.dispose();
     super.dispose();
   }
 
+  Future<void> _refreshNotifications() {
+    final bloc = context.read<NotificationBloc>();
+    return refreshBlocState<NotificationState>(
+      bloc: bloc,
+      dispatch: () => bloc.add(const NotificationEvent.notifications()),
+      isLoading: (state) => state.status.isLoading,
+    );
+  }
+
+  Widget _refreshableMessage(String message) {
+    return RefreshIndicator.adaptive(
+      onRefresh: _refreshNotifications,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(
+            height: 220,
+            child: Center(child: Text(message)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HideCubit,bool>(
-        builder: (context,reveal) {
-          return Scaffold(
-            body: AppBackground(
-              childWidget:SafeArea(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: kMedium),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: kMedium),
-                        headerSection(context),
-                        const SizedBox(height: kMedium),
-                        reveal?Container():const SizedBox(height: kMedium),
-                        reveal?Container(): Align(alignment:Alignment.centerRight,child: Text("Clear All",style: context.textTheme.headlineSmall?.copyWith(fontSize: 14,color: Theme.of(context).colorScheme.onSurface),)),
-                        Expanded(
-                          child: BlocBuilder<NotificationBloc, NotificationState>(
-                            builder: (context, state) {
+    return BlocBuilder<HideCubit, bool>(builder: (context, reveal) {
+      return Scaffold(
+        body: AppBackground(
+          childWidget: SafeArea(
+              child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: kMedium),
+            child: Column(
+              children: [
+                const SizedBox(height: kMedium),
+                headerSection(context),
+                const SizedBox(height: kMedium),
+                reveal ? Container() : const SizedBox(height: kMedium),
+                reveal
+                    ? Container()
+                    : Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          "Clear All",
+                          style: context.textTheme.headlineSmall?.copyWith(
+                              fontSize: 14,
+                              color: Theme.of(context).colorScheme.onSurface),
+                        )),
+                Expanded(
+                  child: BlocBuilder<NotificationBloc, NotificationState>(
+                    builder: (context, state) {
+                      switch (state.status) {
+                        case NotificationStatus.loading:
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        case NotificationStatus.failure:
+                          return _refreshableMessage(state.failure!.error);
+                        case NotificationStatus.success:
+                          if (state.notifications.isEmpty) {
+                            return _refreshableMessage("No Notifications");
+                          }
 
+                          return BlocBuilder<NotificationBloc,
+                              NotificationState>(
+                            builder: (context, state) {
                               switch (state.status) {
+                                case NotificationStatus.success:
+                                  return SafeArea(
+                                    child: RefreshIndicator.adaptive(
+                                      onRefresh: _refreshNotifications,
+                                      child: SingleChildScrollView(
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
+                                        child: Column(
+                                          children: [
+                                            const SizedBox(height: kMedium),
+                                            //TODO! Add upcoming matches
+                                            AutoHeightGridView(
+                                              itemCount:
+                                                  state.notifications.length,
+                                              crossAxisCount:
+                                                  context.isTablet ? 1 : 1,
+                                              mainAxisSpacing: kSmall,
+                                              crossAxisSpacing: kSmall,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              padding: EdgeInsets.zero,
+                                              shrinkWrap: true,
+                                              builder: (context, index) {
+                                                final notification =
+                                                    state.notifications[index];
+                                                return NotificationsCard(
+                                                    notification: notification);
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                case NotificationStatus.failure:
+                                  return _refreshableMessage(
+                                      state.failure!.error);
                                 case NotificationStatus.loading:
                                   return const Center(
                                     child: CircularProgressIndicator(),
                                   );
-                                case NotificationStatus.failure:
-                                  return Center(
-                                    child: Text(state.failure!.error),
-                                  );
-                                case NotificationStatus.success:
-
-                                  if (state.notifications.isEmpty) {
-                                    return Center(
-                                      child: Text(
-                                        "No Notifications",
-                                        style: context.textTheme.headlineSmall,
-                                      ),
-                                    );
-                                  }
-
-                                  return BlocBuilder<NotificationBloc,NotificationState>(
-                                    builder: (context, state) {
-                                      switch (state.status) {
-                                        case NotificationStatus.success:
-                                          return SafeArea(
-                                              child: Container(
-                                                child: SingleChildScrollView(
-                                                  child: Column(
-                                                    children: [
-                                                      const SizedBox(height: kMedium),
-                                                      //TODO! Add upcoming matches
-                                                      AutoHeightGridView(
-                                                        itemCount: state.notifications.length,
-                                                        crossAxisCount: context.isTablet ? 1 : 1,
-                                                        mainAxisSpacing: kSmall,
-                                                        crossAxisSpacing: kSmall,
-                                                        physics: const BouncingScrollPhysics(),
-                                                        padding: EdgeInsets.zero,
-                                                        shrinkWrap: true,
-                                                        builder: (context, index) {
-                                                          final notification = state.notifications[index];
-                                                          return NotificationsCard(notification: notification);
-                                                        },
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ));
-                                        case NotificationStatus.failure:
-                                          return Center(
-                                            child: Text(state.failure!.error),
-                                          );
-                                        case NotificationStatus.loading:
-                                          return const Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        default:
-                                          return SizedBox.shrink();
-                                      }
-                                    },
-                                  );
-
                                 default:
                                   return const SizedBox.shrink();
                               }
                             },
-                          ),
-                        )
-                      ],
-                    ),
-                  )) ,
+                          );
+
+                        default:
+                          return const SizedBox.shrink();
+                      }
+                    },
+                  ),
+                )
+              ],
             ),
-          );
-        }
-    );
+          )),
+        ),
+      );
+    });
   }
 
-
   Row headerSection(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final chipColor =
-        isDark ? AppColors.whiteColor.withValues(alpha: 0.3) : Colors.white;
-    final iconColor =
-        isDark ? AppColors.whiteColor : Theme.of(context).colorScheme.onSurface;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        GestureDetector(
-          onTap: () {
-            context.pop();
-          },
-          child: Container(
-            padding: const EdgeInsets.all(kSmall),
-            decoration: BoxDecoration(
-                color: chipColor,
-                shape: BoxShape.circle),
-            child: Icon(
-              LucideIcons.arrowLeft,
-              color: iconColor,
-            ),
-          ),
-        ),
+        const AppBackButton(),
         Text(
           "Notifications",
           style: context.textTheme.headlineSmall?.copyWith(
@@ -208,16 +214,20 @@ class _NotificationPageState extends State<NotificationPage> {
       ],
     );
   }
-
-
 }
-RowIconButton(IconData icon,String text){
+
+RowIconButton(IconData icon, String text) {
   return Row(
     mainAxisSize: MainAxisSize.min,
     children: [
       Icon(icon),
-      SizedBox(width: kSMedium,),
-      Text(text,style: TextStyle(fontSize: 14),)
+      SizedBox(
+        width: kSMedium,
+      ),
+      Text(
+        text,
+        style: TextStyle(fontSize: 14),
+      )
     ],
   );
 }

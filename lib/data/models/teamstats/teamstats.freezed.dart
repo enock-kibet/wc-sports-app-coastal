@@ -167,13 +167,17 @@ TeamStatsData _$TeamStatsDataFromJson(Map<String, dynamic> json) {
 mixin _$TeamStatsData {
   String get teamId => throw _privateConstructorUsedError;
   String get teamName => throw _privateConstructorUsedError;
-  int get wins => throw _privateConstructorUsedError;
-  int get losses => throw _privateConstructorUsedError;
-  int get draws => throw _privateConstructorUsedError;
-  int get points => throw _privateConstructorUsedError;
+  int get rank => throw _privateConstructorUsedError;
   int get gamesPlayed => throw _privateConstructorUsedError;
+  int get wins => throw _privateConstructorUsedError;
+  int get draws => throw _privateConstructorUsedError;
+  int get forfeits => throw _privateConstructorUsedError;
+  int get losses => throw _privateConstructorUsedError;
   int get pointsScored => throw _privateConstructorUsedError;
   int get pointsAgainst => throw _privateConstructorUsedError;
+  int get pointsDifference => throw _privateConstructorUsedError;
+  int get points => throw _privateConstructorUsedError;
+  double get winPercentage => throw _privateConstructorUsedError;
   String get season => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -191,13 +195,17 @@ abstract class $TeamStatsDataCopyWith<$Res> {
   $Res call(
       {String teamId,
       String teamName,
-      int wins,
-      int losses,
-      int draws,
-      int points,
+      int rank,
       int gamesPlayed,
+      int wins,
+      int draws,
+      int forfeits,
+      int losses,
       int pointsScored,
       int pointsAgainst,
+      int pointsDifference,
+      int points,
+      double winPercentage,
       String season});
 }
 
@@ -216,13 +224,17 @@ class _$TeamStatsDataCopyWithImpl<$Res, $Val extends TeamStatsData>
   $Res call({
     Object? teamId = null,
     Object? teamName = null,
-    Object? wins = null,
-    Object? losses = null,
-    Object? draws = null,
-    Object? points = null,
+    Object? rank = null,
     Object? gamesPlayed = null,
+    Object? wins = null,
+    Object? draws = null,
+    Object? forfeits = null,
+    Object? losses = null,
     Object? pointsScored = null,
     Object? pointsAgainst = null,
+    Object? pointsDifference = null,
+    Object? points = null,
+    Object? winPercentage = null,
     Object? season = null,
   }) {
     return _then(_value.copyWith(
@@ -234,25 +246,29 @@ class _$TeamStatsDataCopyWithImpl<$Res, $Val extends TeamStatsData>
           ? _value.teamName
           : teamName // ignore: cast_nullable_to_non_nullable
               as String,
+      rank: null == rank
+          ? _value.rank
+          : rank // ignore: cast_nullable_to_non_nullable
+              as int,
+      gamesPlayed: null == gamesPlayed
+          ? _value.gamesPlayed
+          : gamesPlayed // ignore: cast_nullable_to_non_nullable
+              as int,
       wins: null == wins
           ? _value.wins
           : wins // ignore: cast_nullable_to_non_nullable
-              as int,
-      losses: null == losses
-          ? _value.losses
-          : losses // ignore: cast_nullable_to_non_nullable
               as int,
       draws: null == draws
           ? _value.draws
           : draws // ignore: cast_nullable_to_non_nullable
               as int,
-      points: null == points
-          ? _value.points
-          : points // ignore: cast_nullable_to_non_nullable
+      forfeits: null == forfeits
+          ? _value.forfeits
+          : forfeits // ignore: cast_nullable_to_non_nullable
               as int,
-      gamesPlayed: null == gamesPlayed
-          ? _value.gamesPlayed
-          : gamesPlayed // ignore: cast_nullable_to_non_nullable
+      losses: null == losses
+          ? _value.losses
+          : losses // ignore: cast_nullable_to_non_nullable
               as int,
       pointsScored: null == pointsScored
           ? _value.pointsScored
@@ -262,6 +278,18 @@ class _$TeamStatsDataCopyWithImpl<$Res, $Val extends TeamStatsData>
           ? _value.pointsAgainst
           : pointsAgainst // ignore: cast_nullable_to_non_nullable
               as int,
+      pointsDifference: null == pointsDifference
+          ? _value.pointsDifference
+          : pointsDifference // ignore: cast_nullable_to_non_nullable
+              as int,
+      points: null == points
+          ? _value.points
+          : points // ignore: cast_nullable_to_non_nullable
+              as int,
+      winPercentage: null == winPercentage
+          ? _value.winPercentage
+          : winPercentage // ignore: cast_nullable_to_non_nullable
+              as double,
       season: null == season
           ? _value.season
           : season // ignore: cast_nullable_to_non_nullable
@@ -281,13 +309,17 @@ abstract class _$$TeamStatsDataImplCopyWith<$Res>
   $Res call(
       {String teamId,
       String teamName,
-      int wins,
-      int losses,
-      int draws,
-      int points,
+      int rank,
       int gamesPlayed,
+      int wins,
+      int draws,
+      int forfeits,
+      int losses,
       int pointsScored,
       int pointsAgainst,
+      int pointsDifference,
+      int points,
+      double winPercentage,
       String season});
 }
 
@@ -304,13 +336,17 @@ class __$$TeamStatsDataImplCopyWithImpl<$Res>
   $Res call({
     Object? teamId = null,
     Object? teamName = null,
-    Object? wins = null,
-    Object? losses = null,
-    Object? draws = null,
-    Object? points = null,
+    Object? rank = null,
     Object? gamesPlayed = null,
+    Object? wins = null,
+    Object? draws = null,
+    Object? forfeits = null,
+    Object? losses = null,
     Object? pointsScored = null,
     Object? pointsAgainst = null,
+    Object? pointsDifference = null,
+    Object? points = null,
+    Object? winPercentage = null,
     Object? season = null,
   }) {
     return _then(_$TeamStatsDataImpl(
@@ -322,25 +358,29 @@ class __$$TeamStatsDataImplCopyWithImpl<$Res>
           ? _value.teamName
           : teamName // ignore: cast_nullable_to_non_nullable
               as String,
+      rank: null == rank
+          ? _value.rank
+          : rank // ignore: cast_nullable_to_non_nullable
+              as int,
+      gamesPlayed: null == gamesPlayed
+          ? _value.gamesPlayed
+          : gamesPlayed // ignore: cast_nullable_to_non_nullable
+              as int,
       wins: null == wins
           ? _value.wins
           : wins // ignore: cast_nullable_to_non_nullable
-              as int,
-      losses: null == losses
-          ? _value.losses
-          : losses // ignore: cast_nullable_to_non_nullable
               as int,
       draws: null == draws
           ? _value.draws
           : draws // ignore: cast_nullable_to_non_nullable
               as int,
-      points: null == points
-          ? _value.points
-          : points // ignore: cast_nullable_to_non_nullable
+      forfeits: null == forfeits
+          ? _value.forfeits
+          : forfeits // ignore: cast_nullable_to_non_nullable
               as int,
-      gamesPlayed: null == gamesPlayed
-          ? _value.gamesPlayed
-          : gamesPlayed // ignore: cast_nullable_to_non_nullable
+      losses: null == losses
+          ? _value.losses
+          : losses // ignore: cast_nullable_to_non_nullable
               as int,
       pointsScored: null == pointsScored
           ? _value.pointsScored
@@ -350,6 +390,18 @@ class __$$TeamStatsDataImplCopyWithImpl<$Res>
           ? _value.pointsAgainst
           : pointsAgainst // ignore: cast_nullable_to_non_nullable
               as int,
+      pointsDifference: null == pointsDifference
+          ? _value.pointsDifference
+          : pointsDifference // ignore: cast_nullable_to_non_nullable
+              as int,
+      points: null == points
+          ? _value.points
+          : points // ignore: cast_nullable_to_non_nullable
+              as int,
+      winPercentage: null == winPercentage
+          ? _value.winPercentage
+          : winPercentage // ignore: cast_nullable_to_non_nullable
+              as double,
       season: null == season
           ? _value.season
           : season // ignore: cast_nullable_to_non_nullable
@@ -364,13 +416,17 @@ class _$TeamStatsDataImpl implements _TeamStatsData {
   const _$TeamStatsDataImpl(
       {required this.teamId,
       required this.teamName,
-      required this.wins,
-      required this.losses,
-      required this.draws,
-      required this.points,
+      required this.rank,
       required this.gamesPlayed,
+      required this.wins,
+      required this.draws,
+      required this.forfeits,
+      required this.losses,
       required this.pointsScored,
       required this.pointsAgainst,
+      required this.pointsDifference,
+      required this.points,
+      required this.winPercentage,
       required this.season});
 
   factory _$TeamStatsDataImpl.fromJson(Map<String, dynamic> json) =>
@@ -381,25 +437,33 @@ class _$TeamStatsDataImpl implements _TeamStatsData {
   @override
   final String teamName;
   @override
-  final int wins;
+  final int rank;
   @override
-  final int losses;
+  final int gamesPlayed;
+  @override
+  final int wins;
   @override
   final int draws;
   @override
-  final int points;
+  final int forfeits;
   @override
-  final int gamesPlayed;
+  final int losses;
   @override
   final int pointsScored;
   @override
   final int pointsAgainst;
   @override
+  final int pointsDifference;
+  @override
+  final int points;
+  @override
+  final double winPercentage;
+  @override
   final String season;
 
   @override
   String toString() {
-    return 'TeamStatsData(teamId: $teamId, teamName: $teamName, wins: $wins, losses: $losses, draws: $draws, points: $points, gamesPlayed: $gamesPlayed, pointsScored: $pointsScored, pointsAgainst: $pointsAgainst, season: $season)';
+    return 'TeamStatsData(teamId: $teamId, teamName: $teamName, rank: $rank, gamesPlayed: $gamesPlayed, wins: $wins, draws: $draws, forfeits: $forfeits, losses: $losses, pointsScored: $pointsScored, pointsAgainst: $pointsAgainst, pointsDifference: $pointsDifference, points: $points, winPercentage: $winPercentage, season: $season)';
   }
 
   @override
@@ -410,23 +474,44 @@ class _$TeamStatsDataImpl implements _TeamStatsData {
             (identical(other.teamId, teamId) || other.teamId == teamId) &&
             (identical(other.teamName, teamName) ||
                 other.teamName == teamName) &&
-            (identical(other.wins, wins) || other.wins == wins) &&
-            (identical(other.losses, losses) || other.losses == losses) &&
-            (identical(other.draws, draws) || other.draws == draws) &&
-            (identical(other.points, points) || other.points == points) &&
+            (identical(other.rank, rank) || other.rank == rank) &&
             (identical(other.gamesPlayed, gamesPlayed) ||
                 other.gamesPlayed == gamesPlayed) &&
+            (identical(other.wins, wins) || other.wins == wins) &&
+            (identical(other.draws, draws) || other.draws == draws) &&
+            (identical(other.forfeits, forfeits) ||
+                other.forfeits == forfeits) &&
+            (identical(other.losses, losses) || other.losses == losses) &&
             (identical(other.pointsScored, pointsScored) ||
                 other.pointsScored == pointsScored) &&
             (identical(other.pointsAgainst, pointsAgainst) ||
                 other.pointsAgainst == pointsAgainst) &&
+            (identical(other.pointsDifference, pointsDifference) ||
+                other.pointsDifference == pointsDifference) &&
+            (identical(other.points, points) || other.points == points) &&
+            (identical(other.winPercentage, winPercentage) ||
+                other.winPercentage == winPercentage) &&
             (identical(other.season, season) || other.season == season));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, teamId, teamName, wins, losses,
-      draws, points, gamesPlayed, pointsScored, pointsAgainst, season);
+  int get hashCode => Object.hash(
+      runtimeType,
+      teamId,
+      teamName,
+      rank,
+      gamesPlayed,
+      wins,
+      draws,
+      forfeits,
+      losses,
+      pointsScored,
+      pointsAgainst,
+      pointsDifference,
+      points,
+      winPercentage,
+      season);
 
   @JsonKey(ignore: true)
   @override
@@ -446,13 +531,17 @@ abstract class _TeamStatsData implements TeamStatsData {
   const factory _TeamStatsData(
       {required final String teamId,
       required final String teamName,
-      required final int wins,
-      required final int losses,
-      required final int draws,
-      required final int points,
+      required final int rank,
       required final int gamesPlayed,
+      required final int wins,
+      required final int draws,
+      required final int forfeits,
+      required final int losses,
       required final int pointsScored,
       required final int pointsAgainst,
+      required final int pointsDifference,
+      required final int points,
+      required final double winPercentage,
       required final String season}) = _$TeamStatsDataImpl;
 
   factory _TeamStatsData.fromJson(Map<String, dynamic> json) =
@@ -463,19 +552,27 @@ abstract class _TeamStatsData implements TeamStatsData {
   @override
   String get teamName;
   @override
-  int get wins;
+  int get rank;
   @override
-  int get losses;
+  int get gamesPlayed;
+  @override
+  int get wins;
   @override
   int get draws;
   @override
-  int get points;
+  int get forfeits;
   @override
-  int get gamesPlayed;
+  int get losses;
   @override
   int get pointsScored;
   @override
   int get pointsAgainst;
+  @override
+  int get pointsDifference;
+  @override
+  int get points;
+  @override
+  double get winPercentage;
   @override
   String get season;
   @override

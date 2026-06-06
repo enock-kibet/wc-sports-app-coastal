@@ -20,16 +20,24 @@ Notifications _$NotificationsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Notifications {
+  @JsonKey(defaultValue: 0)
   int get id => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: '')
   String get userId => throw _privateConstructorUsedError;
   String? get cartId => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: '')
   String get notificationType => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: '')
   String get channel => throw _privateConstructorUsedError;
   String? get campaignId => throw _privateConstructorUsedError;
   String? get attributionWindow => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: '')
   String get notificationKey => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: '')
   String get createdUtc => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: '')
   String get updatedUtc => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: '')
   String get notificationText => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -45,17 +53,17 @@ abstract class $NotificationsCopyWith<$Res> {
       _$NotificationsCopyWithImpl<$Res, Notifications>;
   @useResult
   $Res call(
-      {int id,
-      String userId,
+      {@JsonKey(defaultValue: 0) int id,
+      @JsonKey(defaultValue: '') String userId,
       String? cartId,
-      String notificationType,
-      String channel,
+      @JsonKey(defaultValue: '') String notificationType,
+      @JsonKey(defaultValue: '') String channel,
       String? campaignId,
       String? attributionWindow,
-      String notificationKey,
-      String createdUtc,
-      String updatedUtc,
-      String notificationText});
+      @JsonKey(defaultValue: '') String notificationKey,
+      @JsonKey(defaultValue: '') String createdUtc,
+      @JsonKey(defaultValue: '') String updatedUtc,
+      @JsonKey(defaultValue: '') String notificationText});
 }
 
 /// @nodoc
@@ -141,17 +149,17 @@ abstract class _$$NotificationsImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
-      String userId,
+      {@JsonKey(defaultValue: 0) int id,
+      @JsonKey(defaultValue: '') String userId,
       String? cartId,
-      String notificationType,
-      String channel,
+      @JsonKey(defaultValue: '') String notificationType,
+      @JsonKey(defaultValue: '') String channel,
       String? campaignId,
       String? attributionWindow,
-      String notificationKey,
-      String createdUtc,
-      String updatedUtc,
-      String notificationText});
+      @JsonKey(defaultValue: '') String notificationKey,
+      @JsonKey(defaultValue: '') String createdUtc,
+      @JsonKey(defaultValue: '') String updatedUtc,
+      @JsonKey(defaultValue: '') String notificationText});
 }
 
 /// @nodoc
@@ -230,42 +238,50 @@ class __$$NotificationsImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$NotificationsImpl implements _Notifications {
   const _$NotificationsImpl(
-      {required this.id,
-      required this.userId,
+      {@JsonKey(defaultValue: 0) required this.id,
+      @JsonKey(defaultValue: '') required this.userId,
       this.cartId,
-      required this.notificationType,
-      required this.channel,
+      @JsonKey(defaultValue: '') required this.notificationType,
+      @JsonKey(defaultValue: '') required this.channel,
       this.campaignId,
       this.attributionWindow,
-      required this.notificationKey,
-      required this.createdUtc,
-      required this.updatedUtc,
-      required this.notificationText});
+      @JsonKey(defaultValue: '') required this.notificationKey,
+      @JsonKey(defaultValue: '') required this.createdUtc,
+      @JsonKey(defaultValue: '') required this.updatedUtc,
+      @JsonKey(defaultValue: '') required this.notificationText});
 
   factory _$NotificationsImpl.fromJson(Map<String, dynamic> json) =>
       _$$NotificationsImplFromJson(json);
 
   @override
+  @JsonKey(defaultValue: 0)
   final int id;
   @override
+  @JsonKey(defaultValue: '')
   final String userId;
   @override
   final String? cartId;
   @override
+  @JsonKey(defaultValue: '')
   final String notificationType;
   @override
+  @JsonKey(defaultValue: '')
   final String channel;
   @override
   final String? campaignId;
   @override
   final String? attributionWindow;
   @override
+  @JsonKey(defaultValue: '')
   final String notificationKey;
   @override
+  @JsonKey(defaultValue: '')
   final String createdUtc;
   @override
+  @JsonKey(defaultValue: '')
   final String updatedUtc;
   @override
+  @JsonKey(defaultValue: '')
   final String notificationText;
 
   @override
@@ -330,42 +346,51 @@ class _$NotificationsImpl implements _Notifications {
 
 abstract class _Notifications implements Notifications {
   const factory _Notifications(
-      {required final int id,
-      required final String userId,
-      final String? cartId,
-      required final String notificationType,
-      required final String channel,
-      final String? campaignId,
-      final String? attributionWindow,
-      required final String notificationKey,
-      required final String createdUtc,
-      required final String updatedUtc,
-      required final String notificationText}) = _$NotificationsImpl;
+          {@JsonKey(defaultValue: 0) required final int id,
+          @JsonKey(defaultValue: '') required final String userId,
+          final String? cartId,
+          @JsonKey(defaultValue: '') required final String notificationType,
+          @JsonKey(defaultValue: '') required final String channel,
+          final String? campaignId,
+          final String? attributionWindow,
+          @JsonKey(defaultValue: '') required final String notificationKey,
+          @JsonKey(defaultValue: '') required final String createdUtc,
+          @JsonKey(defaultValue: '') required final String updatedUtc,
+          @JsonKey(defaultValue: '') required final String notificationText}) =
+      _$NotificationsImpl;
 
   factory _Notifications.fromJson(Map<String, dynamic> json) =
       _$NotificationsImpl.fromJson;
 
   @override
+  @JsonKey(defaultValue: 0)
   int get id;
   @override
+  @JsonKey(defaultValue: '')
   String get userId;
   @override
   String? get cartId;
   @override
+  @JsonKey(defaultValue: '')
   String get notificationType;
   @override
+  @JsonKey(defaultValue: '')
   String get channel;
   @override
   String? get campaignId;
   @override
   String? get attributionWindow;
   @override
+  @JsonKey(defaultValue: '')
   String get notificationKey;
   @override
+  @JsonKey(defaultValue: '')
   String get createdUtc;
   @override
+  @JsonKey(defaultValue: '')
   String get updatedUtc;
   @override
+  @JsonKey(defaultValue: '')
   String get notificationText;
   @override
   @JsonKey(ignore: true)

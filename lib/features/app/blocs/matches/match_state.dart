@@ -21,5 +21,6 @@ class MatchState with _$MatchState {
       @Default([]) List<MatchType> datedMatches,
       @Default([]) List<MatchType> monthMatches,
       @Default([]) List<MatchType> statsMatches,
+      @Default(false) bool statsLoaded,
       @Default([]) List<MatchType> searchedMatches}) = _MatchState;
 }

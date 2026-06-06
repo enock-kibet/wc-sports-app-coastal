@@ -6,26 +6,29 @@ class PlayerTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return TabBar(
         dividerHeight: .5,
         labelPadding: const EdgeInsets.symmetric(horizontal: 0),
-        dividerColor: AppColors.greyColor,
+        dividerColor: scheme.onSurface.withValues(alpha: 0.28),
+        labelColor: scheme.onSurface,
+        unselectedLabelColor: scheme.onSurface.withValues(alpha: 0.62),
         unselectedLabelStyle: TextStyle(
             fontFamily: "Inter",
             fontWeight: FontWeight.w500,
             fontSize: 12,
-            color: AppColors.greyColor,
             letterSpacing: 1),
         indicator: UnderlineTabIndicator(
             insets: const EdgeInsets.symmetric(horizontal: -30),
-            borderSide: BorderSide(width: 4, color: AppColors.blackColor),
+            borderSide: BorderSide(width: 4, color: scheme.onSurface),
             borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(3), topRight: Radius.circular(3))),
         labelStyle: TextStyle(
             fontFamily: "Inter",
             fontWeight: FontWeight.w700,
             fontSize: 12,
-            color: AppColors.darkColor,
             letterSpacing: 1),
         controller: tabController,
         tabs: const [
@@ -93,6 +96,8 @@ class PlayerStatsTable extends StatelessWidget {
           );
         }
 
+        final statColumns = _collectStatColumns(matchStats);
+
         return Column(
           children: [
             const SizedBox(height: kMedium),
@@ -116,7 +121,7 @@ class PlayerStatsTable extends StatelessWidget {
                           BorderSide(color: Color(0xffdcdcdc), width: 1),
                     ),
                     showBottomBorder: false,
-                    columns: const [
+                    columns: [
                       DataColumn(
                           label: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -127,50 +132,31 @@ class PlayerStatsTable extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text("Result"),
                       )),
-                      DataColumn(
+                      ...statColumns.map(
+                        (statName) => DataColumn(
                           label: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text("Field Goals"),
-                      )),
-                      DataColumn(
-                          label: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text("Free Throws"),
-                      )),
-                      DataColumn(
-                          label: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text("Three Pointers"),
-                      )),
-                      DataColumn(
-                          label: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text("Fouls"),
-                      )),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Text(statName),
+                          ),
+                        ),
+                      ),
                     ],
                     rows: matchStats.map((match) {
-                      // Helper to get a stat count by name
-                      int getStat(String name) {
-                        return match.statsByType
-                                .firstWhere(
-                                  (s) => s.statType.stattype == name,
-                                  orElse: () => StatsByType(
-                                    statType: StatType(stattype: name),
-                                    count: 0,
-                                  ),
-                                )
-                                .count ??
-                            0;
+                      final statsByType = <String, int>{};
+                      for (final stat in match.statsByType) {
+                        statsByType[stat.statType.stattype] = stat.count;
                       }
 
                       return DataRow(
                         cells: [
                           DataCell(Text(match.matchTitle)),
                           DataCell(Text(match.scoreboard)),
-                          DataCell(Text('${getStat("Field Goal")}')),
-                          DataCell(Text('${getStat("Free Throw (FT)")}')),
-                          DataCell(Text('${getStat("Three Pointer (3 PT)")}')),
-                          DataCell(Text('${getStat("Personal Fouls")}')),
+                          ...statColumns.map(
+                            (statName) => DataCell(
+                              Text('${statsByType[statName] ?? 0}'),
+                            ),
+                          ),
                         ],
                       );
                     }).toList(),
@@ -182,6 +168,46 @@ class PlayerStatsTable extends StatelessWidget {
         );
       },
     );
+  }
+
+  List<String> _collectStatColumns(List<PlayerStatResponse> matchStats) {
+    final preferredOrder = <String>[
+      'Field Goal',
+      'Field Goal Attempts',
+      'Free Throw (FT)',
+      'Free Throw Attempts',
+      'Three Pointer (3 PT)',
+      '3 Point Attempts',
+      'Assists',
+      'Steals',
+      'Blocks',
+      'Turnovers',
+      'Offensive Rebounds',
+      'Defensive Rebounds',
+      'Personal Fouls',
+      'Technical Fouls',
+    ];
+
+    final discovered = <String>{};
+    for (final match in matchStats) {
+      for (final stat in match.statsByType) {
+        final name = stat.statType.stattype.trim();
+        if (name.isNotEmpty) {
+          discovered.add(name);
+        }
+      }
+    }
+
+    final ordered = <String>[];
+    for (final preferred in preferredOrder) {
+      if (discovered.remove(preferred)) {
+        ordered.add(preferred);
+      }
+    }
+
+    final remainder = discovered.toList()..sort();
+    ordered.addAll(remainder);
+    return ordered;
   }
 }
 

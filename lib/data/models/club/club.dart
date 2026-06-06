@@ -19,6 +19,7 @@ class ClubRoasterData with _$ClubRoasterData {
     required String id,
     required String name,
     required String leagueId,
+    String? imageUrl,
   }) = _ClubRoasterData;
 
   factory ClubRoasterData.fromJson(Map<String, dynamic> json) =>

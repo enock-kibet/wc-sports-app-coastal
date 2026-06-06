@@ -41,7 +41,7 @@ class TotalAndQuantity extends StatelessWidget {
               icon: Icons.add,
               onButtonPress: add,
               backgroundColor: AppColors.defaultAppPurple,
-              iconColor: AppColors.whiteColor,
+              iconColor: AppColors.darkColor,
               borderColor: AppColors.defaultAppPurple,
             )
           ],

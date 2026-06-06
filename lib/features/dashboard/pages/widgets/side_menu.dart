@@ -50,7 +50,7 @@ class _SideMenuState extends State<SideMenu> {
             },
           ),
           SideMenuIconTile(
-            title: "Team Media",
+            title: "League Media",
             icon: LucideIcons.tv,
             press: () {
               context.read<SideMenuCubit>().closeDrawer();

@@ -143,10 +143,11 @@ class Http {
       return MultipleResult.onError(
         error: ErrorHandler(error).handle(),
       );
-    } catch (error) {
-      debugPrint(error.toString());
+    } catch (error, stackTrace) {
+      debugPrint("Unexpected GET error: $error");
+      debugPrintStack(stackTrace: stackTrace);
       return MultipleResult.onError(
-        error: Failure(error: "Unexpected error occurred"),
+        error: Failure(error: _unexpectedFailureMessage(error)),
       );
     }
   }
@@ -178,10 +179,11 @@ class Http {
       return MultipleResult.onError(
         error: ErrorHandler(error).handle(),
       );
-    } on Exception catch (error) {
-      debugPrint(" some exception: ${error.toString()}");
+    } catch (error, stackTrace) {
+      debugPrint("Unexpected POST error: $error");
+      debugPrintStack(stackTrace: stackTrace);
       return MultipleResult.onError(
-        error: Failure(error: "Unexpected error occurred"),
+        error: Failure(error: _unexpectedFailureMessage(error)),
       );
     }
   }
@@ -209,9 +211,11 @@ class Http {
       return MultipleResult.onError(
         error: ErrorHandler(error).handle(),
       );
-    } on Exception catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint("Unexpected PUT error: $error");
+      debugPrintStack(stackTrace: stackTrace);
       return MultipleResult.onError(
-        error: Failure(error: "Unexpected error occurred"),
+        error: Failure(error: _unexpectedFailureMessage(error)),
       );
     }
   }
@@ -237,9 +241,11 @@ class Http {
       return MultipleResult.onError(
         error: ErrorHandler(error).handle(),
       );
-    } on Exception catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint("Unexpected PATCH error: $error");
+      debugPrintStack(stackTrace: stackTrace);
       return MultipleResult.onError(
-        error: Failure(error: "Unexpected error occurred"),
+        error: Failure(error: _unexpectedFailureMessage(error)),
       );
     }
   }
@@ -263,11 +269,27 @@ class Http {
       return MultipleResult.onError(
         error: ErrorHandler(error).handle(),
       );
-    } on Exception catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint("Unexpected DELETE error: $error");
+      debugPrintStack(stackTrace: stackTrace);
       return MultipleResult.onError(
-        error: Failure(error: "Unexpected error occurred"),
+        error: Failure(error: _unexpectedFailureMessage(error)),
       );
     }
+  }
+
+  static String _unexpectedFailureMessage(Object error) {
+    final message = error.toString().trim();
+    if (message.isEmpty) {
+      return "Unexpected error occurred";
+    }
+
+    return ErrorHandler.humanizeMessage(
+      message
+          .replaceFirst("Exception: ", "")
+          .replaceFirst("FormatException: ", ""),
+      fallback: "Unexpected error occurred",
+    );
   }
 
   static Options _withAuthOption(

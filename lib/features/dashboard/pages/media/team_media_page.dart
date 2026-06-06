@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/app_colors.dart';
@@ -30,8 +31,7 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
           image: DecorationImage(
               image: AssetImage("assets/background.png"), fit: BoxFit.cover),
         ),
-        child: SafeArea(
-            child: LayoutBuilder(builder: (context, constraints) {
+        child: SafeArea(child: LayoutBuilder(builder: (context, constraints) {
           return SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -124,8 +124,7 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
 
   TextField searchField(bool isTablet) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final borderColor =
-        isDark ? AppColors.whiteColor : const Color(0xFFDADADA);
+    final borderColor = isDark ? AppColors.whiteColor : const Color(0xFFDADADA);
     final fillColor =
         isDark ? AppColors.whiteColor.withValues(alpha: 0.2) : Colors.white;
     final iconColor =
@@ -181,26 +180,12 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        GestureDetector(
-          onTap: () {
-            context.pop();
-          },
-          child: Container(
-            padding: const EdgeInsets.all(kSmall),
-            decoration: BoxDecoration(
-                color: chipColor,
-                shape: BoxShape.circle),
-            child: Icon(
-              LucideIcons.arrowLeft,
-              color: iconColor,
-            ),
-          ),
-        ),
+        const AppBackButton(),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Team Media!",
+              Text("League Media!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: titleColor,
@@ -221,9 +206,7 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
           },
           child: Container(
             padding: const EdgeInsets.all(kSmall),
-            decoration: BoxDecoration(
-                color: chipColor,
-                shape: BoxShape.circle),
+            decoration: BoxDecoration(color: chipColor, shape: BoxShape.circle),
             child: Icon(
               LucideIcons.bell,
               color: iconColor,

@@ -1,10 +1,12 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/mixin/input_validation_mixin.dart';
 import 'package:sports_app/core/snackbar_service.dart';
@@ -26,6 +28,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   late AuthBloc authBloc;
   final ValueNotifier<bool> _isChecked = ValueNotifier(false);
   final ValueNotifier<bool> _isHidden = ValueNotifier(true);
@@ -340,6 +343,20 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
                           ],
                         )),
                     const SizedBox(
+                      height: kSMedium,
+                    ),
+                    if (Platform.isIOS)
+                      SignInWithAppleButton(
+                        text: state.status == AuthStatus.loading
+                            ? "Loading..."
+                            : 'Sign Up with Apple',
+                        style: SignInWithAppleButtonStyle.black,
+                        height: 56,
+                        onPressed: state.status == AuthStatus.loading
+                            ? null
+                            : _signUpWithApple,
+                      ),
+                    const SizedBox(
                       height: kSMedium * 5,
                     ),
                   ],
@@ -359,6 +376,63 @@ class _SignUpPageState extends State<SignUpPage> with InputValidationMixin {
       return true;
     } else {
       return false;
+    }
+  }
+
+  Future<void> _signUpWithApple() async {
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final appleId = credential.userIdentifier;
+      final identityToken = credential.identityToken;
+
+      if (appleId == null || identityToken == null) {
+        throw Exception("Invalid Apple credential");
+      }
+
+      final name =
+          "${credential.givenName ?? ''} ${credential.familyName ?? ''}".trim();
+
+      String? storedEmail =
+          await _secureStorage.read(key: "apple_email_$appleId");
+
+      if (credential.email != null) {
+        storedEmail = credential.email;
+        await _secureStorage.write(
+          key: "apple_email_$appleId",
+          value: credential.email,
+        );
+      }
+
+      String? storedName =
+          await _secureStorage.read(key: "apple_name_$appleId");
+
+      if (name.isNotEmpty) {
+        storedName = name;
+        await _secureStorage.write(
+          key: "apple_name_$appleId",
+          value: name,
+        );
+      }
+
+      authBloc.add(
+        AuthEvent.appleLogin(request: {
+          "appleId": appleId,
+          if (storedEmail != null) "email": storedEmail,
+          if (storedName != null) "name": storedName,
+          "identityToken": identityToken,
+        }),
+      );
+    } catch (e) {
+      SnackbarService.show(
+        "Apple Sign-In cancelled or failed",
+        backgroundColor: AppColors.dangerColor,
+      );
     }
   }
 }

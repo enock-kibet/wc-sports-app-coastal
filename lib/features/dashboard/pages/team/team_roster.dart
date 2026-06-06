@@ -1,7 +1,35 @@
 part of 'team.dart';
 
 class TeamRoster extends StatelessWidget {
-  const TeamRoster({super.key});
+  final String? clubId;
+  const TeamRoster({super.key, this.clubId});
+
+  Future<void> _refreshRoster(BuildContext context) {
+    final bloc = context.read<RoasterBloc>();
+    return refreshBlocState<RoasterState>(
+      bloc: bloc,
+      dispatch: () => bloc.add(RoasterEvent.roasters(clubId)),
+      isLoading: (state) => state.status.isLoading,
+    );
+  }
+
+  Widget _buildRefreshMessage(
+    BuildContext context, {
+    required String message,
+  }) {
+    return RefreshIndicator.adaptive(
+      onRefresh: () => _refreshRoster(context),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(
+            height: 220,
+            child: Center(child: Text(message)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,17 +38,21 @@ class TeamRoster extends StatelessWidget {
         if (state.status.isLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state.status.isFailure) {
-          return Center(child: Text("Failed to load"));
+          return _buildRefreshMessage(context, message: "Failed to load");
         } else if (state.status.isSuccess && state.roasters != null) {
           final players = state.roasters!;
           if (players.isEmpty) {
-            return const Center(child: Text("No players found"));
+            return _buildRefreshMessage(context, message: "No players found");
           }
           return Padding(
             padding: const EdgeInsets.only(top: kMedium),
-            child: SingleChildScrollView(
-              child: Column(
-                children: players.map((player) {
+            child: RefreshIndicator.adaptive(
+              onRefresh: () => _refreshRoster(context),
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: players.length,
+                itemBuilder: (context, index) {
+                  final player = players[index];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: PlayerProfile(
@@ -28,14 +60,14 @@ class TeamRoster extends StatelessWidget {
                       context: context,
                     ),
                   );
-                }).toList(),
+                },
               ),
             ),
           );
         } else if (state.roasters != null && state.roasters!.isEmpty) {
-          return const Center(child: Text("No players found"));
+          return _buildRefreshMessage(context, message: "No players found");
         } else {
-          return const Center(child: Text("No players found"));
+          return _buildRefreshMessage(context, message: "No players found");
         }
       },
     );

@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/buildcontext.dart';
+import 'package:sports_app/common/utils/pull_to_refresh.dart';
 import 'package:sports_app/features/app/blocs/media/media_bloc.dart';
 import 'package:sports_app/features/app/blocs/stripe/stripe_bloc.dart';
 import 'package:sports_app/features/app/side_menu_cubit.dart';
@@ -54,6 +56,35 @@ class _MediaPageState extends State<MediaPage> {
     super.dispose();
   }
 
+  Future<void> _refreshMedia() {
+    final bloc = context.read<MediaBloc>();
+    return refreshBlocState<MediaState>(
+      bloc: bloc,
+      dispatch: () => bloc.add(const MediaEvent.media()),
+      isLoading: (state) => state.status.isLoading,
+    );
+  }
+
+  Widget _refreshableMessage(String message) {
+    return RefreshIndicator.adaptive(
+      onRefresh: _refreshMedia,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(
+            height: 260,
+            child: Center(
+              child: Text(
+                message,
+                style: context.textTheme.headlineSmall,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HideCubit, bool>(
@@ -83,36 +114,35 @@ class _MediaPageState extends State<MediaPage> {
                                   child: CircularProgressIndicator());
 
                             case MediaStatus.failure:
-                              return Center(
-                                child: Text(
-                                  state.failure?.error ??
-                                      "Unable to load media right now.",
-                                ),
+                              return _refreshableMessage(
+                                state.failure?.error ??
+                                    "Unable to load media right now.",
                               );
 
                             case MediaStatus.success:
                               if (state.media.isEmpty) {
-                                return Center(
-                                  child: Text(
-                                    "No Media",
-                                    style: context.textTheme.headlineSmall,
-                                  ),
-                                );
+                                return _refreshableMessage("No Media");
                               }
 
                               final mediaData = state.media.first;
 
-                              return SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // RecentHighlightsList(
-                                    //     highlights: mediaData.recentHighlights),
-                                    // const SizedBox(height: 24),
-                                    SeasonHighlightsList(
-                                        seasonHighlights:
-                                            mediaData.seasonHighlights),
-                                  ],
+                              return RefreshIndicator.adaptive(
+                                onRefresh: _refreshMedia,
+                                child: SingleChildScrollView(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // RecentHighlightsList(
+                                      //     highlights: mediaData.recentHighlights),
+                                      // const SizedBox(height: 24),
+                                      SeasonHighlightsList(
+                                          seasonHighlights:
+                                              mediaData.seasonHighlights),
+                                    ],
+                                  ),
                                 ),
                               );
 
@@ -146,21 +176,11 @@ class _MediaPageState extends State<MediaPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        GestureDetector(
-          onTap: () => context.pop(),
-          child: Container(
-            padding: const EdgeInsets.all(kSmall),
-            decoration: BoxDecoration(
-              color: chipColor,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(LucideIcons.arrowLeft, color: iconColor),
-          ),
-        ),
+        const AppBackButton(),
         Column(
           children: [
             Text(
-              'Team Media',
+              'League Media',
               style: TextStyle(
                 color: titleColor,
                 fontSize: 18,
@@ -193,8 +213,7 @@ class _MediaPageState extends State<MediaPage> {
     required TextEditingController controller,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final borderColor =
-        isDark ? AppColors.whiteColor : const Color(0xFFDADADA);
+    final borderColor = isDark ? AppColors.whiteColor : const Color(0xFFDADADA);
     final fillColor =
         isDark ? AppColors.whiteColor.withValues(alpha: 0.2) : Colors.white;
     final iconColor =

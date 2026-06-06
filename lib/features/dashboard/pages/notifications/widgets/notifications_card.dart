@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/data/models/notifications/notification.dart';
-import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/theme.dart';
 
 class NotificationsCard extends StatelessWidget {
@@ -100,7 +98,7 @@ class NotificationsCard extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0),
                             child: Text(
-                              notification.notificationText!,
+                              notification.notificationText,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.bodyMedium?.copyWith(

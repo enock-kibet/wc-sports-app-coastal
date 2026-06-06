@@ -26,6 +26,7 @@ _$ClubRoasterDataImpl _$$ClubRoasterDataImplFromJson(
       id: json['id'] as String,
       name: json['name'] as String,
       leagueId: json['leagueId'] as String,
+      imageUrl: json['imageUrl'] as String?,
     );
 
 Map<String, dynamic> _$$ClubRoasterDataImplToJson(
@@ -34,4 +35,5 @@ Map<String, dynamic> _$$ClubRoasterDataImplToJson(
       'id': instance.id,
       'name': instance.name,
       'leagueId': instance.leagueId,
+      'imageUrl': instance.imageUrl,
     };

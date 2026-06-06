@@ -56,9 +56,12 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
 
   @override
   Widget build(BuildContext context) {
-    final labelColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.68);
-    final outlinedBorderColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.22);
-    final secondaryTextColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75);
+    final labelColor =
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.68);
+    final outlinedBorderColor =
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.22);
+    final secondaryTextColor =
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75);
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: authBloc,
@@ -176,9 +179,12 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                       children: [
                         TextButton(
                           onPressed: () {},
-                          child: const Text(
+                          child: Text(
                             "Forgot Password",
-                            style: TextStyle(fontSize: kSMedium),
+                            style: TextStyle(
+                              fontSize: kSMedium,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                         ),
                         TextButton(
@@ -189,9 +195,12 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                               context.go('/home');
                             }
                           },
-                          child: const Text(
+                          child: Text(
                             "Skip Login",
-                            style: TextStyle(fontSize: kSMedium),
+                            style: TextStyle(
+                              fontSize: kSMedium,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                         ),
                       ],
@@ -461,8 +470,7 @@ CustomTextField(bool isEmail, String hintText,
             borderSide: const BorderSide(color: Color(0xFFD0D0D0))),
         filled: false,
         hintText: hintText,
-        hintStyle:
-            const TextStyle(fontSize: 13, color: Color(0xFF9A9A9A)),
+        hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF9A9A9A)),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(kMedium),
             borderSide: BorderSide(color: AppColors.primaryColor))),
@@ -569,9 +577,8 @@ class _ClubPickerSheetState extends State<_ClubPickerSheet> {
                   }
 
                   final teams = (state.clubRoasters ?? [])
-                      .where((team) => team.name
-                          .toLowerCase()
-                          .contains(query.toLowerCase()))
+                      .where((team) =>
+                          team.name.toLowerCase().contains(query.toLowerCase()))
                       .toList();
 
                   if (selected == null && widget.initiallySelectedId != null) {
@@ -654,7 +661,7 @@ CustomFilledButton(String buttonText) {
         child: Text(
       buttonText,
       style: TextStyle(
-          color: AppColors.inputFillColor,
+          color: AppColors.darkColor,
           fontSize: 18,
           fontWeight: FontWeight.w500),
     )),
@@ -681,7 +688,7 @@ CustomisableFilledButton(
     child: Center(
         child: Text(
       buttonText,
-      style: TextStyle(color: AppColors.inputFillColor, fontSize: textSize),
+      style: TextStyle(color: AppColors.darkColor, fontSize: textSize),
     )),
   );
 }
@@ -703,8 +710,7 @@ CustomOutlinedButton(String buttonText) {
 
 LoginSignUpSwitch(BuildContext context, bool isSignInPage) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
-  final trackColor =
-      isDark ? const Color(0xFFECE8E6) : const Color(0xFFF0F0F0);
+  final trackColor = isDark ? const Color(0xFFECE8E6) : const Color(0xFFF0F0F0);
   final activeColor =
       isDark ? const Color(0xFF6B6664) : const Color(0xFF656060);
   final inactiveColor = trackColor;

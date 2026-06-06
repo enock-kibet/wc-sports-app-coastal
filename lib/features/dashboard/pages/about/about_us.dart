@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:sports_app/common/app_background.dart';
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/theme/app_colors.dart';
 
@@ -11,10 +11,10 @@ class AboutUs extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final iconTileColor =
-        isDark ? Colors.white.withValues(alpha: 0.08) : theme.colorScheme.surface;
-    final iconTint =
-        isDark ? Colors.white : theme.colorScheme.onSurface;
+    final iconTileColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : theme.colorScheme.surface;
+    final iconTint = isDark ? Colors.white : theme.colorScheme.onSurface;
 
     return Scaffold(
       body: AppBackground(
@@ -47,16 +47,7 @@ class AboutUs extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(
                               left: 20.0, top: 7, bottom: 7),
-                          child: IconButton.filledTonal(
-                            onPressed: () => context.pop(),
-                            icon: Icon(
-                              Icons.arrow_back,
-                              color: AppColors.inputFillColor,
-                            ),
-                            style: IconButton.styleFrom(
-                                backgroundColor: const Color(0X66000000),
-                                fixedSize: const Size(48, 48)),
-                          ),
+                          child: const AppBackButton(),
                         ),
                         Align(
                             alignment: Alignment.center,

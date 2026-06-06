@@ -1,9 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/theme/app_colors.dart';
@@ -74,7 +73,7 @@ class _StandingPageState extends State<StandingPage> {
                         foregroundColor:
                             WidgetStateProperty.resolveWith((states) {
                           if (states.contains(WidgetState.selected)) {
-                            return AppColors.whiteColor;
+                            return AppColors.darkColor;
                           }
                           return null;
                         }),
@@ -271,21 +270,7 @@ class _StandingPageState extends State<StandingPage> {
           top: kSmall,
           left: kMedium,
           child: SafeArea(
-            child: GestureDetector(
-              onTap: () {
-                context.pop();
-              },
-              child: Container(
-                padding: const EdgeInsets.all(kSmall),
-                decoration: BoxDecoration(
-                    color: AppColors.whiteColor.withOpacity(0.3),
-                    shape: BoxShape.circle),
-                child: Icon(
-                  LucideIcons.arrowLeft,
-                  color: AppColors.whiteColor,
-                ),
-              ),
-            ),
+            child: const AppBackButton(),
           ),
         ),
       ],

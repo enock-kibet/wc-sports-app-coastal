@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/data/models/user/user.dart';
@@ -172,20 +173,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   bottom: false,
                   child: Padding(
                     padding: const EdgeInsets.all(kMedium),
-                    child: GestureDetector(
-                      onTap: () => context.go('/home'),
-                      child: Container(
-                        padding: const EdgeInsets.all(kSmall),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.22),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          LucideIcons.arrowLeft,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                    child: AppBackButton(onPressed: () => context.go('/home')),
                   ),
                 ),
               ),

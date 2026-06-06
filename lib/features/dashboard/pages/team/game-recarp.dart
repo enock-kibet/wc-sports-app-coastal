@@ -62,9 +62,6 @@ class _GameRecapPageState extends State<GameRecapPage> {
       'Blocks',
       'Assists',
       'Turnovers',
-      'Field Goal Attempts',
-      '3 Point Attempts',
-      'Free Throw Attempts',
       'Offensive Rebounds',
       'Defensive Rebounds',
       'Personal Fouls',
@@ -316,7 +313,12 @@ class _GameRecapPageState extends State<GameRecapPage> {
         Row(
           children: [
             const SizedBox(width: 140),
-            for (final header in headers) statCell(header, color: headerColor),
+            for (final header in headers)
+              statCell(
+                header,
+                bold: false,
+                color: headerColor,
+              ),
           ],
         ),
         const SizedBox(height: 12),
@@ -682,9 +684,7 @@ class _GameRecapPageState extends State<GameRecapPage> {
           child: Text(
             fallbackAbbr,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: scheme.onSurface,
-            ),
+            style: TextStyle(color: scheme.onSurface),
           ),
         ),
       );
@@ -781,13 +781,23 @@ class _GameRecapPageState extends State<GameRecapPage> {
           ...statKeys.map((k) {
             final l = leftTotals[k] ?? 0;
             final r = rightTotals[k] ?? 0;
+            final leftValue = _formatStatValue(
+              statKey: k,
+              value: l,
+              totals: leftTotals,
+            );
+            final rightValue = _formatStatValue(
+              statKey: k,
+              value: r,
+              totals: rightTotals,
+            );
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
-                      l.toString(),
+                      leftValue,
                       style: TextStyle(color: scheme.onSurface),
                     ),
                   ),
@@ -800,7 +810,7 @@ class _GameRecapPageState extends State<GameRecapPage> {
                   ),
                   Expanded(
                     child: Text(
-                      r.toString(),
+                      rightValue,
                       textAlign: TextAlign.end,
                       style: TextStyle(color: scheme.onSurface),
                     ),
@@ -812,6 +822,40 @@ class _GameRecapPageState extends State<GameRecapPage> {
         ],
       ),
     );
+  }
+
+  String _formatStatValue({
+    required String statKey,
+    required num value,
+    required Map<String, num> totals,
+  }) {
+    final attemptsKey = _attemptsStatKey(statKey);
+    if (attemptsKey == null) {
+      return _formatNumber(value);
+    }
+
+    final attempts = totals[attemptsKey] ?? 0;
+    return '${_formatNumber(value)}/${_formatNumber(attempts)}';
+  }
+
+  String? _attemptsStatKey(String statKey) {
+    switch (statKey) {
+      case 'Field Goal':
+        return 'Field Goal Attempts';
+      case 'Free Throw (FT)':
+        return 'Free Throw Attempts';
+      case 'Three Pointer (3 PT)':
+        return '3 Point Attempts';
+      default:
+        return null;
+    }
+  }
+
+  String _formatNumber(num value) {
+    if (value == value.roundToDouble()) {
+      return value.toInt().toString();
+    }
+    return value.toString();
   }
 }
 

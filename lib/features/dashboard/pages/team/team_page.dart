@@ -67,7 +67,7 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
                       height: 39,
                     ),
                     Text(
-                      widget.selectedClub?.name ?? "Team",
+                      widget.selectedClub?.name ?? "League",
                       style: context.textTheme.headlineLarge
                           ?.copyWith(fontSize: 16),
                     ),
@@ -98,7 +98,9 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
                         controller: tabController,
                         tabs: [
                           Tab(
-                            text: 'ROSTER',
+                            text: widget.selectedClub == null
+                                ? 'TEAMS'
+                                : 'ROSTER',
                           ),
                           Tab(
                             text: 'STATS',
@@ -126,7 +128,9 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
                                     ..add(RoasterEvent.roasters(
                                       widget.selectedClub!.id,
                                     )),
-                                  child: const TeamRoster(),
+                                  child: TeamRoster(
+                                    clubId: widget.selectedClub!.id,
+                                  ),
                                 ),
                           TeamStats(
                             key: ValueKey(
@@ -145,19 +149,55 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-              widget.showBackNavigation
-                  ? Positioned(
-                      top: 20,
-                      left: 20,
-                      child: CustomIconButton(
-                          size: 40,
-                          onButtonPress: () {
-                            context.pop();
-                          },
-                          icon: Icons.arrow_back))
-                  : Container()
+              Positioned(
+                top: 20,
+                left: 20,
+                child: AppBackButton(
+                  onPressed: widget.showBackNavigation
+                      ? null
+                      : () => context.go('/home'),
+                ),
+              ),
+              Positioned(
+                top: 20,
+                right: 20,
+                child: _TeamNotificationButton(
+                  onPressed: () =>
+                      context.pushNamed(AppRoute.notifications.name),
+                ),
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TeamNotificationButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _TeamNotificationButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? Colors.white.withValues(alpha: 0.3) : Colors.white;
+    final iconColor = isDark ? Colors.white : colorScheme.onSurface;
+
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.all(kSmall),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          LucideIcons.bell,
+          color: iconColor,
         ),
       ),
     );

@@ -99,7 +99,12 @@ class SizeGuideRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              CustomIconButton(onButtonPress: subtract, icon: Icons.remove),
+              CustomIconButton(
+                onButtonPress: subtract,
+                icon: Icons.remove,
+                borderColor: Theme.of(context).colorScheme.onSurface,
+                iconColor: Theme.of(context).colorScheme.onSurface,
+              ),
               const SizedBox(width: 12),
               SizedBox(
                 width: 16,
@@ -115,7 +120,7 @@ class SizeGuideRow extends StatelessWidget {
                 icon: Icons.add,
                 onButtonPress: add,
                 backgroundColor: AppColors.defaultAppPurple,
-                iconColor: AppColors.whiteColor,
+                iconColor: AppColors.darkColor,
                 borderColor: AppColors.defaultAppPurple,
               ),
             ],
@@ -228,8 +233,10 @@ class GradientFilledButton extends StatelessWidget {
           shadowColor: Colors.transparent, // Removes unwanted shadow
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         ),
-        child: Text(text,
-            style: const TextStyle(fontSize: 16, color: Colors.white)),
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 16, color: AppColors.darkColor),
+        ),
       ),
     );
   }

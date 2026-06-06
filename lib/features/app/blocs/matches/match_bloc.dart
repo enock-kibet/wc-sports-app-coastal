@@ -55,19 +55,26 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
       );
     });
     on<_MatchStats>((event, emit) async {
-      emit(state.copyWith(status: MatchStatus.loading));
       final recordResponse = await _matchService.getMatchStats(event.clubId);
       recordResponse.when(
         onError: (error) {
+          final hasMatches =
+              state.matches.isNotEmpty || state.statsMatches.isNotEmpty;
           emit(state.copyWith(
-            status: MatchStatus.failure,
+            status: hasMatches ? state.status : MatchStatus.failure,
+            statsLoaded: true,
             failure: error,
           ));
         },
         onSuccess: (data) async {
           emit(state.copyWith(
-            status: MatchStatus.success,
+            status: state.status == MatchStatus.initial ||
+                    state.status == MatchStatus.loading ||
+                    state.status == MatchStatus.failure
+                ? MatchStatus.success
+                : state.status,
             statsMatches: data,
+            statsLoaded: true,
             // monthMatches: currentMonthMatches,
             // datedMatches: todaysMatches, // 👈 in case _selectedDay is today
             failure: null,

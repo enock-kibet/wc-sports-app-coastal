@@ -9,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sports_app/common/app_background.dart';
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/match/match.dart';
@@ -238,14 +239,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                           Positioned(
                             left: 20,
                             top: 20,
-                            child: CustomIconButton(
-                              onButtonPress: () => context.pop(),
-                              size: 40,
-                              borderColor: Colors.transparent,
-                              iconColor: AppColors.whiteColor,
-                              backgroundColor: Colors.black.withOpacity(.24),
-                              icon: LucideIcons.arrowLeft,
-                            ),
+                            child: const AppBackButton(),
                           ),
                           Positioned(
                             right: 20,

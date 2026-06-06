@@ -5,31 +5,41 @@ class TeamStats extends StatelessWidget {
 
   const TeamStats({super.key, this.selectedClubId});
 
+  Future<void> _refreshMatchStats(BuildContext context) {
+    final bloc = context.read<MatchBloc>();
+    return refreshBlocState<MatchState>(
+      bloc: bloc,
+      dispatch: () => bloc.add(MatchEvent.matchstats(clubId: selectedClubId)),
+      isLoading: (state) => state.status.isLoading,
+    );
+  }
+
   @override
-Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return BlocBuilder<MatchBloc, MatchState>(
       builder: (context, state) {
         final matches = state.statsMatches;
+        final isIpad = _isIpadLayout(context);
 
-    // print(matches);
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: SafeArea(
-          child: Column(
-            children: [
-              /// Tabs inside a container
-              Container(
-                  margin: const EdgeInsets.symmetric(vertical: 12),
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
+        return DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: isIpad ? 760 : double.infinity,
+                        ),
                         child: TabBar(
                           isScrollable: false,
                           tabs: [
@@ -46,66 +56,132 @@ Widget build(BuildContext context) {
                           unselectedLabelColor: Colors.grey,
                           indicator: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.all(Radius.circular(25)),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(25),
+                            ),
                             border: Border.all(
-                                color: Theme.of(context).colorScheme.onSurface),
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                           dividerColor: Colors.transparent,
                         ),
                       ),
-                    ],
-                  )),
-
-              /// Tab content
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    /// Team Stats
-                    ListView.builder(
-                      itemCount: matches.length,
-                      itemBuilder: (context, index) {
-                        return MatchCard(
-                          match: matches[index].recap,
-                          homeTeam: matches[index].teamOne,
-                          homePic: matches[index].recap?.clubOne.pic,
-                          homeAbbr: "AP",
-                          homeColor: Colors.indigo,
-                          awayTeam: matches[index].teamTwo,
-                          awayPic: matches[index].recap?.clubTwo.pic,
-                          awayAbbr: "M",
-                          awayColor: Colors.black87,
-                          homeScore: matches[index].teamOneScore,
-                          awayScore: matches[index].teamTwoScore,
-                          date: matches[index].matchDate.toString(),
-                        );
-                      },
                     ),
-
-                    /// Personal Stats
-                    PlayerStats(context, selectedClubId: selectedClubId),
-                  ],
-                ),
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        RefreshIndicator.adaptive(
+                          onRefresh: () => _refreshMatchStats(context),
+                          child: _buildTeamStatsMatches(context, matches),
+                        ),
+                        PlayerStats(
+                          context,
+                          selectedClubId: selectedClubId,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
-  });
+  }
+
+  Widget _buildTeamStatsMatches(BuildContext context, List<MatchType> matches) {
+    if (!_isIpadLayout(context)) {
+      return ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: matches.length,
+        itemBuilder: (context, index) => _buildMatchCard(matches[index]),
+      );
+    }
+
+    final rowCount = (matches.length / 2).ceil();
+
+    return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
+      itemCount: rowCount,
+      separatorBuilder: (_, __) => const SizedBox(height: 4),
+      itemBuilder: (context, rowIndex) {
+        final leftIndex = rowIndex * 2;
+        final rightIndex = leftIndex + 1;
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _buildMatchCard(matches[leftIndex]),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: rightIndex < matches.length
+                  ? _buildMatchCard(matches[rightIndex])
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildMatchCard(MatchType match) {
+    return MatchCard(
+      match: match.recap,
+      homeTeam: match.teamOne,
+      homePic: match.recap?.clubOne.pic,
+      homeAbbr: "AP",
+      homeColor: Colors.indigo,
+      awayTeam: match.teamTwo,
+      awayPic: match.recap?.clubTwo.pic,
+      awayAbbr: "M",
+      awayColor: Colors.black87,
+      homeScore: match.teamOneScore,
+      awayScore: match.teamTwoScore,
+      date: match.matchDate.toString(),
+    );
+  }
+
+  bool _isIpadLayout(BuildContext context) {
+    return Theme.of(context).platform == TargetPlatform.iOS &&
+        MediaQuery.of(context).size.shortestSide >= 600;
   }
 }
 
 Widget PlayerStats(BuildContext context, {String? selectedClubId}) {
   return BlocProvider(
-    create: (_) => StatBloc(clubId: selectedClubId)
-      ..add(const StatEvent.stats()),
+    create: (_) =>
+        StatBloc(clubId: selectedClubId)..add(const StatEvent.stats()),
     child: BlocBuilder<StatBloc, StatState>(
       builder: (context, state) {
+        Future<void> onRefresh() {
+          final bloc = context.read<StatBloc>();
+          return refreshBlocState<StatState>(
+            bloc: bloc,
+            dispatch: () => bloc.add(const StatEvent.stats()),
+            isLoading: (state) => state.status.isLoading,
+          );
+        }
+
         if (state.status.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
         if (state.status.isFailure) {
-          return Center(child: Text("Error: ${state.failure}"));
+          return RefreshIndicator.adaptive(
+            onRefresh: onRefresh,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: 220,
+                  child: Center(child: Text("Error: ${state.failure}")),
+                ),
+              ],
+            ),
+          );
         }
         if (state.status.isSuccess && state.stats != null) {
           final categories = state.stats!.keys.toList();
@@ -122,14 +198,16 @@ Widget PlayerStats(BuildContext context, {String? selectedClubId}) {
               ),
               const SizedBox(height: kSmall),
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
+                child: RefreshIndicator.adaptive(
+                  onRefresh: onRefresh,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(children: [
                       for (var category in categories) ...[
                         StatCard(category: category),
                         const SizedBox(height: kSmall),
                       ]
-                    ],
+                    ]),
                   ),
                 ),
               ),
@@ -327,7 +405,7 @@ class StatCard extends StatelessWidget {
             Category: category,
             alternate: i.isOdd,
             name: "${entry.rank}. ${entry.playerName}",
-            details: "${entry.avg}",
+            details: _formatAverage(entry.avg),
           ),
         );
       }),
@@ -377,7 +455,7 @@ class StatCard extends StatelessWidget {
                 subtitle: Text("${player.clubname} • ${player.games} games",
                     style: TextStyle(fontSize: 10)),
                 trailing: Text(
-                  player.avg.toString(),
+                  _formatAverage(player.avg),
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 10),
                 ),
@@ -393,6 +471,13 @@ class StatCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatAverage(double avg) {
+    final fixed = avg.toStringAsFixed(3);
+    return fixed
+        .replaceFirst(RegExp(r'0+$'), '')
+        .replaceFirst(RegExp(r'\.$'), '');
   }
 }
 // Widget TeamSummaryStats() {

@@ -74,9 +74,6 @@
 
     <key>GIDClientID</key>
     <string>555382788437-fn3kqfq2d0d5ofdmhlfv6v3ip7bvs5e9.apps.googleusercontent.com</string>
-
-    <key>NSUserTrackingUsageDescription</key>
-    <string>We need to track your activity for sign in</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>This app needs access to your location while using the app.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

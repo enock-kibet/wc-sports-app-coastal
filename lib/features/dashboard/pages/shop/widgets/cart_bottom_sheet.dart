@@ -1,15 +1,45 @@
 part of "../shop_page.dart";
 
-void showCartShopBottomSheet(BuildContext context,
-    {required PointsState pointsState}) {
+Future<void> showCartShopBottomSheet(BuildContext context,
+    {required PointsState pointsState}) async {
   final pointsState = context.read<PointsBloc>().state;
-  context.read<CartBloc>().add(
-        CartEvent.getCartItems(
-          request: {
-            "email": service<AppPreferencesManager>().currentUserValue!.email,
-          },
-        ),
+  final cartBloc = context.read<CartBloc>();
+
+  cartBloc.add(
+    CartEvent.getCartItems(
+      request: {
+        "email": service<AppPreferencesManager>().currentUserValue!.email,
+      },
+    ),
+  );
+
+  final cartState = await cartBloc.stream
+      .firstWhere(
+        (state) =>
+            state.status == CartStatus.success ||
+            state.status == CartStatus.failure,
+      )
+      .timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => cartBloc.state,
       );
+
+  if (!context.mounted) return;
+
+  if (cartState.status == CartStatus.failure) {
+    SnackbarService.showError(
+      cartState.failure?.error ?? 'Unable to load your cart right now.',
+    );
+    return;
+  }
+
+  if (cartState.cartItems.isEmpty) {
+    SnackbarService.show(
+      'Your cart is empty.',
+      backgroundColor: AppColors.blackColor,
+    );
+    return;
+  }
 
   // Fetch addresses from AddressBloc
   context.read<AddressBloc>().add(
@@ -31,29 +61,29 @@ void showCartShopBottomSheet(BuildContext context,
     builder: (context) {
       return BlocConsumer<CartBloc, CartState>(
         listener: (context, state) {
-          if (state.status == ProductStatus.processingPayment) {
+          if (state.status == CartStatus.processingPayment) {
             SnackbarService.show(
               'Securing Payment',
               backgroundColor: AppColors.blackColor,
             );
             //AnimatedOverlaySnackbar.show(context, "Loading",color:const Color(0xff1976D2));
-          } else if (state.status == ProductStatus.successfulPayment) {
+          } else if (state.status == CartStatus.successfulPayment) {
             context.goNamed(
               AppRoute.paymentWebView.name,
               extra: state.authorizationUrl,
             );
             //AnimatedOverlaySnackbar.show(context, "Success: ${state.authorizationUrl??"didn't get"}",color:const Color(0xff2E7D32));
-          } else if (state.status == ProductStatus.failure) {
+          } else if (state.status == CartStatus.failure) {
             AnimatedOverlaySnackbar.show(
                 context, "failed: ${state.failure?.error ?? "failed"}",
                 color: AppColors.defaultAppRed);
-          } else if (state.status == ProductStatus.success) {
+          } else if (state.status == CartStatus.success) {
             AnimatedOverlaySnackbar.show(context, "Added to cart successfully",
                 color: AppColors.blackColor);
           }
         },
         builder: (context, state) {
-          final cartItems = state.cartItems ?? [];
+          final cartItems = state.cartItems;
           final isLoading = state.status == CartStatus.loading;
 
           // get addresses from state

@@ -828,6 +828,7 @@ mixin _$MatchState {
   List<MatchType> get datedMatches => throw _privateConstructorUsedError;
   List<MatchType> get monthMatches => throw _privateConstructorUsedError;
   List<MatchType> get statsMatches => throw _privateConstructorUsedError;
+  bool get statsLoaded => throw _privateConstructorUsedError;
   List<MatchType> get searchedMatches => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -848,6 +849,7 @@ abstract class $MatchStateCopyWith<$Res> {
       List<MatchType> datedMatches,
       List<MatchType> monthMatches,
       List<MatchType> statsMatches,
+      bool statsLoaded,
       List<MatchType> searchedMatches});
 }
 
@@ -870,6 +872,7 @@ class _$MatchStateCopyWithImpl<$Res, $Val extends MatchState>
     Object? datedMatches = null,
     Object? monthMatches = null,
     Object? statsMatches = null,
+    Object? statsLoaded = null,
     Object? searchedMatches = null,
   }) {
     return _then(_value.copyWith(
@@ -897,6 +900,10 @@ class _$MatchStateCopyWithImpl<$Res, $Val extends MatchState>
           ? _value.statsMatches
           : statsMatches // ignore: cast_nullable_to_non_nullable
               as List<MatchType>,
+      statsLoaded: null == statsLoaded
+          ? _value.statsLoaded
+          : statsLoaded // ignore: cast_nullable_to_non_nullable
+              as bool,
       searchedMatches: null == searchedMatches
           ? _value.searchedMatches
           : searchedMatches // ignore: cast_nullable_to_non_nullable
@@ -920,6 +927,7 @@ abstract class _$$MatchStateImplCopyWith<$Res>
       List<MatchType> datedMatches,
       List<MatchType> monthMatches,
       List<MatchType> statsMatches,
+      bool statsLoaded,
       List<MatchType> searchedMatches});
 }
 
@@ -940,6 +948,7 @@ class __$$MatchStateImplCopyWithImpl<$Res>
     Object? datedMatches = null,
     Object? monthMatches = null,
     Object? statsMatches = null,
+    Object? statsLoaded = null,
     Object? searchedMatches = null,
   }) {
     return _then(_$MatchStateImpl(
@@ -967,6 +976,10 @@ class __$$MatchStateImplCopyWithImpl<$Res>
           ? _value._statsMatches
           : statsMatches // ignore: cast_nullable_to_non_nullable
               as List<MatchType>,
+      statsLoaded: null == statsLoaded
+          ? _value.statsLoaded
+          : statsLoaded // ignore: cast_nullable_to_non_nullable
+              as bool,
       searchedMatches: null == searchedMatches
           ? _value._searchedMatches
           : searchedMatches // ignore: cast_nullable_to_non_nullable
@@ -985,6 +998,7 @@ class _$MatchStateImpl implements _MatchState {
       final List<MatchType> datedMatches = const [],
       final List<MatchType> monthMatches = const [],
       final List<MatchType> statsMatches = const [],
+      this.statsLoaded = false,
       final List<MatchType> searchedMatches = const []})
       : _matches = matches,
         _datedMatches = datedMatches,
@@ -1033,6 +1047,9 @@ class _$MatchStateImpl implements _MatchState {
     return EqualUnmodifiableListView(_statsMatches);
   }
 
+  @override
+  @JsonKey()
+  final bool statsLoaded;
   final List<MatchType> _searchedMatches;
   @override
   @JsonKey()
@@ -1044,7 +1061,7 @@ class _$MatchStateImpl implements _MatchState {
 
   @override
   String toString() {
-    return 'MatchState(status: $status, failure: $failure, matches: $matches, datedMatches: $datedMatches, monthMatches: $monthMatches, statsMatches: $statsMatches, searchedMatches: $searchedMatches)';
+    return 'MatchState(status: $status, failure: $failure, matches: $matches, datedMatches: $datedMatches, monthMatches: $monthMatches, statsMatches: $statsMatches, statsLoaded: $statsLoaded, searchedMatches: $searchedMatches)';
   }
 
   @override
@@ -1061,6 +1078,8 @@ class _$MatchStateImpl implements _MatchState {
                 .equals(other._monthMatches, _monthMatches) &&
             const DeepCollectionEquality()
                 .equals(other._statsMatches, _statsMatches) &&
+            (identical(other.statsLoaded, statsLoaded) ||
+                other.statsLoaded == statsLoaded) &&
             const DeepCollectionEquality()
                 .equals(other._searchedMatches, _searchedMatches));
   }
@@ -1074,6 +1093,7 @@ class _$MatchStateImpl implements _MatchState {
       const DeepCollectionEquality().hash(_datedMatches),
       const DeepCollectionEquality().hash(_monthMatches),
       const DeepCollectionEquality().hash(_statsMatches),
+      statsLoaded,
       const DeepCollectionEquality().hash(_searchedMatches));
 
   @JsonKey(ignore: true)
@@ -1091,6 +1111,7 @@ abstract class _MatchState implements MatchState {
       final List<MatchType> datedMatches,
       final List<MatchType> monthMatches,
       final List<MatchType> statsMatches,
+      final bool statsLoaded,
       final List<MatchType> searchedMatches}) = _$MatchStateImpl;
 
   @override
@@ -1105,6 +1126,8 @@ abstract class _MatchState implements MatchState {
   List<MatchType> get monthMatches;
   @override
   List<MatchType> get statsMatches;
+  @override
+  bool get statsLoaded;
   @override
   List<MatchType> get searchedMatches;
   @override

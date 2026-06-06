@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart';
+import 'package:sports_app/common/app_back_button.dart';
 
 class PlaceSearchDelegate extends SearchDelegate<Map<String, dynamic>?> {
   final FlutterGooglePlacesSdk places;
@@ -15,9 +16,12 @@ class PlaceSearchDelegate extends SearchDelegate<Map<String, dynamic>?> {
       ];
 
   @override
-  Widget? buildLeading(BuildContext context) => IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => close(context, null),
+  Widget? buildLeading(BuildContext context) => Padding(
+        padding: const EdgeInsets.all(8),
+        child: AppBackButton(
+          size: 40,
+          onPressed: () => close(context, null),
+        ),
       );
 
   @override

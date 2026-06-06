@@ -21,6 +21,7 @@ import 'package:sports_app/features/auth/otp_page.dart';
 import 'package:sports_app/features/auth/sign_up_page.dart';
 import 'package:sports_app/features/dashboard/pages/about/about_us.dart';
 import 'package:sports_app/features/dashboard/pages/home/match_details_page.dart';
+import 'package:sports_app/features/dashboard/pages/home/previous_game_recap_page.dart';
 import 'package:sports_app/features/dashboard/pages/media/media_page.dart';
 import 'package:sports_app/features/dashboard/pages/media/team_media_page.dart';
 import 'package:sports_app/features/dashboard/pages/notifications/notification_page.dart';
@@ -67,7 +68,8 @@ enum AppRoute {
   pointsManagement,
   paymentWebView,
   playerProfile,
-  clubRoaster
+  clubRoaster,
+  previousGameRecap
 }
 
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -196,6 +198,15 @@ final router = GoRouter(
       builder: (context, state) {
         final match = state.extra as MatchModel;
         return GameRecapPage(match: match);
+      },
+    ),
+    GoRoute(
+      path: '/previous-game-recap',
+      name: AppRoute.previousGameRecap.name,
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) {
+        final match = state.extra as MatchType;
+        return PreviousGameRecapPage(match: match);
       },
     ),
     StatefulShellRoute.indexedStack(
@@ -437,7 +448,8 @@ final router = GoRouter(
         location.startsWith("/media/") ||
         location == "/standing" ||
         location.startsWith("/standing/") ||
-        location == "/game-recap";
+        location == "/game-recap" ||
+        location == "/previous-game-recap";
     final isAuthRoute = location == "/signIn" || location == "/signUp";
     final isProtectedRoute = location == "/otp" ||
         location.startsWith("/profile") ||

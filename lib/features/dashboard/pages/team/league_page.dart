@@ -76,7 +76,7 @@ class _LeaguePageState extends State<LeaguePage> with TickerProviderStateMixin {
                         controller: tabController,
                         tabs: [
                           Tab(
-                            text: 'ROSTER',
+                            text: 'TEAMS',
                           ),
                           Tab(
                             text: 'STATS',
@@ -110,15 +110,7 @@ class _LeaguePageState extends State<LeaguePage> with TickerProviderStateMixin {
                 ),
               ),
               widget.showBackNavigation
-                  ? Positioned(
-                      top: 20,
-                      left: 20,
-                      child: CustomIconButton(
-                          size: 40,
-                          onButtonPress: () {
-                            context.pop();
-                          },
-                          icon: Icons.arrow_back))
+                  ? Positioned(top: 20, left: 20, child: const AppBackButton())
                   : Container()
             ],
           ),

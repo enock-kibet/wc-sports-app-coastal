@@ -10,6 +10,7 @@ import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/core/snackbar_service.dart';
@@ -103,9 +104,7 @@ class _ShopPageState extends State<ShopPage> {
                             style: TextStyle(
                                 fontSize: kMedium,
                                 fontWeight: FontWeight.w700,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface),
+                                color: Theme.of(context).colorScheme.onSurface),
                           ),
                         ],
                       ),
@@ -183,7 +182,8 @@ class _ShopPageState extends State<ShopPage> {
             case ProductStatus.failure:
               return Center(
                 child: Text(
-                  state.failure?.error ?? "Unable to load shop items right now.",
+                  state.failure?.error ??
+                      "Unable to load shop items right now.",
                 ),
               );
             case ProductStatus.loading:
@@ -200,8 +200,7 @@ class _ShopPageState extends State<ShopPage> {
 
   TextField searchField() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final borderColor =
-        isDark ? AppColors.whiteColor : const Color(0xFFDADADA);
+    final borderColor = isDark ? AppColors.whiteColor : const Color(0xFFDADADA);
     return TextField(
       decoration: InputDecoration(
           suffixIcon: Container(
@@ -212,8 +211,9 @@ class _ShopPageState extends State<ShopPage> {
                     ? AppColors.whiteColor
                     : Theme.of(context).colorScheme.onSurface,
               )),
-          fillColor:
-              isDark ? AppColors.whiteColor.withValues(alpha: 0.2) : Colors.white,
+          fillColor: isDark
+              ? AppColors.whiteColor.withValues(alpha: 0.2)
+              : Colors.white,
           filled: true,
           border: OutlineInputBorder(
               borderSide: BorderSide(
@@ -256,20 +256,7 @@ class _ShopPageState extends State<ShopPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-            padding: const EdgeInsets.all(kSmall),
-            decoration: BoxDecoration(
-                color: chipColor,
-                shape: BoxShape.circle),
-            child: GestureDetector(
-              onTap: () {
-                context.go('/home');
-              },
-              child: Icon(
-                LucideIcons.arrowLeft,
-                color: iconColor,
-              ),
-            )),
+        AppBackButton(onPressed: () => context.go('/home')),
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -301,30 +288,18 @@ class _ShopPageState extends State<ShopPage> {
 
               final pointsState = bloc.state;
 
-              context.read<CartBloc>().add(
-                    const CartEvent.getCartItems(request: {}),
-                  );
-              context.read<AddressBloc>().add(
-                    const AddressEvent.getAddresses(request: {}),
-                  );
-              final cartItems = context
-                  .read<CartBloc>()
-                  .state
-                  .cartItems; // adjust property name if needed
-              final addressItems = context
-                  .read<AddressBloc>()
-                  .state
-                  .data; // adjust property name if needed
-              showCartShopBottomSheet(context, pointsState: pointsState);
+              if (!mounted) return;
+              await showCartShopBottomSheet(context, pointsState: pointsState);
             },
             child: Container(
               padding: const EdgeInsets.all(kSmall),
               decoration: BoxDecoration(
-                  color: AppColors.whiteColor.withOpacity(0.3),
-                  shape: BoxShape.circle),
+                color: chipColor,
+                shape: BoxShape.circle,
+              ),
               child: Icon(
                 LucideIcons.shoppingCart,
-                color: AppColors.whiteColor,
+                color: iconColor,
               ),
             ))
       ],

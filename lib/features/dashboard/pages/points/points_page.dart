@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sports_app/common/app_background.dart';
+import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
+import 'package:sports_app/common/utils/pull_to_refresh.dart';
 import 'package:sports_app/data/models/points/points.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/dashboard/pages/pages.dart';
@@ -36,6 +38,14 @@ class _PointsPageState extends State<PointsPage> with TickerProviderStateMixin {
     _pointsBloc.add(const PointsEvent.points()); // Trigger data fetch
   }
 
+  Future<void> _refreshPoints() {
+    return refreshBlocState<PointsState>(
+      bloc: _pointsBloc,
+      dispatch: () => _pointsBloc.add(const PointsEvent.points()),
+      isLoading: (state) => state.status.isLoading,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,10 +72,21 @@ class _PointsPageState extends State<PointsPage> with TickerProviderStateMixin {
                       }
 
                       if (state.status.isFailure) {
-                        return Center(
-                          child: Text(
-                            "Failed to load points",
-                            style: TextStyle(color: Colors.red),
+                        return RefreshIndicator.adaptive(
+                          onRefresh: _refreshPoints,
+                          child: ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            children: const [
+                              SizedBox(
+                                height: 220,
+                                child: Center(
+                                  child: Text(
+                                    "Failed to load points",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         );
                       }
@@ -86,6 +107,7 @@ class _PointsPageState extends State<PointsPage> with TickerProviderStateMixin {
                               tabController: tabController,
                               pointsHistoryList: points,
                               balance: balance,
+                              onRefresh: _refreshPoints,
                             ),
                           ),
                         ],
