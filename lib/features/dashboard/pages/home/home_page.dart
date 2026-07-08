@@ -144,8 +144,7 @@ class _HomePageState extends State<HomePage> {
         categorized[_HomeScheduleCategory.today]!.add(match);
       } else if (matchDate == tomorrow) {
         categorized[_HomeScheduleCategory.tomorrow]!.add(match);
-      } else if (matchDate.isAfter(tomorrow) &&
-          matchDate.isBefore(endOfWeek)) {
+      } else if (matchDate.isAfter(tomorrow) && matchDate.isBefore(endOfWeek)) {
         categorized[_HomeScheduleCategory.thisWeek]!.add(match);
       } else if (matchDate.isAfter(endOfWeek)) {
         categorized[_HomeScheduleCategory.future]!.add(match);
@@ -236,8 +235,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 if (categorized.isNotEmpty) ...[
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 1.0),
+                                    padding: const EdgeInsets.only(bottom: 1.0),
                                     child: Text(
                                       "Upcoming Matches",
                                       style: context.textTheme.headlineLarge
@@ -267,8 +265,7 @@ class _HomePageState extends State<HomePage> {
                                               top: 8.0, bottom: 12),
                                           child: Text(
                                             entryTitle,
-                                            style: context
-                                                .textTheme.bodySmall
+                                            style: context.textTheme.bodySmall
                                                 ?.copyWith(
                                               color: Theme.of(context)
                                                   .colorScheme
@@ -314,8 +311,7 @@ class _HomePageState extends State<HomePage> {
                                       padding: EdgeInsets.only(top: 40.0),
                                       child: Text(
                                         "No matches available",
-                                        style: TextStyle(
-                                            color: Colors.white70),
+                                        style: TextStyle(color: Colors.white70),
                                       ),
                                     ),
                                   ),
