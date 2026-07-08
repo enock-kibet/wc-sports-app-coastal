@@ -4,7 +4,9 @@ class DottedDivider extends StatelessWidget {
   final double height;
   final Color color;
 
-  const DottedDivider({Key? key, this.height = 1, this.color =const Color(0xffbababa)}) : super(key: key);
+  const DottedDivider(
+      {Key? key, this.height = 1, this.color = const Color(0xffbababa)})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +41,10 @@ class _DottedLinePainter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 
-String truncateText(String text, {int limit = 20,bool show= true}) {
-  return (text.length <= limit) ? text : '${text.substring(0, limit)}${show?"...":""}';
+String truncateText(String text, {int limit = 20, bool show = true}) {
+  return (text.length <= limit)
+      ? text
+      : '${text.substring(0, limit)}${show ? "..." : ""}';
 }
 
 extension StringCasingExtension on String {
@@ -57,7 +61,7 @@ extension StringCasingExtension on String {
 String replaceDomain(String url) {
   // Old and new domain
   const oldDomain = 'https://srv19716098.ultasrv.net';
-  const newDomain = 'https://backend.wencetechnologies.com';
+  const newDomain = 'http://nomasana.local:8080';
 
   // Check if the URL starts with the old domain
   if (url.startsWith(oldDomain)) {
@@ -68,10 +72,11 @@ String replaceDomain(String url) {
   // Return the original URL if no match is found
   return url;
 }
+
 String addDomain(String url) {
   // Old and new domain
   const oldDomain = 'https://srv19716098.ultasrv.net';
-  const newDomain = 'https://backend.wencetechnologies.com';
+  const newDomain = 'http://nomasana.local:8080';
   const uploadThingDomain = 'https://utfs';
 
   // Check if the URL starts with the old domain
@@ -79,10 +84,10 @@ String addDomain(String url) {
     // Replace the old domain with the new one
     return url.replaceFirst(oldDomain, newDomain);
   }
-  if (url.startsWith(newDomain)){
+  if (url.startsWith(newDomain)) {
     return url;
   }
-  if(url.startsWith(uploadThingDomain)){
+  if (url.startsWith(uploadThingDomain)) {
     return url;
   }
 

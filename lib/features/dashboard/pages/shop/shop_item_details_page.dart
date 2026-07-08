@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -13,9 +11,9 @@ import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/products/product_bloc.dart';
 import 'package:sports_app/features/dashboard/pages/pages.dart';
+import 'package:sports_app/features/dashboard/pages/shared/frontend_checkout_flow.dart';
+import 'package:sports_app/features/dashboard/pages/shop/widgets/product_image_placeholder.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
-import 'package:sports_app/main.dart';
-import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/theme.dart';
 
 class ShopDetailsPage extends StatefulWidget {
@@ -42,10 +40,13 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
             );
             //AnimatedOverlaySnackbar.show(context, "Loading",color:const Color(0xff1976D2));
           } else if (state.status == ProductStatus.successfulPayment) {
-            context.goNamed(
-              AppRoute.paymentWebView.name,
-              extra: state.authorizationUrl,
-            );
+            final checkout = service<ProductService>().latestCheckoutResult;
+            if (checkout == null) {
+              SnackbarService.showError(
+                  'Unable to continue checkout right now.');
+              return;
+            }
+            handleFrontendCheckoutSuccess(context, checkout);
             //AnimatedOverlaySnackbar.show(context, "Success: ${state.authorizationUrl??"didn't get"}",color:const Color(0xff2E7D32));
           } else if (state.status == ProductStatus.failure) {
             SnackbarService.showError(
@@ -112,13 +113,12 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                       // Build selected variant IDs with quantities
                                       final selectedVariants = widget
                                           .product.variants
-                                          .where((variant) =>
-                                              sizeCounts[variant
-                                                      .productTypeName] !=
-                                                  null &&
-                                              sizeCounts[variant
-                                                      .productTypeName]! >
-                                                  0)
+                                          .where((variant) {
+                                            final quantity = sizeCounts[
+                                                    variant.productTypeName] ??
+                                                0;
+                                            return quantity > 0;
+                                          })
                                           .map((variant) => {
                                                 "variantId": variant.variantId,
                                                 "quantity": sizeCounts[variant
@@ -188,14 +188,34 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                                         value,
                                         widget.product,
                                         buyMerch: () {
+                                          final sizeCounts = value.$2;
+                                          final selectedVariants =
+                                              widget.product.variants
+                                                  .where((variant) {
+                                                    final quantity = sizeCounts[
+                                                            variant
+                                                                .productTypeName] ??
+                                                        0;
+                                                    return quantity > 0;
+                                                  })
+                                                  .map((variant) => {
+                                                        "variantId":
+                                                            variant.variantId,
+                                                        "quantity": sizeCounts[
+                                                                variant
+                                                                    .productTypeName] ??
+                                                            0,
+                                                      })
+                                                  .toList();
+
                                           context.read<ProductBloc>().add(
                                                 ProductEvent.buyProducts(
                                                     request: {
-                                                      "amount": value.$1,
-                                                      "email": userEmail,
                                                       "productID":
                                                           widget.product.id,
-                                                      "category": ""
+                                                      "category": "",
+                                                      "bundleditems":
+                                                          selectedVariants,
                                                     }),
                                               );
                                         },
@@ -226,15 +246,13 @@ class _ShopDetailsPageState extends State<ShopDetailsPage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
-                            ClipRRect(
+                            ShopProductImage(
+                              imageUrl: widget.product.imageUrl,
+                              width: double.infinity,
+                              height: 300,
                               borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(36),
-                                  topRight: Radius.circular(36)),
-                              child: Image.network(
-                                widget.product.imageUrl,
-                                width: double.infinity,
-                                height: 300,
-                                fit: BoxFit.cover,
+                                topLeft: Radius.circular(36),
+                                topRight: Radius.circular(36),
                               ),
                             ),
                             Padding(
@@ -448,7 +466,7 @@ class MultiValueNotifier extends ValueNotifier<(double, Map<String, int>)> {
   void decrement(String size, List<Variant> variants) {
     final updatedCounts = Map<String, int>.from(value.$2);
     if ((updatedCounts[size] ?? 0) > 0) {
-      updatedCounts[size] = (updatedCounts[size]! - 1);
+      updatedCounts[size] = (updatedCounts[size] ?? 0) - 1;
     }
     _recalculateTotal(variants, updatedCounts);
   }

@@ -27,6 +27,7 @@ class RequestInterceptor extends Interceptor {
   ) async {
     options.headers['Accept'] = 'application/json';
     options.headers['Content-Type'] = 'application/json';
+    _applyContextHeaders(options);
 
     final useAuthToken = options.extra[_useAuthTokenKey] as bool? ?? true;
     if (!useAuthToken) {
@@ -126,12 +127,13 @@ class Http {
     Deserializer<T>? deserializer,
     Map<String, dynamic>? queryParams,
     ProgressCallback? progressCallback,
+    Map<String, String>? headers,
   }) async {
     try {
       final res = await dio.get(
         url,
         data: data,
-        options: _withAuthOption(options, useAuthToken),
+        options: _withAuthOption(options, useAuthToken, headers: headers),
         queryParameters: queryParams,
         onReceiveProgress: progressCallback,
       );
@@ -320,9 +322,49 @@ bool _isRefreshExemptPath(String path) {
     "/User/emaillogin",
     "/User/googlelogin",
     "/User/applelogin",
+    "/api/v1/frontend-auth/refresh",
+    "/api/v1/frontend-auth/login",
+    "/api/v1/frontend-auth/social/google",
+    "/api/v1/frontend-auth/social/apple",
   ];
 
   return exemptPaths.any(path.contains);
+}
+
+void _applyContextHeaders(RequestOptions options) {
+  final currentContext = service<AppPreferencesManager>().currentContextValue;
+  final explicitLeagueId =
+      _stringHeaderValue(options.headers[AppConfig.leagueHeaderName]);
+  final explicitSeasonId =
+      _stringHeaderValue(options.headers[AppConfig.seasonHeaderName]);
+
+  final resolvedLeagueId = explicitLeagueId ??
+      _stringHeaderValue(currentContext?.activeLeagueId) ??
+      AppConfig.defaultLeagueId;
+  final resolvedSeasonId = explicitSeasonId ??
+      _stringHeaderValue(currentContext?.activeSeasonId) ??
+      AppConfig.defaultSeasonId;
+
+  if (resolvedLeagueId != null) {
+    options.headers[AppConfig.leagueHeaderName] = resolvedLeagueId;
+  } else {
+    options.headers.remove(AppConfig.leagueHeaderName);
+  }
+
+  if (resolvedSeasonId != null) {
+    options.headers[AppConfig.seasonHeaderName] = resolvedSeasonId;
+  } else {
+    options.headers.remove(AppConfig.seasonHeaderName);
+  }
+}
+
+String? _stringHeaderValue(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+
+  final normalized = value.toString().trim();
+  return normalized.isEmpty ? null : normalized;
 }
 
 int? _decodeJwtExpiry(String token) {

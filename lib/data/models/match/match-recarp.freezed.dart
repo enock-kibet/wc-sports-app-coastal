@@ -33,6 +33,8 @@ mixin _$MatchModel {
   bool get matchStatus => throw _privateConstructorUsedError;
   List<IntervalScoreModel> get intervalScores =>
       throw _privateConstructorUsedError;
+  List<PlayerBoxScoreModel> get playerStatistics =>
+      throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -58,7 +60,8 @@ abstract class $MatchModelCopyWith<$Res> {
       String clubOneScore,
       String clubTwoScore,
       bool matchStatus,
-      List<IntervalScoreModel> intervalScores});
+      List<IntervalScoreModel> intervalScores,
+      List<PlayerBoxScoreModel> playerStatistics});
 
   $ClubModelCopyWith<$Res> get clubOne;
   $ClubModelCopyWith<$Res> get clubTwo;
@@ -91,6 +94,7 @@ class _$MatchModelCopyWithImpl<$Res, $Val extends MatchModel>
     Object? clubTwoScore = null,
     Object? matchStatus = null,
     Object? intervalScores = null,
+    Object? playerStatistics = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -141,6 +145,10 @@ class _$MatchModelCopyWithImpl<$Res, $Val extends MatchModel>
           ? _value.intervalScores
           : intervalScores // ignore: cast_nullable_to_non_nullable
               as List<IntervalScoreModel>,
+      playerStatistics: null == playerStatistics
+          ? _value.playerStatistics
+          : playerStatistics // ignore: cast_nullable_to_non_nullable
+              as List<PlayerBoxScoreModel>,
     ) as $Val);
   }
 
@@ -197,7 +205,8 @@ abstract class _$$MatchModelImplCopyWith<$Res>
       String clubOneScore,
       String clubTwoScore,
       bool matchStatus,
-      List<IntervalScoreModel> intervalScores});
+      List<IntervalScoreModel> intervalScores,
+      List<PlayerBoxScoreModel> playerStatistics});
 
   @override
   $ClubModelCopyWith<$Res> get clubOne;
@@ -232,6 +241,7 @@ class __$$MatchModelImplCopyWithImpl<$Res>
     Object? clubTwoScore = null,
     Object? matchStatus = null,
     Object? intervalScores = null,
+    Object? playerStatistics = null,
   }) {
     return _then(_$MatchModelImpl(
       id: null == id
@@ -282,6 +292,10 @@ class __$$MatchModelImplCopyWithImpl<$Res>
           ? _value._intervalScores
           : intervalScores // ignore: cast_nullable_to_non_nullable
               as List<IntervalScoreModel>,
+      playerStatistics: null == playerStatistics
+          ? _value._playerStatistics
+          : playerStatistics // ignore: cast_nullable_to_non_nullable
+              as List<PlayerBoxScoreModel>,
     ));
   }
 }
@@ -301,8 +315,10 @@ class _$MatchModelImpl implements _MatchModel {
       required this.clubOneScore,
       required this.clubTwoScore,
       required this.matchStatus,
-      final List<IntervalScoreModel> intervalScores = const []})
-      : _intervalScores = intervalScores;
+      final List<IntervalScoreModel> intervalScores = const [],
+      final List<PlayerBoxScoreModel> playerStatistics = const []})
+      : _intervalScores = intervalScores,
+        _playerStatistics = playerStatistics;
 
   factory _$MatchModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$MatchModelImplFromJson(json);
@@ -338,9 +354,19 @@ class _$MatchModelImpl implements _MatchModel {
     return EqualUnmodifiableListView(_intervalScores);
   }
 
+  final List<PlayerBoxScoreModel> _playerStatistics;
+  @override
+  @JsonKey()
+  List<PlayerBoxScoreModel> get playerStatistics {
+    if (_playerStatistics is EqualUnmodifiableListView)
+      return _playerStatistics;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_playerStatistics);
+  }
+
   @override
   String toString() {
-    return 'MatchModel(id: $id, name: $name, clubOne: $clubOne, clubTwo: $clubTwo, matchDate: $matchDate, venue: $venue, description: $description, matchWinner: $matchWinner, clubOneScore: $clubOneScore, clubTwoScore: $clubTwoScore, matchStatus: $matchStatus, intervalScores: $intervalScores)';
+    return 'MatchModel(id: $id, name: $name, clubOne: $clubOne, clubTwo: $clubTwo, matchDate: $matchDate, venue: $venue, description: $description, matchWinner: $matchWinner, clubOneScore: $clubOneScore, clubTwoScore: $clubTwoScore, matchStatus: $matchStatus, intervalScores: $intervalScores, playerStatistics: $playerStatistics)';
   }
 
   @override
@@ -366,7 +392,9 @@ class _$MatchModelImpl implements _MatchModel {
             (identical(other.matchStatus, matchStatus) ||
                 other.matchStatus == matchStatus) &&
             const DeepCollectionEquality()
-                .equals(other._intervalScores, _intervalScores));
+                .equals(other._intervalScores, _intervalScores) &&
+            const DeepCollectionEquality()
+                .equals(other._playerStatistics, _playerStatistics));
   }
 
   @JsonKey(ignore: true)
@@ -384,7 +412,8 @@ class _$MatchModelImpl implements _MatchModel {
       clubOneScore,
       clubTwoScore,
       matchStatus,
-      const DeepCollectionEquality().hash(_intervalScores));
+      const DeepCollectionEquality().hash(_intervalScores),
+      const DeepCollectionEquality().hash(_playerStatistics));
 
   @JsonKey(ignore: true)
   @override
@@ -413,7 +442,8 @@ abstract class _MatchModel implements MatchModel {
       required final String clubOneScore,
       required final String clubTwoScore,
       required final bool matchStatus,
-      final List<IntervalScoreModel> intervalScores}) = _$MatchModelImpl;
+      final List<IntervalScoreModel> intervalScores,
+      final List<PlayerBoxScoreModel> playerStatistics}) = _$MatchModelImpl;
 
   factory _MatchModel.fromJson(Map<String, dynamic> json) =
       _$MatchModelImpl.fromJson;
@@ -442,6 +472,8 @@ abstract class _MatchModel implements MatchModel {
   bool get matchStatus;
   @override
   List<IntervalScoreModel> get intervalScores;
+  @override
+  List<PlayerBoxScoreModel> get playerStatistics;
   @override
   @JsonKey(ignore: true)
   _$$MatchModelImplCopyWith<_$MatchModelImpl> get copyWith =>
@@ -1423,5 +1455,623 @@ abstract class _IntervalScoreModel implements IntervalScoreModel {
   @override
   @JsonKey(ignore: true)
   _$$IntervalScoreModelImplCopyWith<_$IntervalScoreModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+PlayerBoxScoreModel _$PlayerBoxScoreModelFromJson(Map<String, dynamic> json) {
+  return _PlayerBoxScoreModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PlayerBoxScoreModel {
+  String get playerId => throw _privateConstructorUsedError;
+  String get playerName => throw _privateConstructorUsedError;
+  String get clubId => throw _privateConstructorUsedError;
+  String get clubName => throw _privateConstructorUsedError;
+  String get teamSide => throw _privateConstructorUsedError;
+  bool get isStarter => throw _privateConstructorUsedError;
+  int get points => throw _privateConstructorUsedError;
+  int get assists => throw _privateConstructorUsedError;
+  int get offensiveRebounds => throw _privateConstructorUsedError;
+  int get defensiveRebounds => throw _privateConstructorUsedError;
+  int get totalRebounds => throw _privateConstructorUsedError;
+  int get steals => throw _privateConstructorUsedError;
+  int get blocks => throw _privateConstructorUsedError;
+  int get turnovers => throw _privateConstructorUsedError;
+  int get personalFouls => throw _privateConstructorUsedError;
+  int get technicalFouls => throw _privateConstructorUsedError;
+  int get fieldGoalsMade => throw _privateConstructorUsedError;
+  int get fieldGoalsAttempted => throw _privateConstructorUsedError;
+  int get freeThrowsMade => throw _privateConstructorUsedError;
+  int get freeThrowsAttempted => throw _privateConstructorUsedError;
+  int get threePointersMade => throw _privateConstructorUsedError;
+  int get threePointersAttempted => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $PlayerBoxScoreModelCopyWith<PlayerBoxScoreModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PlayerBoxScoreModelCopyWith<$Res> {
+  factory $PlayerBoxScoreModelCopyWith(
+          PlayerBoxScoreModel value, $Res Function(PlayerBoxScoreModel) then) =
+      _$PlayerBoxScoreModelCopyWithImpl<$Res, PlayerBoxScoreModel>;
+  @useResult
+  $Res call(
+      {String playerId,
+      String playerName,
+      String clubId,
+      String clubName,
+      String teamSide,
+      bool isStarter,
+      int points,
+      int assists,
+      int offensiveRebounds,
+      int defensiveRebounds,
+      int totalRebounds,
+      int steals,
+      int blocks,
+      int turnovers,
+      int personalFouls,
+      int technicalFouls,
+      int fieldGoalsMade,
+      int fieldGoalsAttempted,
+      int freeThrowsMade,
+      int freeThrowsAttempted,
+      int threePointersMade,
+      int threePointersAttempted});
+}
+
+/// @nodoc
+class _$PlayerBoxScoreModelCopyWithImpl<$Res, $Val extends PlayerBoxScoreModel>
+    implements $PlayerBoxScoreModelCopyWith<$Res> {
+  _$PlayerBoxScoreModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? playerId = null,
+    Object? playerName = null,
+    Object? clubId = null,
+    Object? clubName = null,
+    Object? teamSide = null,
+    Object? isStarter = null,
+    Object? points = null,
+    Object? assists = null,
+    Object? offensiveRebounds = null,
+    Object? defensiveRebounds = null,
+    Object? totalRebounds = null,
+    Object? steals = null,
+    Object? blocks = null,
+    Object? turnovers = null,
+    Object? personalFouls = null,
+    Object? technicalFouls = null,
+    Object? fieldGoalsMade = null,
+    Object? fieldGoalsAttempted = null,
+    Object? freeThrowsMade = null,
+    Object? freeThrowsAttempted = null,
+    Object? threePointersMade = null,
+    Object? threePointersAttempted = null,
+  }) {
+    return _then(_value.copyWith(
+      playerId: null == playerId
+          ? _value.playerId
+          : playerId // ignore: cast_nullable_to_non_nullable
+              as String,
+      playerName: null == playerName
+          ? _value.playerName
+          : playerName // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubId: null == clubId
+          ? _value.clubId
+          : clubId // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubName: null == clubName
+          ? _value.clubName
+          : clubName // ignore: cast_nullable_to_non_nullable
+              as String,
+      teamSide: null == teamSide
+          ? _value.teamSide
+          : teamSide // ignore: cast_nullable_to_non_nullable
+              as String,
+      isStarter: null == isStarter
+          ? _value.isStarter
+          : isStarter // ignore: cast_nullable_to_non_nullable
+              as bool,
+      points: null == points
+          ? _value.points
+          : points // ignore: cast_nullable_to_non_nullable
+              as int,
+      assists: null == assists
+          ? _value.assists
+          : assists // ignore: cast_nullable_to_non_nullable
+              as int,
+      offensiveRebounds: null == offensiveRebounds
+          ? _value.offensiveRebounds
+          : offensiveRebounds // ignore: cast_nullable_to_non_nullable
+              as int,
+      defensiveRebounds: null == defensiveRebounds
+          ? _value.defensiveRebounds
+          : defensiveRebounds // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalRebounds: null == totalRebounds
+          ? _value.totalRebounds
+          : totalRebounds // ignore: cast_nullable_to_non_nullable
+              as int,
+      steals: null == steals
+          ? _value.steals
+          : steals // ignore: cast_nullable_to_non_nullable
+              as int,
+      blocks: null == blocks
+          ? _value.blocks
+          : blocks // ignore: cast_nullable_to_non_nullable
+              as int,
+      turnovers: null == turnovers
+          ? _value.turnovers
+          : turnovers // ignore: cast_nullable_to_non_nullable
+              as int,
+      personalFouls: null == personalFouls
+          ? _value.personalFouls
+          : personalFouls // ignore: cast_nullable_to_non_nullable
+              as int,
+      technicalFouls: null == technicalFouls
+          ? _value.technicalFouls
+          : technicalFouls // ignore: cast_nullable_to_non_nullable
+              as int,
+      fieldGoalsMade: null == fieldGoalsMade
+          ? _value.fieldGoalsMade
+          : fieldGoalsMade // ignore: cast_nullable_to_non_nullable
+              as int,
+      fieldGoalsAttempted: null == fieldGoalsAttempted
+          ? _value.fieldGoalsAttempted
+          : fieldGoalsAttempted // ignore: cast_nullable_to_non_nullable
+              as int,
+      freeThrowsMade: null == freeThrowsMade
+          ? _value.freeThrowsMade
+          : freeThrowsMade // ignore: cast_nullable_to_non_nullable
+              as int,
+      freeThrowsAttempted: null == freeThrowsAttempted
+          ? _value.freeThrowsAttempted
+          : freeThrowsAttempted // ignore: cast_nullable_to_non_nullable
+              as int,
+      threePointersMade: null == threePointersMade
+          ? _value.threePointersMade
+          : threePointersMade // ignore: cast_nullable_to_non_nullable
+              as int,
+      threePointersAttempted: null == threePointersAttempted
+          ? _value.threePointersAttempted
+          : threePointersAttempted // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PlayerBoxScoreModelImplCopyWith<$Res>
+    implements $PlayerBoxScoreModelCopyWith<$Res> {
+  factory _$$PlayerBoxScoreModelImplCopyWith(_$PlayerBoxScoreModelImpl value,
+          $Res Function(_$PlayerBoxScoreModelImpl) then) =
+      __$$PlayerBoxScoreModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String playerId,
+      String playerName,
+      String clubId,
+      String clubName,
+      String teamSide,
+      bool isStarter,
+      int points,
+      int assists,
+      int offensiveRebounds,
+      int defensiveRebounds,
+      int totalRebounds,
+      int steals,
+      int blocks,
+      int turnovers,
+      int personalFouls,
+      int technicalFouls,
+      int fieldGoalsMade,
+      int fieldGoalsAttempted,
+      int freeThrowsMade,
+      int freeThrowsAttempted,
+      int threePointersMade,
+      int threePointersAttempted});
+}
+
+/// @nodoc
+class __$$PlayerBoxScoreModelImplCopyWithImpl<$Res>
+    extends _$PlayerBoxScoreModelCopyWithImpl<$Res, _$PlayerBoxScoreModelImpl>
+    implements _$$PlayerBoxScoreModelImplCopyWith<$Res> {
+  __$$PlayerBoxScoreModelImplCopyWithImpl(_$PlayerBoxScoreModelImpl _value,
+      $Res Function(_$PlayerBoxScoreModelImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? playerId = null,
+    Object? playerName = null,
+    Object? clubId = null,
+    Object? clubName = null,
+    Object? teamSide = null,
+    Object? isStarter = null,
+    Object? points = null,
+    Object? assists = null,
+    Object? offensiveRebounds = null,
+    Object? defensiveRebounds = null,
+    Object? totalRebounds = null,
+    Object? steals = null,
+    Object? blocks = null,
+    Object? turnovers = null,
+    Object? personalFouls = null,
+    Object? technicalFouls = null,
+    Object? fieldGoalsMade = null,
+    Object? fieldGoalsAttempted = null,
+    Object? freeThrowsMade = null,
+    Object? freeThrowsAttempted = null,
+    Object? threePointersMade = null,
+    Object? threePointersAttempted = null,
+  }) {
+    return _then(_$PlayerBoxScoreModelImpl(
+      playerId: null == playerId
+          ? _value.playerId
+          : playerId // ignore: cast_nullable_to_non_nullable
+              as String,
+      playerName: null == playerName
+          ? _value.playerName
+          : playerName // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubId: null == clubId
+          ? _value.clubId
+          : clubId // ignore: cast_nullable_to_non_nullable
+              as String,
+      clubName: null == clubName
+          ? _value.clubName
+          : clubName // ignore: cast_nullable_to_non_nullable
+              as String,
+      teamSide: null == teamSide
+          ? _value.teamSide
+          : teamSide // ignore: cast_nullable_to_non_nullable
+              as String,
+      isStarter: null == isStarter
+          ? _value.isStarter
+          : isStarter // ignore: cast_nullable_to_non_nullable
+              as bool,
+      points: null == points
+          ? _value.points
+          : points // ignore: cast_nullable_to_non_nullable
+              as int,
+      assists: null == assists
+          ? _value.assists
+          : assists // ignore: cast_nullable_to_non_nullable
+              as int,
+      offensiveRebounds: null == offensiveRebounds
+          ? _value.offensiveRebounds
+          : offensiveRebounds // ignore: cast_nullable_to_non_nullable
+              as int,
+      defensiveRebounds: null == defensiveRebounds
+          ? _value.defensiveRebounds
+          : defensiveRebounds // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalRebounds: null == totalRebounds
+          ? _value.totalRebounds
+          : totalRebounds // ignore: cast_nullable_to_non_nullable
+              as int,
+      steals: null == steals
+          ? _value.steals
+          : steals // ignore: cast_nullable_to_non_nullable
+              as int,
+      blocks: null == blocks
+          ? _value.blocks
+          : blocks // ignore: cast_nullable_to_non_nullable
+              as int,
+      turnovers: null == turnovers
+          ? _value.turnovers
+          : turnovers // ignore: cast_nullable_to_non_nullable
+              as int,
+      personalFouls: null == personalFouls
+          ? _value.personalFouls
+          : personalFouls // ignore: cast_nullable_to_non_nullable
+              as int,
+      technicalFouls: null == technicalFouls
+          ? _value.technicalFouls
+          : technicalFouls // ignore: cast_nullable_to_non_nullable
+              as int,
+      fieldGoalsMade: null == fieldGoalsMade
+          ? _value.fieldGoalsMade
+          : fieldGoalsMade // ignore: cast_nullable_to_non_nullable
+              as int,
+      fieldGoalsAttempted: null == fieldGoalsAttempted
+          ? _value.fieldGoalsAttempted
+          : fieldGoalsAttempted // ignore: cast_nullable_to_non_nullable
+              as int,
+      freeThrowsMade: null == freeThrowsMade
+          ? _value.freeThrowsMade
+          : freeThrowsMade // ignore: cast_nullable_to_non_nullable
+              as int,
+      freeThrowsAttempted: null == freeThrowsAttempted
+          ? _value.freeThrowsAttempted
+          : freeThrowsAttempted // ignore: cast_nullable_to_non_nullable
+              as int,
+      threePointersMade: null == threePointersMade
+          ? _value.threePointersMade
+          : threePointersMade // ignore: cast_nullable_to_non_nullable
+              as int,
+      threePointersAttempted: null == threePointersAttempted
+          ? _value.threePointersAttempted
+          : threePointersAttempted // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PlayerBoxScoreModelImpl implements _PlayerBoxScoreModel {
+  const _$PlayerBoxScoreModelImpl(
+      {required this.playerId,
+      required this.playerName,
+      required this.clubId,
+      required this.clubName,
+      required this.teamSide,
+      required this.isStarter,
+      this.points = 0,
+      this.assists = 0,
+      this.offensiveRebounds = 0,
+      this.defensiveRebounds = 0,
+      this.totalRebounds = 0,
+      this.steals = 0,
+      this.blocks = 0,
+      this.turnovers = 0,
+      this.personalFouls = 0,
+      this.technicalFouls = 0,
+      this.fieldGoalsMade = 0,
+      this.fieldGoalsAttempted = 0,
+      this.freeThrowsMade = 0,
+      this.freeThrowsAttempted = 0,
+      this.threePointersMade = 0,
+      this.threePointersAttempted = 0});
+
+  factory _$PlayerBoxScoreModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PlayerBoxScoreModelImplFromJson(json);
+
+  @override
+  final String playerId;
+  @override
+  final String playerName;
+  @override
+  final String clubId;
+  @override
+  final String clubName;
+  @override
+  final String teamSide;
+  @override
+  final bool isStarter;
+  @override
+  @JsonKey()
+  final int points;
+  @override
+  @JsonKey()
+  final int assists;
+  @override
+  @JsonKey()
+  final int offensiveRebounds;
+  @override
+  @JsonKey()
+  final int defensiveRebounds;
+  @override
+  @JsonKey()
+  final int totalRebounds;
+  @override
+  @JsonKey()
+  final int steals;
+  @override
+  @JsonKey()
+  final int blocks;
+  @override
+  @JsonKey()
+  final int turnovers;
+  @override
+  @JsonKey()
+  final int personalFouls;
+  @override
+  @JsonKey()
+  final int technicalFouls;
+  @override
+  @JsonKey()
+  final int fieldGoalsMade;
+  @override
+  @JsonKey()
+  final int fieldGoalsAttempted;
+  @override
+  @JsonKey()
+  final int freeThrowsMade;
+  @override
+  @JsonKey()
+  final int freeThrowsAttempted;
+  @override
+  @JsonKey()
+  final int threePointersMade;
+  @override
+  @JsonKey()
+  final int threePointersAttempted;
+
+  @override
+  String toString() {
+    return 'PlayerBoxScoreModel(playerId: $playerId, playerName: $playerName, clubId: $clubId, clubName: $clubName, teamSide: $teamSide, isStarter: $isStarter, points: $points, assists: $assists, offensiveRebounds: $offensiveRebounds, defensiveRebounds: $defensiveRebounds, totalRebounds: $totalRebounds, steals: $steals, blocks: $blocks, turnovers: $turnovers, personalFouls: $personalFouls, technicalFouls: $technicalFouls, fieldGoalsMade: $fieldGoalsMade, fieldGoalsAttempted: $fieldGoalsAttempted, freeThrowsMade: $freeThrowsMade, freeThrowsAttempted: $freeThrowsAttempted, threePointersMade: $threePointersMade, threePointersAttempted: $threePointersAttempted)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PlayerBoxScoreModelImpl &&
+            (identical(other.playerId, playerId) ||
+                other.playerId == playerId) &&
+            (identical(other.playerName, playerName) ||
+                other.playerName == playerName) &&
+            (identical(other.clubId, clubId) || other.clubId == clubId) &&
+            (identical(other.clubName, clubName) ||
+                other.clubName == clubName) &&
+            (identical(other.teamSide, teamSide) ||
+                other.teamSide == teamSide) &&
+            (identical(other.isStarter, isStarter) ||
+                other.isStarter == isStarter) &&
+            (identical(other.points, points) || other.points == points) &&
+            (identical(other.assists, assists) || other.assists == assists) &&
+            (identical(other.offensiveRebounds, offensiveRebounds) ||
+                other.offensiveRebounds == offensiveRebounds) &&
+            (identical(other.defensiveRebounds, defensiveRebounds) ||
+                other.defensiveRebounds == defensiveRebounds) &&
+            (identical(other.totalRebounds, totalRebounds) ||
+                other.totalRebounds == totalRebounds) &&
+            (identical(other.steals, steals) || other.steals == steals) &&
+            (identical(other.blocks, blocks) || other.blocks == blocks) &&
+            (identical(other.turnovers, turnovers) ||
+                other.turnovers == turnovers) &&
+            (identical(other.personalFouls, personalFouls) ||
+                other.personalFouls == personalFouls) &&
+            (identical(other.technicalFouls, technicalFouls) ||
+                other.technicalFouls == technicalFouls) &&
+            (identical(other.fieldGoalsMade, fieldGoalsMade) ||
+                other.fieldGoalsMade == fieldGoalsMade) &&
+            (identical(other.fieldGoalsAttempted, fieldGoalsAttempted) ||
+                other.fieldGoalsAttempted == fieldGoalsAttempted) &&
+            (identical(other.freeThrowsMade, freeThrowsMade) ||
+                other.freeThrowsMade == freeThrowsMade) &&
+            (identical(other.freeThrowsAttempted, freeThrowsAttempted) ||
+                other.freeThrowsAttempted == freeThrowsAttempted) &&
+            (identical(other.threePointersMade, threePointersMade) ||
+                other.threePointersMade == threePointersMade) &&
+            (identical(other.threePointersAttempted, threePointersAttempted) ||
+                other.threePointersAttempted == threePointersAttempted));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        playerId,
+        playerName,
+        clubId,
+        clubName,
+        teamSide,
+        isStarter,
+        points,
+        assists,
+        offensiveRebounds,
+        defensiveRebounds,
+        totalRebounds,
+        steals,
+        blocks,
+        turnovers,
+        personalFouls,
+        technicalFouls,
+        fieldGoalsMade,
+        fieldGoalsAttempted,
+        freeThrowsMade,
+        freeThrowsAttempted,
+        threePointersMade,
+        threePointersAttempted
+      ]);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PlayerBoxScoreModelImplCopyWith<_$PlayerBoxScoreModelImpl> get copyWith =>
+      __$$PlayerBoxScoreModelImplCopyWithImpl<_$PlayerBoxScoreModelImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PlayerBoxScoreModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _PlayerBoxScoreModel implements PlayerBoxScoreModel {
+  const factory _PlayerBoxScoreModel(
+      {required final String playerId,
+      required final String playerName,
+      required final String clubId,
+      required final String clubName,
+      required final String teamSide,
+      required final bool isStarter,
+      final int points,
+      final int assists,
+      final int offensiveRebounds,
+      final int defensiveRebounds,
+      final int totalRebounds,
+      final int steals,
+      final int blocks,
+      final int turnovers,
+      final int personalFouls,
+      final int technicalFouls,
+      final int fieldGoalsMade,
+      final int fieldGoalsAttempted,
+      final int freeThrowsMade,
+      final int freeThrowsAttempted,
+      final int threePointersMade,
+      final int threePointersAttempted}) = _$PlayerBoxScoreModelImpl;
+
+  factory _PlayerBoxScoreModel.fromJson(Map<String, dynamic> json) =
+      _$PlayerBoxScoreModelImpl.fromJson;
+
+  @override
+  String get playerId;
+  @override
+  String get playerName;
+  @override
+  String get clubId;
+  @override
+  String get clubName;
+  @override
+  String get teamSide;
+  @override
+  bool get isStarter;
+  @override
+  int get points;
+  @override
+  int get assists;
+  @override
+  int get offensiveRebounds;
+  @override
+  int get defensiveRebounds;
+  @override
+  int get totalRebounds;
+  @override
+  int get steals;
+  @override
+  int get blocks;
+  @override
+  int get turnovers;
+  @override
+  int get personalFouls;
+  @override
+  int get technicalFouls;
+  @override
+  int get fieldGoalsMade;
+  @override
+  int get fieldGoalsAttempted;
+  @override
+  int get freeThrowsMade;
+  @override
+  int get freeThrowsAttempted;
+  @override
+  int get threePointersMade;
+  @override
+  int get threePointersAttempted;
+  @override
+  @JsonKey(ignore: true)
+  _$$PlayerBoxScoreModelImplCopyWith<_$PlayerBoxScoreModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

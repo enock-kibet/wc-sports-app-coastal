@@ -1,12 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sports_app/data/error/failure.dart';
-import 'package:sports_app/data/models/addresses/address.dart';
 import 'package:sports_app/data/models/products/cart.dart';
 
 import 'package:sports_app/data/services/service.dart';
-
-import '../../../../localization/app_prefs_manager.dart';
 
 part 'cart_event.dart';
 part 'cart_state.dart';

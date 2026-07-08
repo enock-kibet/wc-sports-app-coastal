@@ -19,13 +19,17 @@ class GameRecapPage extends StatefulWidget {
 
 class _GameRecapPageState extends State<GameRecapPage> {
   late final Future<List<_LeaderCategory>> _statLeadersFuture;
+  late MatchModel _resolvedMatch;
+  bool _isHydratingMatch = false;
 
-  MatchModel get match => widget.match;
+  MatchModel get match => _resolvedMatch;
 
   @override
   void initState() {
     super.initState();
+    _resolvedMatch = widget.match;
     _statLeadersFuture = _loadStatLeaders();
+    _hydrateMatchIfNeeded();
   }
 
   @override
@@ -44,17 +48,15 @@ class _GameRecapPageState extends State<GameRecapPage> {
         "${parsedDate.day.toString().padLeft(2, '0')} ${_mon(parsedDate.month)}";
 
     final venueName = match.venue.name;
+    final playerStatistics = match.playerStatistics;
 
-    // ✅ stats are already typed lists
-    final clubOneStats = clubOne.stats;
-    final clubTwoStats = clubTwo.stats;
-
-    final team1Totals = _aggregateStats(clubOneStats);
-    final team2Totals = _aggregateStats(clubTwoStats);
+    final team1Totals = _aggregateStats(playerStatistics, 'home');
+    final team2Totals = _aggregateStats(playerStatistics, 'away');
     final quarterBreakdown = _buildQuarterBreakdown();
 
     // choose the stat keys you want to show (expand later)
     final statRows = <String>[
+      'Points',
       'Field Goal',
       'Free Throw (FT)',
       'Three Pointer (3 PT)',
@@ -168,13 +170,40 @@ class _GameRecapPageState extends State<GameRecapPage> {
     return (m >= 1 && m <= 12) ? months[m - 1] : "";
   }
 
-  /// ✅ sums typed StatModel list
-  static Map<String, num> _aggregateStats(List<StatModel> stats) {
+  static Map<String, num> _aggregateStats(
+    List<PlayerBoxScoreModel> stats,
+    String side,
+  ) {
     final totals = <String, num>{};
-    for (final s in stats) {
-      final key = s.stat.trim();
-      if (key.isEmpty) continue;
-      totals[key] = (totals[key] ?? 0) + s.statValue;
+    for (final stat in stats) {
+      if (stat.teamSide.toLowerCase() != side.toLowerCase()) {
+        continue;
+      }
+
+      totals['Points'] = (totals['Points'] ?? 0) + stat.points;
+      totals['Field Goal'] = (totals['Field Goal'] ?? 0) + stat.fieldGoalsMade;
+      totals['Field Goal Attempts'] =
+          (totals['Field Goal Attempts'] ?? 0) + stat.fieldGoalsAttempted;
+      totals['Free Throw (FT)'] =
+          (totals['Free Throw (FT)'] ?? 0) + stat.freeThrowsMade;
+      totals['Free Throw Attempts'] =
+          (totals['Free Throw Attempts'] ?? 0) + stat.freeThrowsAttempted;
+      totals['Three Pointer (3 PT)'] =
+          (totals['Three Pointer (3 PT)'] ?? 0) + stat.threePointersMade;
+      totals['3 Point Attempts'] =
+          (totals['3 Point Attempts'] ?? 0) + stat.threePointersAttempted;
+      totals['Steals'] = (totals['Steals'] ?? 0) + stat.steals;
+      totals['Blocks'] = (totals['Blocks'] ?? 0) + stat.blocks;
+      totals['Assists'] = (totals['Assists'] ?? 0) + stat.assists;
+      totals['Turnovers'] = (totals['Turnovers'] ?? 0) + stat.turnovers;
+      totals['Offensive Rebounds'] =
+          (totals['Offensive Rebounds'] ?? 0) + stat.offensiveRebounds;
+      totals['Defensive Rebounds'] =
+          (totals['Defensive Rebounds'] ?? 0) + stat.defensiveRebounds;
+      totals['Personal Fouls'] =
+          (totals['Personal Fouls'] ?? 0) + stat.personalFouls;
+      totals['Technical Fouls'] =
+          (totals['Technical Fouls'] ?? 0) + stat.technicalFouls;
     }
     return totals;
   }
@@ -269,10 +298,50 @@ class _GameRecapPageState extends State<GameRecapPage> {
           Divider(color: borderColor, height: 1),
           const SizedBox(height: 14),
           if (quarterBreakdown != null)
-            _quarterBreakdown(context, quarterBreakdown),
+            _quarterBreakdown(context, quarterBreakdown)
+          else if (_isHydratingMatch)
+            const SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
         ],
       ),
     );
+  }
+
+  Future<void> _hydrateMatchIfNeeded() async {
+    if (!_needsDetailedRecap(_resolvedMatch)) {
+      return;
+    }
+
+    setState(() {
+      _isHydratingMatch = true;
+    });
+
+    final response = await service<MatchService>().getMatchRecap(_resolvedMatch.id);
+
+    if (!mounted) {
+      return;
+    }
+
+    response.when(
+      onError: (_) {
+        setState(() {
+          _isHydratingMatch = false;
+        });
+      },
+      onSuccess: (hydratedMatch) {
+        setState(() {
+          _resolvedMatch = hydratedMatch;
+          _isHydratingMatch = false;
+        });
+      },
+    );
+  }
+
+  bool _needsDetailedRecap(MatchModel match) {
+    return match.intervalScores.isEmpty || match.playerStatistics.isEmpty;
   }
 
   Widget _quarterBreakdown(

@@ -6,8 +6,6 @@ import 'package:sports_app/data/models/addresses/pickupaddress.dart';
 
 import 'package:sports_app/data/services/service.dart';
 
-import '../../../../localization/app_prefs_manager.dart';
-
 part 'address_event.dart';
 part 'address_state.dart';
 part 'address_bloc.freezed.dart';
@@ -40,13 +38,11 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
       emit(state.copyWith(status: AddressStatus.loading));
       final recordResponse = await _addressService.addNewAddress(event.request);
       recordResponse.when(onError: (error) {
-        print('UUUUWE ${error.error}');
         emit(state.copyWith(
           status: AddressStatus.failure,
           failure: error,
         ));
       }, onSuccess: (data) async {
-        print('UUUUWS ${data}');
         emit(state.copyWith(
           status: AddressStatus.success,
           addressId: data,
@@ -64,7 +60,6 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
           failure: error,
         ));
       }, onSuccess: (data) async {
-        print('UUUUWS ${data}');
         emit(state.copyWith(
           status: AddressStatus.success,
           pickupAddresses: data,

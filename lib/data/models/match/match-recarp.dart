@@ -18,6 +18,7 @@ class MatchModel with _$MatchModel {
     required String clubTwoScore,
     required bool matchStatus,
     @Default([]) List<IntervalScoreModel> intervalScores,
+    @Default([]) List<PlayerBoxScoreModel> playerStatistics,
   }) = _MatchModel;
 
   factory MatchModel.fromJson(Map<String, dynamic> json) =>
@@ -86,4 +87,35 @@ class IntervalScoreModel with _$IntervalScoreModel {
 
   factory IntervalScoreModel.fromJson(Map<String, dynamic> json) =>
       _$IntervalScoreModelFromJson(json);
+}
+
+@freezed
+class PlayerBoxScoreModel with _$PlayerBoxScoreModel {
+  const factory PlayerBoxScoreModel({
+    required String playerId,
+    required String playerName,
+    required String clubId,
+    required String clubName,
+    required String teamSide,
+    required bool isStarter,
+    @Default(0) int points,
+    @Default(0) int assists,
+    @Default(0) int offensiveRebounds,
+    @Default(0) int defensiveRebounds,
+    @Default(0) int totalRebounds,
+    @Default(0) int steals,
+    @Default(0) int blocks,
+    @Default(0) int turnovers,
+    @Default(0) int personalFouls,
+    @Default(0) int technicalFouls,
+    @Default(0) int fieldGoalsMade,
+    @Default(0) int fieldGoalsAttempted,
+    @Default(0) int freeThrowsMade,
+    @Default(0) int freeThrowsAttempted,
+    @Default(0) int threePointersMade,
+    @Default(0) int threePointersAttempted,
+  }) = _PlayerBoxScoreModel;
+
+  factory PlayerBoxScoreModel.fromJson(Map<String, dynamic> json) =>
+      _$PlayerBoxScoreModelFromJson(json);
 }

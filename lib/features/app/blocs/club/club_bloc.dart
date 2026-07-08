@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sports_app/data/error/failure.dart';
 import 'package:sports_app/data/models/club/club.dart';
-import 'package:sports_app/data/models/roaster/roaster.dart';
 
 import 'package:sports_app/data/services/service.dart';
 

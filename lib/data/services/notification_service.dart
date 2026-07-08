@@ -5,6 +5,7 @@ import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 
 class WCNotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -54,23 +55,22 @@ class WCNotificationService {
     if (Platform.isAndroid) {
       final androidInfo = await deviceInfo.androidInfo;
       return {
-        'deviceId': installationId,
+        'device_id': installationId,
         'platform': 'android',
-        'model': androidInfo.model,
-        'osVersion': androidInfo.version.release,
+        'device_name': androidInfo.model,
       };
     } else if (Platform.isIOS) {
       final iosInfo = await deviceInfo.iosInfo;
       return {
-        'deviceId': installationId,
+        'device_id': installationId,
         'platform': 'ios',
-        'model': iosInfo.utsname.machine,
-        'osVersion': iosInfo.systemVersion,
+        'device_name': iosInfo.utsname.machine,
       };
     } else {
       return {
-        'deviceId': installationId,
+        'device_id': installationId,
         'platform': Platform.operatingSystem,
+        'device_name': Platform.localHostname,
       };
     }
   }
@@ -84,26 +84,33 @@ class WCNotificationService {
     }
 
     final deviceInfo = await getDeviceInfo();
+    final packageInfo = await PackageInfo.fromPlatform();
 
     final body = {
-      'token': token,
-      'deviceId': deviceInfo['deviceId']!,
-      'userId': userID,
+      'device_id': deviceInfo['device_id']!,
+      'device_token': token,
       'platform': deviceInfo['platform']!,
+      'device_name': deviceInfo['device_name']!,
+      'app_version': packageInfo.version,
+      'metadata': {
+        'build': packageInfo.buildNumber,
+        if (userID.isNotEmpty) 'legacy_user_id': userID,
+      },
     };
 
     try {
       final response = await http.post(
         Uri.parse(
-            'https://backend.wencetechnologies.com/sportapp/api/Device/register'),
+            'http://nomasana.local:8080/api/v1/frontend/notifications/devices'),
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $uToken',
         },
         body: jsonEncode(body),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         print("Device registered successfully");
       } else {
         print(

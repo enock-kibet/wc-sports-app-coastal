@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmf;
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart'
-    as google_maps_flutter;
-import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/common/app_background.dart';
@@ -16,16 +13,15 @@ import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/addresses/pickupaddress.dart';
 import 'package:sports_app/data/models/products/cart.dart';
+import 'package:sports_app/data/models/products/frontend_checkout.dart';
 import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/products/cart_bloc.dart';
 import 'package:sports_app/features/app/blocs/products/product_bloc.dart';
-import 'package:sports_app/features/auth/login_page.dart';
-import 'package:sports_app/features/dashboard/pages/profile/components/circular_toggle.dart';
-import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
+import 'package:sports_app/features/dashboard/pages/shared/frontend_checkout_flow.dart';
 import 'package:sports_app/features/dashboard/pages/shop/widgets/address_bottom_sheet.dart';
-import 'package:sports_app/features/dashboard/pages/shop/widgets/cart_location_picker.dart';
+import 'package:sports_app/features/dashboard/pages/shop/widgets/product_image_placeholder.dart';
 import 'package:sports_app/features/dashboard/pages/shop/widgets/top_sellers_card.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/theme/app_colors.dart';
@@ -34,10 +30,7 @@ import 'package:auto_height_grid_view/auto_height_grid_view.dart';
 import 'package:sports_app/utils/dotted.dart';
 
 import '../../../../data/models/addresses/address.dart';
-import '../../../../main.dart';
-import '../../../../router/router.dart';
 import '../../../app/blocs/address/address_bloc.dart';
-import '../profile/components/circular_icon_container.dart';
 
 part 'widgets/price_card.dart';
 
@@ -57,129 +50,116 @@ class ShopPage extends StatefulWidget {
 }
 
 class _ShopPageState extends State<ShopPage> {
+  Widget _buildShopContent(ProductState state) {
+    return SafeArea(
+        child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: kMedium),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: kMedium),
+            headerSection(),
+            const SizedBox(height: kMedium),
+            searchField(),
+            const SizedBox(height: kMedium),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Top Selling",
+                  style: TextStyle(
+                      fontSize: kMedium,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.onSurface),
+                ),
+              ],
+            ),
+            const SizedBox(height: kMedium),
+            if (state.products.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: kMedium,
+                  vertical: kXLarge,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(kMedium),
+                  border: Border.all(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.08),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      LucideIcons.shoppingBag,
+                      size: 36,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.55),
+                    ),
+                    const SizedBox(height: kSmall),
+                    Text(
+                      "No products available right now.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: kMedium,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: kXXSmall),
+                    Text(
+                      "Please check back again later.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              AutoHeightGridView(
+                itemCount: state.products.length,
+                crossAxisCount: context.isTablet ? 3 : 2,
+                mainAxisSpacing: kSmall,
+                crossAxisSpacing: kSmall,
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                builder: (context, index) {
+                  final product = state.products[index];
+                  return TopSellersCard(product: product);
+                },
+              ),
+          ],
+        ),
+      ),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: AppBackground(
-      childWidget: BlocConsumer<ProductBloc, ProductState>(
-        listener: (context, state) {
-          if (state.status == ProductStatus.processingPayment) {
-            SnackbarService.show(
-              'Securing Payment',
-              backgroundColor: AppColors.blackColor,
-            );
-            //AnimatedOverlaySnackbar.show(context, "Loading",color:const Color(0xff1976D2));
-          } else if (state.status == ProductStatus.successfulPayment) {
-            context.goNamed(
-              AppRoute.paymentWebView.name,
-              extra: state.authorizationUrl,
-            );
-            //AnimatedOverlaySnackbar.show(context, "Success: ${state.authorizationUrl??"didn't get"}",color:const Color(0xff2E7D32));
-          } else if (state.status == ProductStatus.failure) {
-            AnimatedOverlaySnackbar.show(
-                context, "failed: ${state.failure?.error ?? "failed"}",
-                color: AppColors.defaultAppRed);
-          }
-        },
+    return Scaffold(body: AppBackground(
+      childWidget: BlocBuilder<ProductBloc, ProductState>(
         builder: (context, state) {
           switch (state.status) {
             case ProductStatus.success:
             case ProductStatus.successfulPayment:
-              return SafeArea(
-                  child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: kMedium),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: kMedium),
-                      headerSection(),
-                      const SizedBox(height: kMedium),
-                      searchField(),
-                      const SizedBox(height: kMedium),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Top Selling",
-                            style: TextStyle(
-                                fontSize: kMedium,
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).colorScheme.onSurface),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: kMedium),
-                      if (state.products.isEmpty)
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: kMedium,
-                            vertical: kXLarge,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(kMedium),
-                            border: Border.all(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.08),
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                LucideIcons.shoppingBag,
-                                size: 36,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withValues(alpha: 0.55),
-                              ),
-                              const SizedBox(height: kSmall),
-                              Text(
-                                "No products available right now.",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: kMedium,
-                                  fontWeight: FontWeight.w600,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                              ),
-                              const SizedBox(height: kXXSmall),
-                              Text(
-                                "Please check back again later.",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withValues(alpha: 0.7),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      else
-                        AutoHeightGridView(
-                          itemCount: state.products.length,
-                          crossAxisCount: context.isTablet ? 3 : 2,
-                          mainAxisSpacing: kSmall,
-                          crossAxisSpacing: kSmall,
-                          physics: const BouncingScrollPhysics(),
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          builder: (context, index) {
-                            final product = state.products[index];
-                            return TopSellersCard(product: product);
-                          },
-                        ),
-                    ],
-                  ),
-                ),
-              ));
+            case ProductStatus.processingPayment:
+              return _buildShopContent(state);
             case ProductStatus.failure:
+              if (state.products.isNotEmpty) {
+                return _buildShopContent(state);
+              }
               return Center(
                 child: Text(
                   state.failure?.error ??

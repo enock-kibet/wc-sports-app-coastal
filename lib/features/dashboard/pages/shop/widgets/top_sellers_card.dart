@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/data/models/products/product.dart';
+import 'package:sports_app/features/dashboard/pages/shop/widgets/product_image_placeholder.dart';
 import 'package:sports_app/router/router.dart';
 
 import 'package:sports_app/theme/theme.dart';
@@ -32,17 +33,13 @@ class TopSellersCard extends StatelessWidget {
             ),
             child: Column(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.only(
+                ShopProductImage(
+                  imageUrl: product.imageUrl,
+                  width: double.infinity,
+                  height: 150,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(kSmall),
                     topRight: Radius.circular(kSmall),
-                  ),
-                  child: Image.network(
-                    //"https://srv19716098.ultasrv.net/SportApp/images/"+product.imageUrl,
-                    product.imageUrl,
-                    width: double.infinity,
-                    height: 150,
-                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(
@@ -105,7 +102,7 @@ class TopSellersCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(kXSmall),
             decoration: BoxDecoration(
-                color: AppColors.pink2Color.withOpacity(0.3),
+                color: AppColors.pink2Color.withValues(alpha: 0.3),
                 shape: BoxShape.circle),
             child: Icon(
               Icons.bookmark_outline,

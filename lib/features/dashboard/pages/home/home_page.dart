@@ -1,6 +1,6 @@
-import 'package:dotted_border/dotted_border.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -8,15 +8,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/buildcontext.dart';
-import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/common/utils/pull_to_refresh.dart';
 import 'package:sports_app/constants/constants.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/match/match.dart';
-import 'package:sports_app/data/models/stripe_checkout/stripe_checkout.dart';
+import 'package:sports_app/data/models/products/frontend_checkout.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/data/services/upgrade_service.dart';
 import 'package:sports_app/features/app/blocs/matches/match_bloc.dart';
-import 'package:sports_app/features/app/blocs/matches/match_schedule/schedule_bloc.dart';
 import 'package:sports_app/features/app/blocs/media/media_bloc.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/stripe/stripe_bloc.dart';
@@ -37,6 +36,8 @@ part 'widget/scheduled_tiles.dart';
 part 'widget/total_quantity.dart';
 part 'widget/ticket_purchase_bottom_sheet.dart';
 
+enum _HomeScheduleCategory { today, tomorrow, thisWeek, future }
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -47,11 +48,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   SharedPreferencesAsync get asyncPrefs => SharedPreferencesAsync();
   late StripeBloc _stripeBloc;
+  late MediaBloc _mediaBloc;
   late TextEditingController searchText;
-  late HideCubit _hideCubit;
   Map<String, dynamic>? user;
   bool loading = false;
   final FocusNode _focusNode = FocusNode();
+  Timer? _searchDebounce;
 
   @override
   void initState() {
@@ -61,29 +63,17 @@ class _HomePageState extends State<HomePage> {
     });
 
     _stripeBloc = StripeBloc();
+    _mediaBloc = MediaBloc()..add(MediaEvent.getHomeMedia());
     searchText = TextEditingController();
 
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        context.read<HideCubit>().reveal();
-      } else {
-        if (searchText.text == "") {
-          context.read<HideCubit>().hide();
-        } else {}
-      }
-      //context.read<HideCubit>().reveal;
-    });
     super.initState();
+    _focusNode.addListener(_handleFocusChange);
     context.read<MatchBloc>().add(const MatchEvent.matchstats());
     _registerForNotifications();
   }
 
   Future<void> _registerForNotifications() async {
-    final userData = await asyncPrefs.getStringList("USERDATA");
-    final uToken =
-        userData != null && userData.length >= 6 ? userData[4] : null;
-    final userID =
-        userData != null && userData.length >= 6 ? userData[6] : null;
+    await asyncPrefs.getStringList("USERDATA");
     // await WCNotificationService.registerDevice(
     //     userID.toString(), uToken.toString());
     // WCNotificationService.listenForTokenRefresh(
@@ -102,10 +92,77 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _handleFocusChange() {
+    if (_focusNode.hasFocus) {
+      context.read<HideCubit>().reveal();
+      return;
+    }
+
+    if (searchText.text.isEmpty) {
+      context.read<HideCubit>().hide();
+    }
+  }
+
+  void _handleSearchChanged(String value) {
+    final query = value.trim();
+    _searchDebounce?.cancel();
+
+    if (query.isEmpty) {
+      context.read<MatchBloc>().add(const MatchEvent.searchMatch(search: ''));
+      return;
+    }
+
+    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      context.read<MatchBloc>().add(MatchEvent.searchMatch(search: query));
+    });
+  }
+
+  Map<_HomeScheduleCategory, List<MatchType>> _categorizeSchedules(
+    List<MatchType> matches,
+  ) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+    final endOfWeek = today.add(Duration(days: 7 - today.weekday));
+
+    final categorized = <_HomeScheduleCategory, List<MatchType>>{
+      _HomeScheduleCategory.today: [],
+      _HomeScheduleCategory.tomorrow: [],
+      _HomeScheduleCategory.thisWeek: [],
+      _HomeScheduleCategory.future: [],
+    };
+
+    for (final match in matches) {
+      final matchDate = DateTime(
+        match.matchDate.year,
+        match.matchDate.month,
+        match.matchDate.day,
+      );
+
+      if (matchDate == today) {
+        categorized[_HomeScheduleCategory.today]!.add(match);
+      } else if (matchDate == tomorrow) {
+        categorized[_HomeScheduleCategory.tomorrow]!.add(match);
+      } else if (matchDate.isAfter(tomorrow) &&
+          matchDate.isBefore(endOfWeek)) {
+        categorized[_HomeScheduleCategory.thisWeek]!.add(match);
+      } else if (matchDate.isAfter(endOfWeek)) {
+        categorized[_HomeScheduleCategory.future]!.add(match);
+      }
+    }
+
+    categorized.removeWhere((key, value) => value.isEmpty);
+    return categorized;
+  }
+
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _stripeBloc.close();
-    _focusNode.removeListener(() {});
+    _mediaBloc.close();
+    searchText.dispose();
+    _focusNode.removeListener(_handleFocusChange);
     _focusNode.dispose();
     super.dispose();
   }
@@ -126,15 +183,12 @@ class _HomePageState extends State<HomePage> {
                 searchField(
                     controller: searchText,
                     focusNode: _focusNode,
-                    onChanged: (string) => context
-                        .read<MatchBloc>()
-                        .add(MatchEvent.searchMatch(search: searchText.text))),
+                    onChanged: _handleSearchChanged),
                 reveal ? Container() : const SizedBox(height: kMedium),
                 reveal
                     ? Container()
-                    : BlocProvider(
-                        create: (context) =>
-                            MediaBloc()..add(MediaEvent.getHomeMedia()),
+                    : BlocProvider.value(
+                        value: _mediaBloc,
                         child: const HomeMediaBanner(),
                       ),
                 reveal ? Container() : const SizedBox(height: kMedium),
@@ -164,127 +218,110 @@ class _HomePageState extends State<HomePage> {
                             ),
                           );
                         case MatchStatus.success:
-                          context.read<ScheduleBloc>().add(LoadSchedules(
-                              reveal ? state.searchedMatches : state.matches));
+                          final visibleMatches =
+                              reveal ? state.searchedMatches : state.matches;
+                          final categorized =
+                              _categorizeSchedules(visibleMatches);
+                          final statsMatches = state.statsMatches;
+                          final statsLoaded = state.statsLoaded;
 
-                          return BlocBuilder<ScheduleBloc, ScheduleState>(
-                              builder: (context, scheduledMatches) {
-                            if (scheduledMatches is ScheduleLoading) {
-                              return const _HomeMatchesSkeleton();
-                            } else if (scheduledMatches is ScheduleLoaded) {
-                              final categorized =
-                                  scheduledMatches.categorizedSchedulees;
-                              final statsMatches =
-                                  context.read<MatchBloc>().state.statsMatches;
-                              final statsLoaded =
-                                  context.read<MatchBloc>().state.statsLoaded;
+                          if (!statsLoaded) {
+                            return const _HomeMatchesSkeleton();
+                          }
 
-                              if (!statsLoaded) {
-                                return const _HomeMatchesSkeleton();
-                              }
-
-                              return RefreshIndicator.adaptive(
-                                onRefresh: _refreshHomeData,
-                                child: ListView(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  children: [
-                                    // --- Upcoming Schedule ---
-                                    if (categorized.isNotEmpty) ...[
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 1.0),
-                                        child: Text(
-                                          "Upcoming Matches",
-                                          style: context.textTheme.headlineLarge
-                                              ?.copyWith(
-                                            fontSize: 18,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface,
-                                          ),
-                                        ),
+                          return RefreshIndicator.adaptive(
+                            onRefresh: _refreshHomeData,
+                            child: ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                if (categorized.isNotEmpty) ...[
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 1.0),
+                                    child: Text(
+                                      "Upcoming Matches",
+                                      style: context.textTheme.headlineLarge
+                                          ?.copyWith(
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
                                       ),
-                                      ...categorized.entries.map((entry) {
-                                        String entryTitle = entry.key
-                                            .toString()
-                                            .split('.')
-                                            .last
-                                            .toTitleCase();
-                                        if (entryTitle == 'Thisweek') {
-                                          entryTitle = "This Week";
-                                        }
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 8.0, bottom: 12),
-                                              child: Text(
-                                                entryTitle,
-                                                style: context
-                                                    .textTheme.bodySmall
-                                                    ?.copyWith(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface
-                                                      .withValues(alpha: 0.65),
-                                                ),
-                                              ),
-                                            ),
-                                            _buildUpcomingMatchesTiles(
-                                              context,
-                                              entry.value,
-                                            ),
-                                          ],
-                                        );
-                                      }),
-                                    ],
-
-                                    // --- Previous Matches ---
-                                    if (statsMatches.isNotEmpty) ...[
-                                      const SizedBox(height: 24),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 12.0),
-                                        child: Text(
-                                          "Previous Matches",
-                                          style: context.textTheme.headlineLarge
-                                              ?.copyWith(
-                                            fontSize: 18,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface,
-                                          ),
-                                        ),
-                                      ),
-                                      _buildPreviousMatchesTiles(
-                                        context,
-                                        statsMatches,
-                                      ),
-                                    ],
-
-                                    // --- If both are empty ---
-                                    if (categorized.isEmpty &&
-                                        statsMatches.isEmpty &&
-                                        statsLoaded)
-                                      const Center(
-                                        child: Padding(
-                                          padding: EdgeInsets.only(top: 40.0),
+                                    ),
+                                  ),
+                                  ...categorized.entries.map((entry) {
+                                    String entryTitle = entry.key
+                                        .toString()
+                                        .split('.')
+                                        .last
+                                        .toTitleCase();
+                                    if (entryTitle == 'Thisweek') {
+                                      entryTitle = "This Week";
+                                    }
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 8.0, bottom: 12),
                                           child: Text(
-                                            "No matches available",
-                                            style: TextStyle(
-                                                color: Colors.white70),
+                                            entryTitle,
+                                            style: context
+                                                .textTheme.bodySmall
+                                                ?.copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                                  .withValues(alpha: 0.65),
+                                            ),
                                           ),
                                         ),
+                                        _buildUpcomingMatchesTiles(
+                                          context,
+                                          entry.value,
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                                ],
+                                if (statsMatches.isNotEmpty) ...[
+                                  const SizedBox(height: 24),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 12.0),
+                                    child: Text(
+                                      "Previous Matches",
+                                      style: context.textTheme.headlineLarge
+                                          ?.copyWith(
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
                                       ),
-                                  ],
-                                ),
-                              );
-                            }
-                            return (Container());
-                          });
+                                    ),
+                                  ),
+                                  _buildPreviousMatchesTiles(
+                                    context,
+                                    statsMatches,
+                                  ),
+                                ],
+                                if (categorized.isEmpty &&
+                                    statsMatches.isEmpty &&
+                                    statsLoaded)
+                                  const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(top: 40.0),
+                                      child: Text(
+                                        "No matches available",
+                                        style: TextStyle(
+                                            color: Colors.white70),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
 
                         default:
                           return const SizedBox.shrink();

@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sports_app/data/models/session/auth_session.dart';
+import 'package:sports_app/data/models/session/frontend_context.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/localization/app_prefs.dart';
 
@@ -24,6 +27,7 @@ class AppPreferencesManager {
 
   // Example cached data
   late User? _currentUser;
+  FrontendContextData? _currentContext;
   late AuthenticationStatus _status;
   bool _hasSkippedLogin = false;
 
@@ -35,6 +39,7 @@ class AppPreferencesManager {
 
     // Load and cache data from SharedPreferences
     _currentUser = await _prefs.getUserData();
+    _currentContext = await _prefs.getFrontendContext();
 
     _status = firstTimerun
         ? AuthenticationStatus.firstTime
@@ -59,6 +64,7 @@ class AppPreferencesManager {
 
   // Synchronous access
   User? get currentUserValue => _currentUser;
+  FrontendContextData? get currentContextValue => _currentContext;
   AuthenticationStatus get currentAuthStateValue => _status;
   bool get hasSkippedLogin => _hasSkippedLogin;
 
@@ -75,7 +81,7 @@ class AppPreferencesManager {
         await _prefs.setTokenExpiry(expiryMillis);
       } catch (e) {
         // Optionally log decoding error
-        print("Failed to decode token expiry: $e");
+        debugPrint("Failed to decode token expiry: $e");
       }
     }
 
@@ -85,12 +91,26 @@ class AppPreferencesManager {
     _controller.add(_status);
   }
 
+  Future<void> saveSession(AuthenticatedUserPayload payload) async {
+    await saveValue(payload.user);
+    if (payload.context != null) {
+      await saveFrontendContext(payload.context!);
+    }
+  }
+
+  Future<void> saveFrontendContext(FrontendContextData context) async {
+    await _prefs.storeFrontendContext(context);
+    _currentContext = await _prefs.getFrontendContext();
+    _controller.add(_status);
+  }
+
   Future<User?> updateUser(User user) async {
     await _prefs.updateUser(user);
 
     _currentUser = await _prefs.getUserData();
     _status = _verificationStatus(_currentUser);
     _controller.add(_status);
+    return _currentUser;
   }
 
   Future<User?> updateUserPhoto(String photo) async {
@@ -99,6 +119,7 @@ class AppPreferencesManager {
     _currentUser = await _prefs.getUserData();
     _status = _verificationStatus(_currentUser);
     _controller.add(_status);
+    return _currentUser;
   }
 
   // get user data
@@ -107,6 +128,32 @@ class AppPreferencesManager {
   Future<void> updateUserToken(String token) async {
     if (_currentUser != null) {
       await _prefs.updateToken(token);
+      _currentUser = await _prefs.getUserData();
+      _status = _verificationStatus(_currentUser);
+      _controller.add(_status);
+    }
+  }
+
+  Future<void> updateUserTokens(RefreshTokenPayload payload) async {
+    if (_currentUser != null) {
+      int? expiryMillis;
+      if (payload.expiresIn != null) {
+        expiryMillis = DateTime.now().millisecondsSinceEpoch +
+            (payload.expiresIn! * 1000);
+      } else {
+        try {
+          expiryMillis = _decodeJwtExpiry(payload.accessToken);
+        } catch (_) {
+          expiryMillis = null;
+        }
+      }
+
+      await _prefs.updateTokens(
+        accessToken: payload.accessToken,
+        refreshToken: payload.refreshToken,
+        expiryMillis: expiryMillis,
+      );
+      _currentUser = await _prefs.getUserData();
       _status = _verificationStatus(_currentUser);
       _controller.add(_status);
     }
@@ -131,10 +178,11 @@ class AppPreferencesManager {
   }
 
   Future<void> logOut() async {
-    final GoogleSignInAccount? googleSignIn =
-        await GoogleSignIn(scopes: ['profile', 'email']).signOut();
+    await GoogleSignIn(scopes: ['profile', 'email']).signOut();
     await _prefs.removeUser();
+    await removeTokenExpiry();
     _currentUser = await _prefs.getUserData();
+    _currentContext = await _prefs.getFrontendContext();
     _status = _verificationStatus(_currentUser);
     _controller.add(_status);
   }

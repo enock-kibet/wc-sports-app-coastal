@@ -76,14 +76,13 @@ class ErrorHandler {
             case 400:
               return Failure(
                 error: humanizeMessage(
-                  error.response?.data["msg"] ??
-                      error.response?.data["messages"][0],
+                  _extractResponseMessage(error.response?.data),
                 ),
               );
             case 401:
               return Failure(
                 error: humanizeMessage(
-                  error.response?.data["msg"],
+                  _extractResponseMessage(error.response?.data),
                   fallback: 'Your session has expired. Please sign in again.',
                 ),
               );
@@ -93,33 +92,33 @@ class ErrorHandler {
               );
             case 402:
               return Failure(
-                error: humanizeMessage(error.response?.data["msg"]),
+                error: humanizeMessage(_extractResponseMessage(error.response?.data)),
               );
             case 404:
               return Failure(
                 error: humanizeMessage(
-                  error.response?.data["msg"],
+                  _extractResponseMessage(error.response?.data),
                   fallback: 'We could not find what you were looking for.',
                 ),
               );
             case 409:
               return Failure(
                 error: humanizeMessage(
-                  error.response?.data["msg"],
+                  _extractResponseMessage(error.response?.data),
                   fallback: 'This request could not be completed.',
                 ),
               );
             case 422:
               return Failure(
                 error: humanizeMessage(
-                  error.response?.data["msg"],
+                  _extractResponseMessage(error.response?.data),
                   fallback: 'Please check your details and try again.',
                 ),
               );
             case 500:
               return Failure(
                 error: humanizeMessage(
-                  error.response?.data["msg"],
+                  _extractResponseMessage(error.response?.data),
                   fallback:
                       'Something went wrong on our side. Please try again shortly.',
                 ),
@@ -127,7 +126,7 @@ class ErrorHandler {
             case 502:
               return Failure(
                 error: humanizeMessage(
-                  error.response?.data["msg"],
+                  _extractResponseMessage(error.response?.data),
                   fallback:
                       'The service is temporarily unavailable. Please try again shortly.',
                 ),
@@ -135,7 +134,7 @@ class ErrorHandler {
 
             case 412:
               return Failure(
-                error: humanizeMessage(error.response!.data["msg"]),
+                error: humanizeMessage(_extractResponseMessage(error.response!.data)),
                 precondition: error.response!.data["precondition"],
                 description: error.response!.data["description"],
                 value: error.response!.data["value"],
@@ -153,4 +152,33 @@ class ErrorHandler {
       }
     }
   }
+}
+
+dynamic _extractResponseMessage(dynamic responseData) {
+  if (responseData is! Map) {
+    return responseData;
+  }
+
+  final map = responseData;
+  if (map['msg'] != null) return map['msg'];
+  if (map['message'] != null) return map['message'];
+
+  final messages = map['messages'];
+  if (messages is List && messages.isNotEmpty) {
+    return messages.first;
+  }
+
+  final errors = map['errors'];
+  if (errors is Map) {
+    for (final value in errors.values) {
+      if (value is List && value.isNotEmpty) {
+        return value.first;
+      }
+      if (value != null) {
+        return value;
+      }
+    }
+  }
+
+  return null;
 }

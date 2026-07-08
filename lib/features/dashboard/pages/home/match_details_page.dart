@@ -7,20 +7,17 @@ import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/services/service.dart';
-import 'package:sports_app/features/app/blocs/auth/auth_bloc.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/dashboard/pages/home/home.dart';
+import 'package:sports_app/features/dashboard/pages/shared/frontend_checkout_flow.dart';
 import 'package:sports_app/features/dashboard/pages/shop/shop_page.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
-import 'package:sports_app/main.dart';
-import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/theme.dart';
 
 import '../../../app/blocs/products/product_bloc.dart';
@@ -34,13 +31,15 @@ class MatchDetailsPage extends StatefulWidget {
 }
 
 class _MatchDetailsPageState extends State<MatchDetailsPage> {
-  SharedPreferencesAsync get asyncPrefs => SharedPreferencesAsync();
   final ValueNotifier<int> numberOfTickets = ValueNotifier(1);
   static const LatLng _fallbackLocation = LatLng(-1.3044, 36.8254);
 
   late PointsBloc _pointsBloc;
   bool _ownsPointsBloc = false;
-  String? userID;
+  bool _ticketTypesLoading = true;
+  String? _ticketTypesError;
+  List<Map<String, dynamic>> _ticketTypes = const [];
+  String? _selectedTicketTypeId;
 
   @override
   void initState() {
@@ -51,17 +50,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
       _pointsBloc = PointsBloc();
       _ownsPointsBloc = true;
     }
-    _loadUserData();
-  }
-
-  Future<void> _loadUserData() async {
-    final userData = await asyncPrefs.getStringList("USERDATA");
-    if (mounted) {
-      setState(() {
-        userID =
-            (userData != null && userData.length >= 6) ? userData[6] : null;
-      });
-    }
+    _loadTicketTypes();
   }
 
   @override
@@ -73,12 +62,129 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
     super.dispose();
   }
 
+  Future<void> _loadTicketTypes() async {
+    setState(() {
+      _ticketTypesLoading = true;
+      _ticketTypesError = null;
+    });
+
+    final response = await service<ProductService>()
+        .getAvailableTicketTypes(widget.match.matchId);
+
+    if (!mounted) return;
+
+    response.when(
+      onError: (error) {
+        setState(() {
+          _ticketTypesLoading = false;
+          _ticketTypesError = error.error;
+          _ticketTypes = const [];
+          _selectedTicketTypeId = null;
+        });
+      },
+      onSuccess: (ticketTypes) {
+        setState(() {
+          _ticketTypesLoading = false;
+          _ticketTypes = ticketTypes;
+          _selectedTicketTypeId = _pickTicketTypeId(ticketTypes.first);
+        });
+        _clampTicketQuantityToSelection();
+      },
+    );
+  }
+
+  Map<String, dynamic>? get _selectedTicketType {
+    for (final ticketType in _ticketTypes) {
+      if (_pickTicketTypeId(ticketType) == _selectedTicketTypeId) {
+        return ticketType;
+      }
+    }
+    return _ticketTypes.isNotEmpty ? _ticketTypes.first : null;
+  }
+
+  String _pickTicketTypeId(Map<String, dynamic> ticketType) {
+    return (ticketType['id'] ?? '').toString().trim();
+  }
+
+  String _ticketTypeName(Map<String, dynamic> ticketType) {
+    final candidates = [
+      ticketType['name'],
+      ticketType['ticket_name'],
+      ticketType['label'],
+      ticketType['code'],
+    ];
+
+    for (final candidate in candidates) {
+      final value = candidate?.toString().trim();
+      if (value != null && value.isNotEmpty) {
+        return value;
+      }
+    }
+
+    return 'Ticket';
+  }
+
+  String? _ticketTypeDescription(Map<String, dynamic> ticketType) {
+    final candidates = [
+      ticketType['description'],
+      ticketType['notes'],
+      ticketType['details'],
+    ];
+
+    for (final candidate in candidates) {
+      final value = candidate?.toString().trim();
+      if (value != null && value.isNotEmpty) {
+        return value;
+      }
+    }
+
+    return null;
+  }
+
+  double _ticketTypePrice(Map<String, dynamic>? ticketType) {
+    final rawPrice = ticketType?['price'];
+    if (rawPrice is num) return rawPrice.toDouble();
+    return double.tryParse(rawPrice?.toString() ?? '') ??
+        widget.match.matchPrice;
+  }
+
+  int _ticketTypeMaxPerOrder(Map<String, dynamic>? ticketType) {
+    final rawValue = ticketType?['max_per_order'];
+    if (rawValue is num) return rawValue.toInt();
+    return int.tryParse(rawValue?.toString() ?? '') ?? 0;
+  }
+
+  int? _ticketTypeRemainingQty(Map<String, dynamic> ticketType) {
+    final rawValue = ticketType['remaining_quantity'];
+    if (rawValue == null) return null;
+    if (rawValue is num) return rawValue.toInt();
+    return int.tryParse(rawValue.toString());
+  }
+
+  void _selectTicketType(Map<String, dynamic> ticketType) {
+    setState(() {
+      _selectedTicketTypeId = _pickTicketTypeId(ticketType);
+    });
+    _clampTicketQuantityToSelection();
+  }
+
+  void _clampTicketQuantityToSelection() {
+    final maxPerOrder = _ticketTypeMaxPerOrder(_selectedTicketType);
+    if (maxPerOrder > 0 && numberOfTickets.value > maxPerOrder) {
+      numberOfTickets.value = maxPerOrder;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final venue = widget.match.recap?.venue;
     final venueLatLng = venue != null
         ? LatLng(venue.latitude, venue.longitude)
         : _fallbackLocation;
+    final selectedTicketType = _selectedTicketType;
+    final selectedTicketPrice = _ticketTypePrice(selectedTicketType);
+    final selectedTicketName =
+        selectedTicketType == null ? null : _ticketTypeName(selectedTicketType);
 
     return BlocConsumer<ProductBloc, ProductState>(
       bloc: context.read<ProductBloc>(),
@@ -89,10 +195,12 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
             backgroundColor: AppColors.blackColor,
           );
         } else if (state.status == ProductStatus.successfulPayment) {
-          context.goNamed(
-            AppRoute.paymentWebView.name,
-            extra: state.authorizationUrl,
-          );
+          final checkout = service<ProductService>().latestCheckoutResult;
+          if (checkout == null) {
+            SnackbarService.showError('Unable to continue checkout right now.');
+            return;
+          }
+          handleFrontendCheckoutSuccess(context, checkout);
         } else if (state.status == ProductStatus.failure) {
           AnimatedOverlaySnackbar.show(
             context,
@@ -122,16 +230,16 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                     onButtonPress: () {
                       final match = widget.match;
 
-                      if (userID != null) {
-                        final payload = {
-                          "userId": userID ?? "",
-                          "actionCode": "SHARED_TICKET",
-                          "externalRef": match.matchId,
-                        };
-                        _pointsBloc.add(
-                          PointsEvent.addPoints(request: payload),
-                        );
-                      }
+                      final payload = {
+                        "action_key": "frontend.ticket.shared",
+                        "reference_type": "match",
+                        "reference_id": match.matchId,
+                        "description": "Awarded after sharing match.",
+                        "channel": "share_sheet",
+                      };
+                      _pointsBloc.add(
+                        PointsEvent.addPoints(request: payload),
+                      );
 
                       final shareText = '''
           🎟️ ${match.matchName}
@@ -141,7 +249,12 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
           Get your tickets now from the Wence Sports app!
           https://play.google.com/store/apps/details?id=com.wtl.siel''';
 
-                      Share.share(shareText, subject: 'Check out this event!');
+                      SharePlus.instance.share(
+                        ShareParams(
+                          text: shareText,
+                          subject: 'Check out this event!',
+                        ),
+                      );
                     },
                     icon: Icons.share_outlined,
                   ),
@@ -160,7 +273,40 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                           return;
                         }
 
+                        if (_ticketTypesLoading) {
+                          SnackbarService.show(
+                            'Loading ticket options...',
+                            backgroundColor: AppColors.blackColor,
+                          );
+                          return;
+                        }
+
+                        final ticketType = _selectedTicketType;
+                        if (ticketType == null) {
+                          SnackbarService.showError(
+                            _ticketTypesError ??
+                                'No tickets are available for this match yet.',
+                          );
+                          return;
+                        }
+
                         final bloc = _pointsBloc;
+                        final ticketTypeId =
+                            (ticketType['id'] ?? '').toString().trim();
+                        final ticketPrice = _ticketTypePrice(ticketType);
+                        final maxPerOrder = _ticketTypeMaxPerOrder(ticketType);
+                        final checkoutQuantity = maxPerOrder > 0
+                            ? numberOfTickets.value.clamp(1, maxPerOrder)
+                            : numberOfTickets.value;
+
+                        if (maxPerOrder > 0 &&
+                            checkoutQuantity != numberOfTickets.value) {
+                          numberOfTickets.value = checkoutQuantity;
+                          SnackbarService.show(
+                            'You can only buy up to $maxPerOrder tickets per order for this match.',
+                            backgroundColor: AppColors.blackColor,
+                          );
+                        }
 
                         // Step 1: Trigger loading of points
                         bloc.add(const PointsEvent.points());
@@ -179,28 +325,34 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                         showTicketBottomSheet(
                           context,
                           (
-                            TotalAmount:
-                                widget.match.matchPrice * numberOfTickets.value,
-                            quantity: numberOfTickets.value,
+                            TotalAmount: ticketPrice * checkoutQuantity,
+                            quantity: checkoutQuantity,
                           ),
-                          buyMerch: (usedPoints) {
+                          buyMerch: (usedPoints, promotionCode) {
                             final int redeemablePoints = usedPoints;
 
                             context.read<ProductBloc>().add(
                                   ProductEvent.buyProducts(request: {
-                                    "amount": widget.match.matchPrice *
-                                        numberOfTickets.value,
+                                    "amount": ticketPrice * checkoutQuantity,
                                     "email": userEmail,
+                                    "matchId": widget.match.matchId,
+                                    "ticketTypeId": ticketTypeId,
+                                    "reference_type": "ticket_type",
+                                    "quantity": checkoutQuantity,
                                     "productID":
                                         "20d802f0-1557-49a5-9fcf-7de02e570c57",
                                     "category": "",
                                     if (redeemablePoints > 0)
                                       "redeemablePoints": redeemablePoints,
+                                    if (promotionCode != null &&
+                                        promotionCode.trim().isNotEmpty)
+                                      "promotionCode": promotionCode,
                                   }),
                                 );
                           },
                           match: widget.match,
                           pointsState: pointsState,
+                          ticketLabel: selectedTicketName,
                         );
                       },
                       text: "Buy Ticket",
@@ -302,12 +454,158 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                               ),
                             ),
                             const SizedBox(height: 20),
+                            Text(
+                              "Ticket Options",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            if (_ticketTypesLoading)
+                              const Center(child: CircularProgressIndicator())
+                            else if (_ticketTypes.isEmpty)
+                              Text(
+                                _ticketTypesError ??
+                                    "No tickets are available for this match yet.",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
+                                ),
+                              )
+                            else
+                              Column(
+                                children: _ticketTypes.map((ticketType) {
+                                  final ticketTypeId =
+                                      _pickTicketTypeId(ticketType);
+                                  final isSelected =
+                                      ticketTypeId == _selectedTicketTypeId;
+                                  final remainingQty =
+                                      _ticketTypeRemainingQty(ticketType);
+                                  final description =
+                                      _ticketTypeDescription(ticketType);
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: InkWell(
+                                      borderRadius:
+                                          BorderRadius.circular(kMedium),
+                                      onTap: () =>
+                                          _selectTicketType(ticketType),
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(kMedium),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .surface,
+                                          borderRadius:
+                                              BorderRadius.circular(kMedium),
+                                          border: Border.all(
+                                            color: isSelected
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                : Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withValues(alpha: 0.12),
+                                            width: isSelected ? 1.6 : 1,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    _ticketTypeName(ticketType),
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Ksh ${_ticketTypePrice(ticketType).toStringAsFixed(0)}",
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            if (description != null) ...[
+                                              const SizedBox(height: 6),
+                                              Text(
+                                                description,
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface
+                                                      .withValues(alpha: 0.75),
+                                                ),
+                                              ),
+                                            ],
+                                            const SizedBox(height: 8),
+                                            Row(
+                                              children: [
+                                                if (remainingQty != null)
+                                                  Text(
+                                                    "Remaining: $remainingQty",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface
+                                                          .withValues(
+                                                              alpha: 0.75),
+                                                    ),
+                                                  ),
+                                                const Spacer(),
+                                                if (_ticketTypeMaxPerOrder(
+                                                        ticketType) >
+                                                    0)
+                                                  Text(
+                                                    "Max ${_ticketTypeMaxPerOrder(ticketType)} per order",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface
+                                                          .withValues(
+                                                              alpha: 0.75),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(growable: false),
+                              ),
+                            const SizedBox(height: 20),
                             ValueListenableBuilder(
                               valueListenable: numberOfTickets,
                               builder: (context, value, _) {
                                 return TotalAndQuantity(
                                   add: () => numberOfTickets.value = value + 1,
-                                  amount: widget.match.matchPrice * value,
+                                  amount: selectedTicketPrice * value,
                                   quantity: value,
                                   subtract: () => numberOfTickets.value =
                                       value > 1 ? value - 1 : 1,

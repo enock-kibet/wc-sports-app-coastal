@@ -18,7 +18,8 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
     on<_MatchesFetched>((event, emit) async {
       emit(state.copyWith(status: MatchStatus.loading));
 
-      final recordResponse = await _matchService.getMatches();
+      final recordResponse =
+          await _matchService.getMatches(clubId: event.clubId);
       recordResponse.when(
         onError: (error) {
           emit(state.copyWith(status: MatchStatus.failure, failure: error));
@@ -102,16 +103,16 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
     });
 
     on<_MatchesSearched>((event, emit) async {
-      emit(state.copyWith(status: MatchStatus.loading));
       List<MatchType> searchlist = state.matches
           .where((match) => match.matchName
               .toLowerCase()
               .contains(event.search.toLowerCase().trim()))
           .toList();
       emit(state.copyWith(
-          status: MatchStatus.success,
-          searchedMatches: searchlist,
-          failure: null));
+        status: MatchStatus.success,
+        searchedMatches: searchlist,
+        failure: null,
+      ));
     });
 
     on<_MatchesMonth>((event, emit) async {

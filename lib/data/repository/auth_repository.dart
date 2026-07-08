@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/widgets.dart';
+import 'package:sports_app/data/models/session/auth_session.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
 import '../services/service.dart';
 
@@ -67,8 +68,12 @@ class AuthRepository with WidgetsBindingObserver {
 
       return await result.when(
         onError: (_) => false,
-        onSuccess: (token) async {
-          await _prefs.updateUserToken(token);
+        onSuccess: (tokenPayload) async {
+          if (tokenPayload is! RefreshTokenPayload) {
+            return false;
+          }
+
+          await _prefs.updateUserTokens(tokenPayload);
           return true;
         },
       );

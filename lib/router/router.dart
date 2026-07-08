@@ -7,8 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:sports_app/data/models/club/club.dart';
 import 'package:sports_app/data/models/match/match-recarp.dart';
 import 'package:sports_app/data/models/match/match.dart';
-import 'package:sports_app/data/models/player/player.dart';
-import 'package:sports_app/data/models/points/points.dart';
 import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/models/roaster/roaster.dart';
 
@@ -28,7 +26,10 @@ import 'package:sports_app/features/dashboard/pages/notifications/notification_p
 import 'package:sports_app/features/dashboard/pages/points/points_page.dart';
 import 'package:sports_app/features/dashboard/pages/profile/components/edit_profile.dart';
 import 'package:sports_app/features/dashboard/pages/profile/components/personal_details.dart';
+import 'package:sports_app/features/dashboard/pages/profile/order_detail_page.dart';
 import 'package:sports_app/features/dashboard/pages/profile/profile_page.dart';
+import 'package:sports_app/features/dashboard/pages/profile/ticket_detail_page.dart';
+import 'package:sports_app/features/dashboard/pages/profile/tickets_page.dart';
 import 'package:sports_app/features/dashboard/pages/schedule/schedule_page.dart';
 import 'package:sports_app/features/dashboard/pages/shop/shop_item_details_page.dart';
 import 'package:sports_app/features/dashboard/pages/splash_screen.dart';
@@ -66,6 +67,9 @@ enum AppRoute {
   help,
   aboutUs,
   pointsManagement,
+  profileTickets,
+  profileTicketDetails,
+  profileOrderDetails,
   paymentWebView,
   playerProfile,
   clubRoaster,
@@ -258,8 +262,17 @@ final router = GoRouter(
               path: "/schedule",
               name: AppRoute.schedule.name,
               pageBuilder: (context, state) {
-                return const MaterialPage(
-                  child: SchedulePage(),
+                final extra = state.extra;
+                final clubId = extra is ClubRoasterData
+                    ? extra.id
+                    : extra is String
+                        ? extra
+                        : null;
+
+                return MaterialPage(
+                  child: SchedulePage(
+                    clubId: clubId,
+                  ),
                 );
               },
             )
@@ -376,6 +389,36 @@ final router = GoRouter(
                           child: PointsPage(),
                         ),
                       );
+                    },
+                  ),
+                  GoRoute(
+                    path: "tickets",
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: AppRoute.profileTickets.name,
+                    builder: (context, state) {
+                      return const TicketsPage();
+                    },
+                  ),
+                  GoRoute(
+                    path: "tickets/:ticketId",
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: AppRoute.profileTicketDetails.name,
+                    builder: (context, state) {
+                      final ticketId = (state.extra as String?) ??
+                          state.pathParameters['ticketId'] ??
+                          '';
+                      return TicketDetailPage(ticketId: ticketId);
+                    },
+                  ),
+                  GoRoute(
+                    path: "orders/:orderId",
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: AppRoute.profileOrderDetails.name,
+                    builder: (context, state) {
+                      final orderId = (state.extra as String?) ??
+                          state.pathParameters['orderId'] ??
+                          '';
+                      return OrderDetailPage(orderId: orderId);
                     },
                   ),
                   GoRoute(

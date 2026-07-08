@@ -2,7 +2,7 @@ part of 'match_bloc.dart';
 
 @freezed
 class MatchEvent with _$MatchEvent {
-  const factory MatchEvent.matches() = _MatchesFetched;
+  const factory MatchEvent.matches({String? clubId}) = _MatchesFetched;
   const factory MatchEvent.matchstats({String? clubId}) = _MatchStats;
 
   const factory MatchEvent.searchMatch({required String search}) =

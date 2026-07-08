@@ -3,9 +3,10 @@ part of "../home_page.dart";
 void showTicketBottomSheet(
   BuildContext context,
   ({double TotalAmount, int quantity}) values, {
-  required void Function(int usedPoints) buyMerch,
+  required void Function(int usedPoints, String? promotionCode) buyMerch,
   required MatchType match,
   required PointsState pointsState,
+  String? ticketLabel,
 }) {
   showModalBottomSheet(
     context: context,
@@ -20,16 +21,18 @@ void showTicketBottomSheet(
         buyMerch: buyMerch,
         match: match,
         pointsState: pointsState,
+        ticketLabel: ticketLabel,
       );
     },
   );
 }
 
 class _TicketBottomSheetContent extends StatefulWidget {
-  final void Function(int usedPoints) buyMerch;
+  final void Function(int usedPoints, String? promotionCode) buyMerch;
   final MatchType match;
   final ({double TotalAmount, int quantity}) values;
   final PointsState pointsState;
+  final String? ticketLabel;
 
   const _TicketBottomSheetContent({
     super.key,
@@ -37,6 +40,7 @@ class _TicketBottomSheetContent extends StatefulWidget {
     required this.buyMerch,
     required this.match,
     required this.pointsState,
+    this.ticketLabel,
   });
 
   @override
@@ -47,26 +51,97 @@ class _TicketBottomSheetContent extends StatefulWidget {
 class _TicketBottomSheetContentState extends State<_TicketBottomSheetContent> {
   bool usePoints = false;
   final TextEditingController _pointsController = TextEditingController();
+  final TextEditingController _promoCodeController = TextEditingController();
   int usedPoints = 0;
+  bool _isValidatingPromotion = false;
 
   String? pointsError;
+  String? promoError;
+  FrontendPromotionValidationResult? _appliedPromotion;
 
   @override
   void dispose() {
     _pointsController.dispose();
+    _promoCodeController.dispose();
     super.dispose();
+  }
+
+  double get _promotionDiscount {
+    final discount = _appliedPromotion?.discountAmount ?? 0;
+    return discount > widget.values.TotalAmount
+        ? widget.values.TotalAmount
+        : discount;
+  }
+
+  double get _grossAfterPromotion =>
+      (widget.values.TotalAmount - _promotionDiscount)
+          .clamp(0, double.infinity);
+
+  double get _pointsDiscount {
+    if (!usePoints) return 0;
+    final requestedValue = usedPoints / 3;
+    return requestedValue > _grossAfterPromotion
+        ? _grossAfterPromotion
+        : requestedValue;
+  }
+
+  double get _displayedTotal =>
+      (_grossAfterPromotion - _pointsDiscount).clamp(0, double.infinity);
+
+  Future<void> _applyPromotion() async {
+    final code = _promoCodeController.text.trim();
+    if (code.isEmpty) {
+      setState(() {
+        promoError = "Enter a promotion code.";
+      });
+      return;
+    }
+
+    setState(() {
+      _isValidatingPromotion = true;
+      promoError = null;
+    });
+
+    final response = await service<ProductService>().validatePromotionCode(
+      code: code,
+      amount: widget.values.TotalAmount,
+    );
+
+    if (!mounted) return;
+
+    response.when(
+      onError: (error) {
+        setState(() {
+          _isValidatingPromotion = false;
+          _appliedPromotion = null;
+          promoError = error.error;
+        });
+      },
+      onSuccess: (result) {
+        setState(() {
+          _isValidatingPromotion = false;
+          _appliedPromotion = result;
+          promoError = null;
+          _promoCodeController.text = result.code;
+        });
+        SnackbarService.showSuccess("Promotion code applied successfully.");
+      },
+    );
+  }
+
+  void _clearPromotion({bool clearInput = false}) {
+    setState(() {
+      _appliedPromotion = null;
+      promoError = null;
+      if (clearInput) {
+        _promoCodeController.clear();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final points = int.tryParse(widget.pointsState.balance ?? '0') ?? 0;
-    final kshValue = usedPoints / 3;
-
-    final displayedTotal = usePoints
-        ? (widget.values.TotalAmount - kshValue).clamp(0, double.infinity)
-        : widget.values.TotalAmount;
-
-    print("${widget.pointsState.balance}");
+    final points = int.tryParse(widget.pointsState.balance) ?? 0;
 
     return SafeArea(
       child: DraggableScrollableSheet(
@@ -119,10 +194,84 @@ class _TicketBottomSheetContentState extends State<_TicketBottomSheetContent> {
                         iconData: LucideIcons.badgePercent,
                         text: "Add Coupon",
                       ),
+                      const SizedBox(height: 10),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _promoCodeController,
+                              textCapitalization: TextCapitalization.characters,
+                              decoration: InputDecoration(
+                                labelText: "Promotion Code",
+                                hintText: "Enter code",
+                                border: const OutlineInputBorder(),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                errorText: promoError,
+                              ),
+                              onChanged: (value) {
+                                final appliedCode = _appliedPromotion?.code;
+                                if (appliedCode != null &&
+                                    value.trim() != appliedCode) {
+                                  setState(() {
+                                    _appliedPromotion = null;
+                                  });
+                                }
+                                if (promoError != null) {
+                                  setState(() {
+                                    promoError = null;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: _isValidatingPromotion
+                                  ? null
+                                  : (_appliedPromotion == null
+                                      ? _applyPromotion
+                                      : () =>
+                                          _clearPromotion(clearInput: true)),
+                              child: Text(
+                                _isValidatingPromotion
+                                    ? "Applying..."
+                                    : _appliedPromotion == null
+                                        ? "Apply"
+                                        : "Remove",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (_appliedPromotion != null) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest
+                                .withValues(alpha: 0.35),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${_appliedPromotion?.name ?? "Promotion"} applied. You save Ksh ${_promotionDiscount.toStringAsFixed(2)}.',
+                            style: const TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 20),
                       TicketOrderSummary(
                         quantity: widget.values.quantity,
                         match: widget.match,
+                        ticketLabel: widget.ticketLabel,
                       ),
                       const SizedBox(height: 10),
                       Column(
@@ -270,7 +419,7 @@ class _TicketBottomSheetContentState extends State<_TicketBottomSheetContent> {
                                   style: TextStyle(fontWeight: FontWeight.w500),
                                 ),
                                 TextSpan(
-                                  text: "${displayedTotal.ceil()}",
+                                  text: _displayedTotal.toStringAsFixed(2),
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -279,6 +428,40 @@ class _TicketBottomSheetContentState extends State<_TicketBottomSheetContent> {
                           )
                         ],
                       ),
+                      if (_promotionDiscount > 0) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Text(
+                              "Promotion Discount",
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                            const Spacer(),
+                            Text(
+                              "- Ksh ${_promotionDiscount.toStringAsFixed(2)}",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
+                      if (_pointsDiscount > 0) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Text(
+                              "Points Discount",
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                            const Spacer(),
+                            Text(
+                              "- Ksh ${_pointsDiscount.toStringAsFixed(2)}",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 8),
                       const Divider(color: Color(0xffdfdfdf)),
                       // if (points < 9999)
@@ -286,8 +469,16 @@ class _TicketBottomSheetContentState extends State<_TicketBottomSheetContent> {
                       GradientFilledButton(
                         text: 'Checkout',
                         onPressed: () {
+                          final currentPointsError = pointsError;
+                          if (currentPointsError != null) {
+                            SnackbarService.showError(currentPointsError);
+                            return;
+                          }
                           Navigator.of(context).pop();
-                          widget.buyMerch(usePoints ? usedPoints : 0);
+                          widget.buyMerch(
+                            usePoints ? usedPoints : 0,
+                            _appliedPromotion?.code,
+                          );
                         },
                       )
                     ],
@@ -305,15 +496,20 @@ class _TicketBottomSheetContentState extends State<_TicketBottomSheetContent> {
 class TicketOrderSummary extends StatelessWidget {
   final int quantity;
   final MatchType match;
+  final String? ticketLabel;
 
   const TicketOrderSummary({
     super.key,
     required this.quantity,
     required this.match,
+    this.ticketLabel,
   });
 
   @override
   Widget build(BuildContext context) {
+    final normalizedTicketLabel = ticketLabel?.trim();
+    final hasTicketLabel =
+        normalizedTicketLabel != null && normalizedTicketLabel.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -329,8 +525,10 @@ class TicketOrderSummary extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerRight,
             child: Text(
-              "$quantity tickets for ${match.matchName}",
-              maxLines: 1,
+              !hasTicketLabel
+                  ? "$quantity tickets for ${match.matchName}"
+                  : "$quantity x $normalizedTicketLabel for ${match.matchName}",
+              maxLines: 2,
               style: const TextStyle(
                   fontSize: 12, overflow: TextOverflow.ellipsis),
             ),

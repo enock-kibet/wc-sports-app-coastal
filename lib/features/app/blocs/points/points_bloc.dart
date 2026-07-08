@@ -2,8 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sports_app/data/error/failure.dart';
 import 'package:sports_app/data/models/points/points.dart';
-
 import 'package:sports_app/data/services/service.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../../../localization/app_prefs_manager.dart';
 
@@ -14,13 +14,20 @@ part 'points_bloc.freezed.dart';
 class PointsBloc extends Bloc<PointsEvent, PointsState> {
   late PointsService _pointsService;
 
-  final token = service<AppPreferencesManager>().currentUserValue!.token;
-
   PointsBloc() : super(const PointsState()) {
     _pointsService = service<PointsService>();
 
     on<_PointsFetched>((event, emit) async {
       emit(state.copyWith(status: PointsStatus.loading));
+
+      final currentUser = service<AppPreferencesManager>().currentUserValue;
+      if (currentUser == null) {
+        emit(state.copyWith(
+          status: PointsStatus.failure,
+          failure: Failure(error: "Please sign in to view points."),
+        ));
+        return;
+      }
 
       final results = await Future.wait([
         _pointsService.getPoints(),
@@ -58,8 +65,17 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
     on<_AddPoints>((event, emit) async {
       emit(state.copyWith(status: PointsStatus.loading));
-      final recordResponse =
-          await _pointsService.addPoints(event.request, token!);
+      final currentUser = service<AppPreferencesManager>().currentUserValue;
+      if (currentUser == null) {
+        emit(state.copyWith(
+          status: PointsStatus.failure,
+          failure: Failure(error: "Please sign in to continue."),
+        ));
+        return;
+      }
+      final recordResponse = await _pointsService.addPoints(
+        Map<String, dynamic>.from(event.request as Map),
+      );
       recordResponse.when(onError: (error) {
         emit(state.copyWith(
           status: PointsStatus.failure,
@@ -76,53 +92,41 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
     on<_TransferPoints>((event, emit) async {
       emit(state.copyWith(status: PointsStatus.loading));
+      final currentUser = service<AppPreferencesManager>().currentUserValue;
+      if (currentUser == null) {
+        emit(state.copyWith(
+          status: PointsStatus.failure,
+          failure: Failure(error: "Please sign in to continue."),
+        ));
+        return;
+      }
 
       try {
-        final recordResponse =
-            await _pointsService.transferPoints(event.request, token!);
+        final recordResponse = await _pointsService.transferPoints(
+          Map<String, dynamic>.from(event.request as Map),
+        );
 
         recordResponse.when(
           onError: (error) {
             emit(state.copyWith(
               status: PointsStatus.failure,
-              failure: Failure(
-                error: 'Something went wrong, please try again',
-              ),
+              failure: error,
             ));
           },
           onSuccess: (data) async {
-            // Check that data is not null
-            if (data == null) {
-              emit(state.copyWith(
-                status: PointsStatus.failure,
-                failure:
-                    Failure(error: 'Something went wrong, please try again'),
-              ));
-              return;
-            }
-
-            // Optional: If you expect a Map or List, validate it
-            if (data is Map || data is List) {
-              emit(state.copyWith(
-                status: PointsStatus.success,
-                failure: null,
-              ));
-            } else {
-              emit(state.copyWith(
-                status: PointsStatus.failure,
-                failure:
-                    Failure(error: 'Something went wrong, please try again'),
-              ));
-            }
+            emit(state.copyWith(
+              status: PointsStatus.success,
+              message: data,
+              failure: null,
+            ));
           },
         );
       } catch (e, st) {
-        // Catch unexpected exceptions
+        service<Talker>().error('TransferPoints error: $e', st);
         emit(state.copyWith(
           status: PointsStatus.failure,
           failure: Failure(error: 'Something went wrong, please try again'),
         ));
-        print('TransferPoints error: $e\n$st');
       }
     });
   }

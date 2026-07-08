@@ -6,10 +6,12 @@ import 'package:sports_app/theme/theme.dart';
 
 class NotificationsCard extends StatelessWidget {
   final Notifications notification;
+  final VoidCallback? onTap;
 
   const NotificationsCard({
     super.key,
     required this.notification,
+    this.onTap,
   });
 
   String _formatDate(String date) {
@@ -44,12 +46,7 @@ class NotificationsCard extends StatelessWidget {
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(kSmall * 3),
-          // onTap: () {
-          //   context.pushNamed(
-          //     AppRoute.notifications.name,
-          //     extra: notification,
-          //   );
-          // },
+          onTap: onTap,
           child: Ink(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(kSmall * 3),

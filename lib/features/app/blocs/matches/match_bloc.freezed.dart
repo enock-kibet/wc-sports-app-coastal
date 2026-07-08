@@ -18,7 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$MatchEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() matches,
+    required TResult Function(String? clubId) matches,
     required TResult Function(String? clubId) matchstats,
     required TResult Function(String search) searchMatch,
     required TResult Function(DateTime date) datedMatch,
@@ -27,7 +27,7 @@ mixin _$MatchEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? matches,
+    TResult? Function(String? clubId)? matches,
     TResult? Function(String? clubId)? matchstats,
     TResult? Function(String search)? searchMatch,
     TResult? Function(DateTime date)? datedMatch,
@@ -36,7 +36,7 @@ mixin _$MatchEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? matches,
+    TResult Function(String? clubId)? matches,
     TResult Function(String? clubId)? matchstats,
     TResult Function(String search)? searchMatch,
     TResult Function(DateTime date)? datedMatch,
@@ -97,6 +97,8 @@ abstract class _$$MatchesFetchedImplCopyWith<$Res> {
   factory _$$MatchesFetchedImplCopyWith(_$MatchesFetchedImpl value,
           $Res Function(_$MatchesFetchedImpl) then) =
       __$$MatchesFetchedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String? clubId});
 }
 
 /// @nodoc
@@ -106,55 +108,80 @@ class __$$MatchesFetchedImplCopyWithImpl<$Res>
   __$$MatchesFetchedImplCopyWithImpl(
       _$MatchesFetchedImpl _value, $Res Function(_$MatchesFetchedImpl) _then)
       : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? clubId = freezed,
+  }) {
+    return _then(_$MatchesFetchedImpl(
+      clubId: freezed == clubId
+          ? _value.clubId
+          : clubId // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
 }
 
 /// @nodoc
 
 class _$MatchesFetchedImpl implements _MatchesFetched {
-  const _$MatchesFetchedImpl();
+  const _$MatchesFetchedImpl({this.clubId});
+
+  @override
+  final String? clubId;
 
   @override
   String toString() {
-    return 'MatchEvent.matches()';
+    return 'MatchEvent.matches(clubId: $clubId)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$MatchesFetchedImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$MatchesFetchedImpl &&
+            (identical(other.clubId, clubId) || other.clubId == clubId));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, clubId);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MatchesFetchedImplCopyWith<_$MatchesFetchedImpl> get copyWith =>
+      __$$MatchesFetchedImplCopyWithImpl<_$MatchesFetchedImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() matches,
+    required TResult Function(String? clubId) matches,
     required TResult Function(String? clubId) matchstats,
     required TResult Function(String search) searchMatch,
     required TResult Function(DateTime date) datedMatch,
     required TResult Function(DateTime month) monthMatches,
   }) {
-    return matches();
+    return matches(clubId);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? matches,
+    TResult? Function(String? clubId)? matches,
     TResult? Function(String? clubId)? matchstats,
     TResult? Function(String search)? searchMatch,
     TResult? Function(DateTime date)? datedMatch,
     TResult? Function(DateTime month)? monthMatches,
   }) {
-    return matches?.call();
+    return matches?.call(clubId);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? matches,
+    TResult Function(String? clubId)? matches,
     TResult Function(String? clubId)? matchstats,
     TResult Function(String search)? searchMatch,
     TResult Function(DateTime date)? datedMatch,
@@ -162,7 +189,7 @@ class _$MatchesFetchedImpl implements _MatchesFetched {
     required TResult orElse(),
   }) {
     if (matches != null) {
-      return matches();
+      return matches(clubId);
     }
     return orElse();
   }
@@ -209,7 +236,12 @@ class _$MatchesFetchedImpl implements _MatchesFetched {
 }
 
 abstract class _MatchesFetched implements MatchEvent {
-  const factory _MatchesFetched() = _$MatchesFetchedImpl;
+  const factory _MatchesFetched({final String? clubId}) = _$MatchesFetchedImpl;
+
+  String? get clubId;
+  @JsonKey(ignore: true)
+  _$$MatchesFetchedImplCopyWith<_$MatchesFetchedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -276,7 +308,7 @@ class _$MatchStatsImpl implements _MatchStats {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() matches,
+    required TResult Function(String? clubId) matches,
     required TResult Function(String? clubId) matchstats,
     required TResult Function(String search) searchMatch,
     required TResult Function(DateTime date) datedMatch,
@@ -288,7 +320,7 @@ class _$MatchStatsImpl implements _MatchStats {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? matches,
+    TResult? Function(String? clubId)? matches,
     TResult? Function(String? clubId)? matchstats,
     TResult? Function(String search)? searchMatch,
     TResult? Function(DateTime date)? datedMatch,
@@ -300,7 +332,7 @@ class _$MatchStatsImpl implements _MatchStats {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? matches,
+    TResult Function(String? clubId)? matches,
     TResult Function(String? clubId)? matchstats,
     TResult Function(String search)? searchMatch,
     TResult Function(DateTime date)? datedMatch,
@@ -428,7 +460,7 @@ class _$MatchesSearchedImpl implements _MatchesSearched {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() matches,
+    required TResult Function(String? clubId) matches,
     required TResult Function(String? clubId) matchstats,
     required TResult Function(String search) searchMatch,
     required TResult Function(DateTime date) datedMatch,
@@ -440,7 +472,7 @@ class _$MatchesSearchedImpl implements _MatchesSearched {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? matches,
+    TResult? Function(String? clubId)? matches,
     TResult? Function(String? clubId)? matchstats,
     TResult? Function(String search)? searchMatch,
     TResult? Function(DateTime date)? datedMatch,
@@ -452,7 +484,7 @@ class _$MatchesSearchedImpl implements _MatchesSearched {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? matches,
+    TResult Function(String? clubId)? matches,
     TResult Function(String? clubId)? matchstats,
     TResult Function(String search)? searchMatch,
     TResult Function(DateTime date)? datedMatch,
@@ -580,7 +612,7 @@ class _$MatchesDatedImpl implements _MatchesDated {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() matches,
+    required TResult Function(String? clubId) matches,
     required TResult Function(String? clubId) matchstats,
     required TResult Function(String search) searchMatch,
     required TResult Function(DateTime date) datedMatch,
@@ -592,7 +624,7 @@ class _$MatchesDatedImpl implements _MatchesDated {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? matches,
+    TResult? Function(String? clubId)? matches,
     TResult? Function(String? clubId)? matchstats,
     TResult? Function(String search)? searchMatch,
     TResult? Function(DateTime date)? datedMatch,
@@ -604,7 +636,7 @@ class _$MatchesDatedImpl implements _MatchesDated {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? matches,
+    TResult Function(String? clubId)? matches,
     TResult Function(String? clubId)? matchstats,
     TResult Function(String search)? searchMatch,
     TResult Function(DateTime date)? datedMatch,
@@ -732,7 +764,7 @@ class _$MatchesMonthImpl implements _MatchesMonth {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() matches,
+    required TResult Function(String? clubId) matches,
     required TResult Function(String? clubId) matchstats,
     required TResult Function(String search) searchMatch,
     required TResult Function(DateTime date) datedMatch,
@@ -744,7 +776,7 @@ class _$MatchesMonthImpl implements _MatchesMonth {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? matches,
+    TResult? Function(String? clubId)? matches,
     TResult? Function(String? clubId)? matchstats,
     TResult? Function(String search)? searchMatch,
     TResult? Function(DateTime date)? datedMatch,
@@ -756,7 +788,7 @@ class _$MatchesMonthImpl implements _MatchesMonth {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? matches,
+    TResult Function(String? clubId)? matches,
     TResult Function(String? clubId)? matchstats,
     TResult Function(String search)? searchMatch,
     TResult Function(DateTime date)? datedMatch,

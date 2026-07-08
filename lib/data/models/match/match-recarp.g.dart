@@ -25,6 +25,11 @@ _$MatchModelImpl _$$MatchModelImplFromJson(Map<String, dynamic> json) =>
                   (e) => IntervalScoreModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      playerStatistics: (json['playerStatistics'] as List<dynamic>?)
+              ?.map((e) =>
+                  PlayerBoxScoreModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$MatchModelImplToJson(_$MatchModelImpl instance) =>
@@ -41,6 +46,7 @@ Map<String, dynamic> _$$MatchModelImplToJson(_$MatchModelImpl instance) =>
       'clubTwoScore': instance.clubTwoScore,
       'matchStatus': instance.matchStatus,
       'intervalScores': instance.intervalScores,
+      'playerStatistics': instance.playerStatistics,
     };
 
 _$ClubModelImpl _$$ClubModelImplFromJson(Map<String, dynamic> json) =>
@@ -125,4 +131,59 @@ Map<String, dynamic> _$$IntervalScoreModelImplToJson(
       'homeTeamScore': instance.homeTeamScore,
       'clubTwo': instance.clubTwo,
       'awayTeamScore': instance.awayTeamScore,
+    };
+
+_$PlayerBoxScoreModelImpl _$$PlayerBoxScoreModelImplFromJson(
+        Map<String, dynamic> json) =>
+    _$PlayerBoxScoreModelImpl(
+      playerId: json['playerId'] as String,
+      playerName: json['playerName'] as String,
+      clubId: json['clubId'] as String,
+      clubName: json['clubName'] as String,
+      teamSide: json['teamSide'] as String,
+      isStarter: json['isStarter'] as bool,
+      points: (json['points'] as num?)?.toInt() ?? 0,
+      assists: (json['assists'] as num?)?.toInt() ?? 0,
+      offensiveRebounds: (json['offensiveRebounds'] as num?)?.toInt() ?? 0,
+      defensiveRebounds: (json['defensiveRebounds'] as num?)?.toInt() ?? 0,
+      totalRebounds: (json['totalRebounds'] as num?)?.toInt() ?? 0,
+      steals: (json['steals'] as num?)?.toInt() ?? 0,
+      blocks: (json['blocks'] as num?)?.toInt() ?? 0,
+      turnovers: (json['turnovers'] as num?)?.toInt() ?? 0,
+      personalFouls: (json['personalFouls'] as num?)?.toInt() ?? 0,
+      technicalFouls: (json['technicalFouls'] as num?)?.toInt() ?? 0,
+      fieldGoalsMade: (json['fieldGoalsMade'] as num?)?.toInt() ?? 0,
+      fieldGoalsAttempted: (json['fieldGoalsAttempted'] as num?)?.toInt() ?? 0,
+      freeThrowsMade: (json['freeThrowsMade'] as num?)?.toInt() ?? 0,
+      freeThrowsAttempted: (json['freeThrowsAttempted'] as num?)?.toInt() ?? 0,
+      threePointersMade: (json['threePointersMade'] as num?)?.toInt() ?? 0,
+      threePointersAttempted:
+          (json['threePointersAttempted'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$$PlayerBoxScoreModelImplToJson(
+        _$PlayerBoxScoreModelImpl instance) =>
+    <String, dynamic>{
+      'playerId': instance.playerId,
+      'playerName': instance.playerName,
+      'clubId': instance.clubId,
+      'clubName': instance.clubName,
+      'teamSide': instance.teamSide,
+      'isStarter': instance.isStarter,
+      'points': instance.points,
+      'assists': instance.assists,
+      'offensiveRebounds': instance.offensiveRebounds,
+      'defensiveRebounds': instance.defensiveRebounds,
+      'totalRebounds': instance.totalRebounds,
+      'steals': instance.steals,
+      'blocks': instance.blocks,
+      'turnovers': instance.turnovers,
+      'personalFouls': instance.personalFouls,
+      'technicalFouls': instance.technicalFouls,
+      'fieldGoalsMade': instance.fieldGoalsMade,
+      'fieldGoalsAttempted': instance.fieldGoalsAttempted,
+      'freeThrowsMade': instance.freeThrowsMade,
+      'freeThrowsAttempted': instance.freeThrowsAttempted,
+      'threePointersMade': instance.threePointersMade,
+      'threePointersAttempted': instance.threePointersAttempted,
     };

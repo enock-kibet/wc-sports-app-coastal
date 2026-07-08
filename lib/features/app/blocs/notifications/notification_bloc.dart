@@ -14,13 +14,20 @@ part 'notification_bloc.freezed.dart';
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   late NotificationService _notificationService;
 
-  final token = service<AppPreferencesManager>().currentUserValue!.token;
-
   NotificationBloc() : super(const NotificationState()) {
     _notificationService = service<NotificationService>();
 
     on<_NotificationsFetched>((event, emit) async {
       emit(state.copyWith(status: NotificationStatus.loading));
+      final currentUser = service<AppPreferencesManager>().currentUserValue;
+      if (currentUser == null) {
+        emit(state.copyWith(
+          status: NotificationStatus.failure,
+          failure: Failure(error: "Please sign in to view notifications."),
+        ));
+        return;
+      }
+
       final recordResponse = await _notificationService.getNotifications();
       recordResponse.when(onError: (error) {
         emit(state.copyWith(

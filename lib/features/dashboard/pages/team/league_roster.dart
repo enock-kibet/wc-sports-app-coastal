@@ -89,7 +89,7 @@ String? resolveClubLogoUrl(String? rawImageUrl) {
   final value = rawImageUrl.trim();
   if (value.isEmpty) return null;
 
-  const backendHost = 'https://backend.wencetechnologies.com';
+  const backendHost = 'http://nomasana.local:8080';
 
   if (value.startsWith('http://') || value.startsWith('https://')) {
     return value;

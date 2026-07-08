@@ -10,9 +10,11 @@ import 'package:sports_app/common/extension/extension.dart';
 import 'package:sports_app/common/utils/pull_to_refresh.dart';
 import 'package:sports_app/constants/constants.dart';
 import 'package:sports_app/data/models/match/match.dart';
+import 'package:sports_app/data/models/notifications/notification.dart';
 import 'package:sports_app/data/models/stripe_checkout/stripe_checkout.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/services/service.dart';
+import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/features/app/blocs/matches/match_bloc.dart';
 import 'package:sports_app/features/app/blocs/matches/match_schedule/schedule_bloc.dart';
 import 'package:sports_app/features/app/blocs/notifications/notification_bloc.dart';
@@ -38,7 +40,6 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   late StripeBloc _stripeBloc;
   late TextEditingController searchText;
-  late HideCubit _hideCubit;
   Map<String, dynamic>? user;
   bool loading = false;
   User currentUser = service<AppPreferencesManager>().currentUserValue!;
@@ -79,6 +80,42 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
+  Future<void> _markAllNotificationsRead() async {
+    final result =
+        await service<NotificationService>().markAllNotificationsRead();
+    if (!mounted) return;
+
+    result.when(
+      onError: (error) {
+        SnackbarService.showError(error.error);
+      },
+      onSuccess: (message) async {
+        SnackbarService.showSuccess(message);
+        await _refreshNotifications();
+      },
+    );
+  }
+
+  Future<void> _markNotificationRead(Notifications notification) async {
+    final notificationId = notification.notificationKey.trim();
+    if (notificationId.isEmpty) {
+      return;
+    }
+
+    final result = await service<NotificationService>()
+        .markNotificationRead(notificationId);
+    if (!mounted) return;
+
+    result.when(
+      onError: (error) {
+        SnackbarService.showError(error.error);
+      },
+      onSuccess: (_) async {
+        await _refreshNotifications();
+      },
+    );
+  }
+
   Widget _refreshableMessage(String message) {
     return RefreshIndicator.adaptive(
       onRefresh: _refreshNotifications,
@@ -112,11 +149,14 @@ class _NotificationPageState extends State<NotificationPage> {
                     ? Container()
                     : Align(
                         alignment: Alignment.centerRight,
-                        child: Text(
-                          "Clear All",
-                          style: context.textTheme.headlineSmall?.copyWith(
-                              fontSize: 14,
-                              color: Theme.of(context).colorScheme.onSurface),
+                        child: InkWell(
+                          onTap: _markAllNotificationsRead,
+                          child: Text(
+                            "Clear All",
+                            style: context.textTheme.headlineSmall?.copyWith(
+                                fontSize: 14,
+                                color: Theme.of(context).colorScheme.onSurface),
+                          ),
                         )),
                 Expanded(
                   child: BlocBuilder<NotificationBloc, NotificationState>(
@@ -163,7 +203,12 @@ class _NotificationPageState extends State<NotificationPage> {
                                                 final notification =
                                                     state.notifications[index];
                                                 return NotificationsCard(
-                                                    notification: notification);
+                                                  notification: notification,
+                                                  onTap: () =>
+                                                      _markNotificationRead(
+                                                    notification,
+                                                  ),
+                                                );
                                               },
                                             ),
                                           ],

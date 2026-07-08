@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -14,6 +12,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sports_app/constants/app_config.dart';
 import 'package:sports_app/constants/constants.dart';
 import 'package:sports_app/data/error/error_handler.dart';
 import 'package:sports_app/data/error/failure.dart';
@@ -23,17 +22,18 @@ import 'package:sports_app/data/models/club/club.dart';
 import 'package:sports_app/data/models/match/match-recarp.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/models/multiple_results/multiple_result.dart';
+import 'package:sports_app/data/models/session/auth_session.dart';
+import 'package:sports_app/data/models/session/frontend_context.dart';
 import 'package:sports_app/data/models/points/points.dart';
 import 'package:sports_app/data/models/products/cart.dart';
+import 'package:sports_app/data/models/products/frontend_checkout.dart';
 import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/models/roaster/roaster.dart';
 import 'package:sports_app/data/models/stats/stat.dart';
 import 'package:sports_app/data/models/teamstats/teamstats.dart';
 import 'package:sports_app/data/models/user/user.dart';
 import 'package:sports_app/data/repository/geolocation_repository.dart';
-import 'package:sports_app/localization/app_prefs.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
-import 'package:sports_app/utils/dotted.dart';
 import 'package:talker_dio_logger/talker_dio_logger.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -59,6 +59,7 @@ setUpService() {
       () => AppPreferencesManager());
   service.registerLazySingleton<ProductService>(() => ProductService());
   service.registerLazySingleton<MatchService>(() => MatchService());
+  service.registerLazySingleton<ContextService>(() => ContextService());
   service.registerLazySingleton<StatService>(() => StatService());
   service.registerLazySingleton<RoasterService>(() => RoasterService());
   service.registerLazySingleton<TeamStatsService>(() => TeamStatsService());
@@ -70,6 +71,8 @@ setUpService() {
   service.registerLazySingleton<MediaService>(() => MediaService());
   service.registerLazySingleton<CartService>(() => CartService());
   service.registerLazySingleton<AddressService>(() => AddressService());
+  service.registerLazySingleton<OrderService>(() => OrderService());
+  service.registerLazySingleton<TicketService>(() => TicketService());
   service.registerLazySingleton<PointsService>(() => PointsService());
   service.registerLazySingleton<PickupAddressService>(
       () => PickupAddressService());

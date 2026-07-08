@@ -21,7 +21,9 @@ import 'package:intl/intl.dart';
 import 'package:sports_app/features/app/side_menu_cubit.dart';
 
 class SchedulePage extends StatefulWidget {
-  const SchedulePage({super.key});
+  const SchedulePage({super.key, this.clubId});
+
+  final String? clubId;
 
   @override
   State<SchedulePage> createState() => _SchedulePageState();
@@ -98,8 +100,8 @@ class _SchedulePageState extends State<SchedulePage> {
     return refreshBlocState<MatchState>(
       bloc: bloc,
       dispatch: () {
-        bloc.add(const MatchEvent.matches());
-        bloc.add(const MatchEvent.matchstats());
+        bloc.add(MatchEvent.matches(clubId: widget.clubId));
+        bloc.add(MatchEvent.matchstats(clubId: widget.clubId));
         bloc.add(MatchEvent.monthMatches(month: _focusedDay));
       },
       isLoading: (state) => state.status.isLoading,
@@ -125,7 +127,10 @@ class _SchedulePageState extends State<SchedulePage> {
     // Trigger month load after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final focusedDay = DateTime.now();
-      context.read<MatchBloc>().add(const MatchEvent.matchstats());
+      context.read<MatchBloc>().add(MatchEvent.matches(clubId: widget.clubId));
+      context
+          .read<MatchBloc>()
+          .add(MatchEvent.matchstats(clubId: widget.clubId));
       context.read<MatchBloc>().add(MatchEvent.monthMatches(month: focusedDay));
     });
   }
@@ -352,127 +357,103 @@ class _SchedulePageState extends State<SchedulePage> {
                 ),
 
                 /// Match List
-                BlocBuilder<MatchBloc, MatchState>(
-                  builder: (context, state) {
-                    if (state.status == MatchStatus.loading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (state.status == MatchStatus.failure) {
-                      service<Talker>().error(state.failure!.error);
-                      return RefreshIndicator.adaptive(
-                        onRefresh: _refreshScheduleData,
-                        child: ListView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          children: [
-                            SizedBox(
-                              height: 220,
-                              child: Center(child: Text(state.failure!.error)),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    if (state.status == MatchStatus.success) {
-                      final allMatches = _combinedMatches(state);
-                      List<MatchType> matchesToShow;
-
-                      if (_selectedDay == null) {
-                        final isCurrentMonth =
-                            _focusedDay.month == DateTime.now().month &&
-                                _focusedDay.year == DateTime.now().year;
-
-                        final monthMatches = allMatches
-                            .where((match) =>
-                                _isSameMonth(_focusedDay, match.matchDate))
-                            .toList();
-
-                        if (monthMatches.isEmpty) {
-                          if (isCurrentMonth && !_usedFutureFallback) {
-                            // Fallback (raw matches)
-                            matchesToShow = allMatches;
-                            _usedFutureFallback = true;
-                          } else {
-                            matchesToShow = [];
-                          }
-                        } else {
-                          // monthMatches should be ALL month matches (past + future) for calendar markers
-                          matchesToShow = monthMatches;
-                        }
-                      } else {
-                        // Day view -> show all matches for that day (past allowed)
-                        matchesToShow = allMatches
-                            .where((match) => isSameDay(
-                                  match.matchDate,
-                                  _selectedDay,
-                                ))
-                            .toList();
+                Expanded(
+                  child: BlocBuilder<MatchBloc, MatchState>(
+                    builder: (context, state) {
+                      if (state.status == MatchStatus.loading) {
+                        return const Center(child: CircularProgressIndicator());
                       }
-
-                      // ✅ LIST FILTER RULE:
-                      // - No selected day => Upcoming only
-                      // - Selected day => Show all (past allowed)
-                      // final listMatches = (_selectedDay == null)
-                      //     ? matchesToShow.where((m) => _isUpcoming(m.matchDate)).toList()
-                      //     : List<MatchType>.from(matchesToShow);
-
-                      final listMatches = (_selectedDay == null)
-                          // ✅ Month view: show ALL matches for that month (past + future)
-                          ? List<MatchType>.from(matchesToShow)
-                          // ✅ Day view: show ALL matches for that day (past + future)
-                          : List<MatchType>.from(matchesToShow);
-
-                      listMatches
-                          .sort((a, b) => a.matchDate.compareTo(b.matchDate));
-
-                      String title;
-
-                      final now = DateTime.now();
-                      final isPastMonth = _focusedDay.year < now.year ||
-                          (_focusedDay.year == now.year &&
-                              _focusedDay.month < now.month);
-
-                      if (_selectedDay != null) {
-                        title = "Matches";
-                      } else if (isPastMonth) {
-                        title = "Matches";
-                      } else {
-                        title = "Matches";
-                      }
-
-                      if (listMatches.isEmpty) {
-                        final message = _selectedDay == null
-                            ? "No matches found for this month"
-                            : "No schedules found for this date";
-
-                        return Padding(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: kLarge),
-                          child: RefreshIndicator.adaptive(
-                            onRefresh: _refreshScheduleData,
-                            child: ListView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              children: [
-                                SizedBox(
-                                  height: 220,
-                                  child: Center(
-                                    child: Text(
-                                      message,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: pageTextColor,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                      if (state.status == MatchStatus.failure) {
+                        service<Talker>().error(state.failure!.error);
+                        return RefreshIndicator.adaptive(
+                          onRefresh: _refreshScheduleData,
+                          child: ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            children: [
+                              SizedBox(
+                                height: 220,
+                                child:
+                                    Center(child: Text(state.failure!.error)),
+                              ),
+                            ],
                           ),
                         );
                       }
 
-                      return Expanded(
-                        child: Column(
+                      if (state.status == MatchStatus.success) {
+                        final allMatches = _combinedMatches(state);
+                        List<MatchType> matchesToShow;
+
+                        if (_selectedDay == null) {
+                          final isCurrentMonth =
+                              _focusedDay.month == DateTime.now().month &&
+                                  _focusedDay.year == DateTime.now().year;
+
+                          final monthMatches = allMatches
+                              .where((match) =>
+                                  _isSameMonth(_focusedDay, match.matchDate))
+                              .toList();
+
+                          if (monthMatches.isEmpty) {
+                            if (isCurrentMonth && !_usedFutureFallback) {
+                              matchesToShow = allMatches;
+                              _usedFutureFallback = true;
+                            } else {
+                              matchesToShow = [];
+                            }
+                          } else {
+                            matchesToShow = monthMatches;
+                          }
+                        } else {
+                          matchesToShow = allMatches
+                              .where((match) => isSameDay(
+                                    match.matchDate,
+                                    _selectedDay,
+                                  ))
+                              .toList();
+                        }
+
+                        final listMatches = (_selectedDay == null)
+                            ? List<MatchType>.from(matchesToShow)
+                            : List<MatchType>.from(matchesToShow);
+
+                        listMatches
+                            .sort((a, b) => a.matchDate.compareTo(b.matchDate));
+
+                        const title = "Matches";
+
+                        if (listMatches.isEmpty) {
+                          final message = _selectedDay == null
+                              ? "No matches found for this month"
+                              : "No schedules found for this date";
+
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: kLarge),
+                            child: RefreshIndicator.adaptive(
+                              onRefresh: _refreshScheduleData,
+                              child: ListView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                children: [
+                                  SizedBox(
+                                    height: 220,
+                                    child: Center(
+                                      child: Text(
+                                        message,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: pageTextColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
@@ -498,7 +479,6 @@ class _SchedulePageState extends State<SchedulePage> {
                                         physics:
                                             const AlwaysScrollableScrollPhysics(),
                                         padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
                                         itemCount: listMatches.length,
                                         itemBuilder: (context, index) =>
                                             _buildScheduleMatchTile(
@@ -509,12 +489,12 @@ class _SchedulePageState extends State<SchedulePage> {
                               ),
                             ),
                           ],
-                        ),
-                      );
-                    }
+                        );
+                      }
 
-                    return const SizedBox.shrink();
-                  },
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ),
               ],
             ),

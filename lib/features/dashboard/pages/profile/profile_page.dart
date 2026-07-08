@@ -102,6 +102,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
               ),
               InforCard(
+                image: LucideIcons.ticket,
+                title: "My Tickets",
+                press: () {
+                  context.pushNamed(AppRoute.profileTickets.name);
+                },
+              ),
+              InforCard(
                 image: LucideIcons.moon,
                 title: "Change Theme",
                 press: () {

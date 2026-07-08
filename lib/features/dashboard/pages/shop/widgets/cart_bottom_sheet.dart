@@ -2,13 +2,24 @@ part of "../shop_page.dart";
 
 Future<void> showCartShopBottomSheet(BuildContext context,
     {required PointsState pointsState}) async {
-  final pointsState = context.read<PointsBloc>().state;
+  final parentContext = context;
   final cartBloc = context.read<CartBloc>();
+  final currentUser = service<AppPreferencesManager>().currentUserValue;
+  final userEmail = currentUser?.email.trim();
+
+  if (userEmail == null || userEmail.isEmpty) {
+    SnackbarService.show(
+      'Please sign in to view your cart.',
+      backgroundColor: AppColors.blackColor,
+    );
+    context.go('/signIn');
+    return;
+  }
 
   cartBloc.add(
     CartEvent.getCartItems(
       request: {
-        "email": service<AppPreferencesManager>().currentUserValue!.email,
+        "email": userEmail,
       },
     ),
   );
@@ -44,7 +55,7 @@ Future<void> showCartShopBottomSheet(BuildContext context,
   // Fetch addresses from AddressBloc
   context.read<AddressBloc>().add(
         AddressEvent.getAddresses(request: {
-          "email": service<AppPreferencesManager>().currentUserValue!.email,
+          "email": userEmail,
         }),
       );
 
@@ -58,48 +69,67 @@ Future<void> showCartShopBottomSheet(BuildContext context,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
-    builder: (context) {
-      return BlocConsumer<CartBloc, CartState>(
+    builder: (sheetContext) {
+      return BlocConsumer<ProductBloc, ProductState>(
         listener: (context, state) {
-          if (state.status == CartStatus.processingPayment) {
+          if (state.status == ProductStatus.processingPayment) {
             SnackbarService.show(
               'Securing Payment',
               backgroundColor: AppColors.blackColor,
             );
-            //AnimatedOverlaySnackbar.show(context, "Loading",color:const Color(0xff1976D2));
-          } else if (state.status == CartStatus.successfulPayment) {
-            context.goNamed(
-              AppRoute.paymentWebView.name,
-              extra: state.authorizationUrl,
-            );
-            //AnimatedOverlaySnackbar.show(context, "Success: ${state.authorizationUrl??"didn't get"}",color:const Color(0xff2E7D32));
-          } else if (state.status == CartStatus.failure) {
+            return;
+          }
+
+          if (state.status == ProductStatus.failure) {
             AnimatedOverlaySnackbar.show(
-                context, "failed: ${state.failure?.error ?? "failed"}",
-                color: AppColors.defaultAppRed);
-          } else if (state.status == CartStatus.success) {
-            AnimatedOverlaySnackbar.show(context, "Added to cart successfully",
-                color: AppColors.blackColor);
+              context,
+              state.failure?.error ?? 'Unable to continue checkout.',
+              color: AppColors.defaultAppRed,
+            );
+            return;
           }
+
+          if (state.status != ProductStatus.successfulPayment) {
+            return;
+          }
+
+          final checkout = service<ProductService>().latestCheckoutResult;
+          if (checkout == null) {
+            AnimatedOverlaySnackbar.show(
+              context,
+              'Unable to continue checkout right now.',
+              color: AppColors.defaultAppRed,
+            );
+            return;
+          }
+
+          Navigator.of(sheetContext).pop();
+          handleFrontendCheckoutSuccess(parentContext, checkout);
         },
-        builder: (context, state) {
-          final cartItems = state.cartItems;
-          final isLoading = state.status == CartStatus.loading;
+        builder: (context, productState) {
+          return BlocBuilder<CartBloc, CartState>(
+            builder: (context, state) {
+              final cartItems = state.cartItems;
+              final isLoading = state.status == CartStatus.loading;
 
-          // get addresses from state
+              if (isLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          if (isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          return BlocBuilder<AddressBloc, AddressState>(
-            builder: (context, addressState) {
-              final addresses = addressState.data ?? [];
-              return _ShopCartBottomSheetContent(
-                isLoading: isLoading,
-                cartItems: cartItems,
-                addresses: addresses,
-                pointsState: pointsState,
+              return BlocBuilder<AddressBloc, AddressState>(
+                builder: (context, addressState) {
+                  final addresses = addressState.data;
+                  final pickupAddresses = addressState.pickupAddresses;
+                  return _ShopCartBottomSheetContent(
+                    isLoading: isLoading,
+                    cartItems: cartItems,
+                    addresses: addresses,
+                    pickupAddresses: pickupAddresses,
+                    pointsState: pointsState,
+                    isProcessingCheckout:
+                        productState.status == ProductStatus.processingPayment,
+                  );
+                },
               );
             },
           );
@@ -115,15 +145,19 @@ class _ShopCartBottomSheetContent extends StatefulWidget {
   final bool isLoading;
   final List<CartItem> cartItems;
   final List<Address> addresses;
+  final List<PickupAddress> pickupAddresses;
   final Map<String, double>? priceByProduct;
   final PointsState pointsState;
+  final bool isProcessingCheckout;
 
   const _ShopCartBottomSheetContent({
     super.key,
     required this.isLoading,
     required this.cartItems,
     required this.addresses,
+    required this.pickupAddresses,
     required this.pointsState,
+    required this.isProcessingCheckout,
     this.priceByProduct,
   });
 
@@ -135,10 +169,12 @@ class _ShopCartBottomSheetContent extends StatefulWidget {
 class _ShopCartBottomSheetContentState
     extends State<_ShopCartBottomSheetContent> {
   late List<CartItem> _items;
-  late List<Address> _addresses;
-  late ValueNotifier<bool> usePointsController;
   late TextEditingController pointsController;
+  late TextEditingController promoCodeController;
   String? pointsError;
+  String? promoError;
+  bool _isValidatingPromotion = false;
+  FrontendPromotionValidationResult? _appliedPromotion;
 
   int _selectedTab = 0; // 0 = Delivery, 1 = Pick-Up
 
@@ -146,12 +182,7 @@ class _ShopCartBottomSheetContentState
 
   PickupAddress? _selectedPickupAddressDropdown;
 
-  String? _selected;
-
-  LatLng? _selectedAddressLatLng;
-
   String? _selectedAddress;
-  String? _previewImageUrl;
 
   // Constants
   static const double _defaultPrice = 720.0;
@@ -165,13 +196,14 @@ class _ShopCartBottomSheetContentState
   void initState() {
     super.initState();
     _items = List<CartItem>.from(widget.cartItems);
-    _addresses = List<Address>.from(widget.addresses);
     pointsController = TextEditingController();
+    promoCodeController = TextEditingController();
   }
 
   @override
   void dispose() {
     pointsController.dispose();
+    promoCodeController.dispose();
     super.dispose();
   }
 
@@ -187,6 +219,114 @@ class _ShopCartBottomSheetContentState
       }
     }
     return sum;
+  }
+
+  int get _pointsUsed => int.tryParse(pointsController.text.trim()) ?? 0;
+
+  double get _deliveryFee => _selectedTab == 0 ? 0 : 0;
+
+  double get _promotionDiscount => _appliedPromotion?.discountAmount ?? 0;
+
+  num get _pointsDiscount {
+    final grossAfterPromotion = (_subtotal + _deliveryFee - _promotionDiscount)
+        .clamp(0, double.infinity);
+    final requestedPointsValue = _pointsUsed / 3;
+    if (requestedPointsValue <= 0) {
+      return 0;
+    }
+    return requestedPointsValue > grossAfterPromotion
+        ? grossAfterPromotion
+        : requestedPointsValue;
+  }
+
+  double get _previewTotal {
+    return (_subtotal + _deliveryFee - _promotionDiscount - _pointsDiscount)
+        .clamp(0, double.infinity);
+  }
+
+  void _clearPromotion({bool clearInput = false}) {
+    setState(() {
+      _appliedPromotion = null;
+      promoError = null;
+      if (clearInput) {
+        promoCodeController.clear();
+      }
+    });
+  }
+
+  Future<void> _applyPromotion() async {
+    final code = promoCodeController.text.trim();
+    if (code.isEmpty) {
+      setState(() {
+        promoError = 'Enter a promotion code.';
+      });
+      return;
+    }
+
+    setState(() {
+      _isValidatingPromotion = true;
+      promoError = null;
+    });
+
+    final validation = await service<ProductService>().validatePromotionCode(
+      code: code,
+      amount: _subtotal + _deliveryFee,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    validation.when(
+      onError: (error) {
+        setState(() {
+          _isValidatingPromotion = false;
+          _appliedPromotion = null;
+          promoError = error.error;
+        });
+      },
+      onSuccess: (result) {
+        setState(() {
+          _isValidatingPromotion = false;
+          _appliedPromotion = result;
+          promoError = null;
+          promoCodeController.text = result.code;
+        });
+        SnackbarService.showSuccess('Promotion code applied successfully.');
+      },
+    );
+  }
+
+  Widget _emptySelectorState({
+    required String message,
+    Widget? action,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade400),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            message,
+            style: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.7),
+            ),
+          ),
+        ),
+        if (action != null) ...[
+          const SizedBox(height: 8),
+          action,
+        ],
+      ],
+    );
   }
 
   Future<gmf.LatLng?> getCurrentLatLng() async {
@@ -208,31 +348,6 @@ class _ShopCartBottomSheetContentState
   }
 
   Future<void> _handlePressButton() async {
-    // final result = await showModalBottomSheet<Map<String, dynamic>>(
-    //   context: context,
-    //   isScrollControlled: true,
-    //   shape: const RoundedRectangleBorder(
-    //     borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-    //   ),
-    //   builder: (context) => MapLocationPickerBottomSheet(
-    //     apiKey: kGoogleApiKey,
-    //   ),
-    // );
-    // if (result != null && result["latLng"] != null) {
-    //   final LatLng latLng = result["latLng"];
-    //   final String? address = result["address"];
-    //   setState(() {
-    //     _selectedAddress = address ?? "${latLng.lat},${latLng.lng}";
-    //     _selectedAddressLatLng = latLng;
-    //     _previewImageUrl =
-    //     "https://maps.googleapis.com/maps/api/staticmap"
-    //         "?center=${latLng.lat},${latLng.lng}"
-    //         "&zoom=16"
-    //         "&size=150x150"
-    //         "&markers=color:purple%7C${latLng.lat},${latLng.lng}"
-    //         "&key=$kGoogleApiKey";
-    //   });
-    // }
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -252,8 +367,6 @@ class _ShopCartBottomSheetContentState
               longitude: null,
               isDefault: false,
             );
-            print("Selected20 Address: $_selectedAddress");
-            // You can also store name/phone if needed
           });
         },
       ),
@@ -294,6 +407,8 @@ class _ShopCartBottomSheetContentState
         ..removeAt(vIndex);
 
       setState(() {
+        _appliedPromotion = null;
+        promoError = null;
         if (newVariants.isEmpty) {
           _items.removeAt(pIndex); // remove product entirely
         } else {
@@ -346,6 +461,8 @@ class _ShopCartBottomSheetContentState
       }
 
       setState(() {
+        _appliedPromotion = null;
+        promoError = null;
         _items[pIndex] = product.copyWith(variants: newVariants);
       });
     }
@@ -390,25 +507,12 @@ class _ShopCartBottomSheetContentState
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: product.productImage.isNotEmpty
-                    ? Image.network(
-                        product.productImage,
-                        width: 64,
-                        height: 64,
-                        fit: BoxFit.cover,
-                        errorBuilder: (c, e, s) => Container(
-                          width: 64,
-                          height: 64,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.image_not_supported),
-                        ),
-                      )
-                    : Container(
-                        width: 64,
-                        height: 64,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.image_not_supported),
-                      ),
+                child: ShopProductImage(
+                  imageUrl: product.productImage,
+                  width: 64,
+                  height: 64,
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -495,9 +599,19 @@ class _ShopCartBottomSheetContentState
 
   @override
   Widget build(BuildContext context) {
-    final double deliveryFee = _selectedTab == 0 ? 0 : 0;
     final points = int.tryParse(widget.pointsState.balance) ?? 0;
-    final kshValue = points / 3;
+    final addresses = widget.addresses;
+    final pickupAddresses = widget.pickupAddresses;
+    final selectedAddress = addresses.any(
+      (address) => address.id == _selectedAddressDropdown?.id,
+    )
+        ? _selectedAddressDropdown
+        : null;
+    final selectedPickupAddress = pickupAddresses.any(
+      (address) => address.id == _selectedPickupAddressDropdown?.id,
+    )
+        ? _selectedPickupAddressDropdown
+        : null;
 
     return SafeArea(
       child: DraggableScrollableSheet(
@@ -629,94 +743,31 @@ class _ShopCartBottomSheetContentState
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                BlocBuilder<AddressBloc, AddressState>(
-                                  builder: (context, state) {
-                                    final addresses = state.data ?? [];
-                                    return Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            height: 35,
-                                            child: DropdownSearch<Address>(
-                                              items: (filter,
-                                                      infiniteScrollProps) =>
-                                                  addresses,
-                                              itemAsString: (address) =>
-                                                  address.locality,
-                                              selectedItem:
-                                                  _selectedAddressDropdown ??
-                                                      null,
-                                              compareFn: (a, b) =>
-                                                  a?.id == b?.id,
-                                              decoratorProps:
-                                                  DropDownDecoratorProps(
-                                                decoration: InputDecoration(
-                                                  fillColor: Theme.of(context)
-                                                      .colorScheme
-                                                      .surface,
-                                                  labelText: "Select Address",
-                                                  prefixIcon: const Icon(
-                                                      Icons.location_on,
-                                                      size: 18,
-                                                      color: Colors.purple),
-                                                  suffixIcon: const Icon(
-                                                      Icons.arrow_drop_down,
-                                                      size: 28,
-                                                      color: Colors.purple),
-                                                  border:
-                                                      const OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                12)),
-                                                  ),
-                                                  contentPadding:
-                                                      const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 12,
-                                                          vertical: 8),
-                                                ),
-                                              ),
-                                              popupProps: const PopupProps.menu(
-                                                showSearchBox: false,
-                                                menuProps: MenuProps(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                12)),
-                                                  ),
-                                                ),
-                                              ),
-                                              onChanged: (selectedAddress) {
-                                                debugPrint(
-                                                    "Selected Address ID: ${selectedAddress?.id}");
-                                                debugPrint(
-                                                    "Selected Address Name: ${selectedAddress?.name}");
-                                                setState(() {
-                                                  _selectedAddressDropdown =
-                                                      selectedAddress;
-                                                });
-                                              },
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          GestureDetector(
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (addresses.isEmpty)
+                                        _emptySelectorState(
+                                          message: 'No delivery addresses yet.',
+                                          action: GestureDetector(
                                             onTap: _handlePressButton,
                                             child: const SizedBox(
                                               child: Row(
                                                 children: [
-                                                  Icon(Icons.add,
-                                                      color: Colors.purple,
-                                                      size: 15),
+                                                  Icon(
+                                                    Icons.add,
+                                                    color: Colors.purple,
+                                                    size: 15,
+                                                  ),
                                                   SizedBox(width: 5),
                                                   Text(
                                                     'New delivery address',
                                                     style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w600),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
                                                     maxLines: 2,
                                                     overflow:
                                                         TextOverflow.ellipsis,
@@ -725,10 +776,110 @@ class _ShopCartBottomSheetContentState
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  },
+                                        )
+                                      else
+                                        Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 56,
+                                              child: DropdownSearch<Address>(
+                                                items: (filter,
+                                                        infiniteScrollProps) =>
+                                                    addresses,
+                                                itemAsString: (address) =>
+                                                    address.locality,
+                                                selectedItem: selectedAddress,
+                                                compareFn: (a, b) =>
+                                                    a.id == b.id,
+                                                decoratorProps:
+                                                    DropDownDecoratorProps(
+                                                  decoration: InputDecoration(
+                                                    fillColor: Theme.of(context)
+                                                        .colorScheme
+                                                        .surface,
+                                                    labelText: "Select Address",
+                                                    prefixIcon: const Icon(
+                                                      Icons.location_on,
+                                                      size: 18,
+                                                      color: Colors.purple,
+                                                    ),
+                                                    suffixIcon: const Icon(
+                                                      Icons.arrow_drop_down,
+                                                      size: 28,
+                                                      color: Colors.purple,
+                                                    ),
+                                                    border:
+                                                        const OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(12),
+                                                      ),
+                                                    ),
+                                                    contentPadding:
+                                                        const EdgeInsets
+                                                            .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 8,
+                                                    ),
+                                                  ),
+                                                ),
+                                                popupProps:
+                                                    const PopupProps.menu(
+                                                  showSearchBox: false,
+                                                  menuProps: MenuProps(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(12),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                onChanged: (selectedAddress) {
+                                                  debugPrint(
+                                                    "Selected Address ID: ${selectedAddress?.id}",
+                                                  );
+                                                  debugPrint(
+                                                    "Selected Address Name: ${selectedAddress?.name}",
+                                                  );
+                                                  setState(() {
+                                                    _selectedAddressDropdown =
+                                                        selectedAddress;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            GestureDetector(
+                                              onTap: _handlePressButton,
+                                              child: const SizedBox(
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.add,
+                                                      color: Colors.purple,
+                                                      size: 15,
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                    Text(
+                                                      'New delivery address',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
@@ -759,85 +910,97 @@ class _ShopCartBottomSheetContentState
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                BlocBuilder<AddressBloc, AddressState>(
-                                  builder: (context, state) {
-                                    final pickupAddresses =
-                                        state.pickupAddresses ?? [];
-                                    return Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            height: 35,
-                                            child:
-                                                DropdownSearch<PickupAddress>(
-                                              items: (filter,
-                                                      infiniteScrollProps) =>
-                                                  pickupAddresses,
-                                              itemAsString: (address) =>
-                                                  address.locality,
-                                              selectedItem:
-                                                  _selectedPickupAddressDropdown,
-                                              compareFn: (a, b) => a.id == b.id,
-                                              decoratorProps:
-                                                  DropDownDecoratorProps(
-                                                decoration: InputDecoration(
-                                                  fillColor: Theme.of(context)
-                                                      .colorScheme
-                                                      .surface,
-                                                  labelText:
-                                                      "Select Pickup Location",
-                                                  prefixIcon: const Icon(
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (pickupAddresses.isEmpty)
+                                        _emptySelectorState(
+                                          message:
+                                              'No pickup locations available right now.',
+                                        )
+                                      else
+                                        Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 56,
+                                              child:
+                                                  DropdownSearch<PickupAddress>(
+                                                items: (filter,
+                                                        infiniteScrollProps) =>
+                                                    pickupAddresses,
+                                                itemAsString: (address) =>
+                                                    address.locality,
+                                                selectedItem:
+                                                    selectedPickupAddress,
+                                                compareFn: (a, b) =>
+                                                    a.id == b.id,
+                                                decoratorProps:
+                                                    DropDownDecoratorProps(
+                                                  decoration: InputDecoration(
+                                                    fillColor: Theme.of(context)
+                                                        .colorScheme
+                                                        .surface,
+                                                    labelText:
+                                                        "Select Pickup Location",
+                                                    prefixIcon: const Icon(
                                                       Icons.location_on,
                                                       size: 18,
-                                                      color: Colors.purple),
-                                                  suffixIcon: const Icon(
+                                                      color: Colors.purple,
+                                                    ),
+                                                    suffixIcon: const Icon(
                                                       Icons.arrow_drop_down,
                                                       size: 28,
-                                                      color: Colors.purple),
-                                                  border:
-                                                      const OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                12)),
-                                                  ),
-                                                  contentPadding:
-                                                      const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 12,
-                                                          vertical: 8),
-                                                ),
-                                              ),
-                                              popupProps: const PopupProps.menu(
-                                                showSearchBox: false,
-                                                menuProps: MenuProps(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                12)),
+                                                      color: Colors.purple,
+                                                    ),
+                                                    border:
+                                                        const OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(12),
+                                                      ),
+                                                    ),
+                                                    contentPadding:
+                                                        const EdgeInsets
+                                                            .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 8,
+                                                    ),
                                                   ),
                                                 ),
+                                                popupProps:
+                                                    const PopupProps.menu(
+                                                  showSearchBox: false,
+                                                  menuProps: MenuProps(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(12),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                onChanged: (selectedAddress) {
+                                                  debugPrint(
+                                                    "Selected Address ID: ${_selectedPickupAddressDropdown?.id}",
+                                                  );
+                                                  debugPrint(
+                                                    "Selected Address Name: ${selectedAddress?.name}",
+                                                  );
+                                                  setState(() {
+                                                    _selectedPickupAddressDropdown =
+                                                        selectedAddress;
+                                                  });
+                                                },
                                               ),
-                                              onChanged: (selectedAddress) {
-                                                debugPrint(
-                                                    "Selected Address ID: ${_selectedPickupAddressDropdown?.id}");
-                                                debugPrint(
-                                                    "Selected Address Name: ${selectedAddress?.name}");
-                                                setState(() {
-                                                  _selectedPickupAddressDropdown =
-                                                      selectedAddress;
-                                                });
-                                              },
                                             ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                        ],
-                                      ),
-                                    );
-                                  },
+                                            const SizedBox(height: 8),
+                                          ],
+                                        ),
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
@@ -861,51 +1024,174 @@ class _ShopCartBottomSheetContentState
 
                       const SizedBox(height: 12),
 
-                      Row(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: pointsController,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                labelText: 'Redeem Points',
-                                errorText: pointsError,
-                                border: const OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12)),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 8),
-                              ),
-                              onChanged: (val) {
-                                final int entered = int.tryParse(val) ?? 0;
-                                final int balance = int.tryParse(
-                                        widget.pointsState.balance ?? '0') ??
-                                    0;
-                                setState(() {
-                                  pointsError = entered > balance
-                                      ? 'Insufficient points'
-                                      : null;
-                                });
-                              },
+                          const Text(
+                            'Promotion Code',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: () {
-                              final int balance = int.tryParse(
-                                      widget.pointsState.balance ?? '0') ??
-                                  0;
-                              pointsController.text = balance.toString();
-                              setState(() {
-                                pointsError = null;
-                              });
-                            },
-                            child: const Text('Max'),
+                          const SizedBox(height: 8),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: promoCodeController,
+                                  textCapitalization:
+                                      TextCapitalization.characters,
+                                  decoration: InputDecoration(
+                                    labelText: 'Enter code',
+                                    errorText: promoError,
+                                    border: const OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(12)),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    if (_appliedPromotion != null &&
+                                        value.trim() !=
+                                            _appliedPromotion!.code) {
+                                      setState(() {
+                                        _appliedPromotion = null;
+                                      });
+                                    }
+                                    if (promoError != null) {
+                                      setState(() {
+                                        promoError = null;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              SizedBox(
+                                height: 52,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(0, 52),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                  ),
+                                  onPressed: _isValidatingPromotion
+                                      ? null
+                                      : (_appliedPromotion == null
+                                          ? _applyPromotion
+                                          : () => _clearPromotion(
+                                                clearInput: true,
+                                              )),
+                                  child: Text(
+                                    _isValidatingPromotion
+                                        ? 'Applying...'
+                                        : _appliedPromotion == null
+                                            ? 'Apply'
+                                            : 'Remove',
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
+                          if (_appliedPromotion != null) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest
+                                    .withValues(alpha: 0.35),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${_appliedPromotion!.name} applied. You save $_currency ${_appliedPromotion!.discountAmount.toStringAsFixed(2)}.',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: pointsController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    labelText: 'Redeem Points',
+                                    errorText: pointsError,
+                                    border: const OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(12)),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                  ),
+                                  onChanged: (val) {
+                                    final int entered = int.tryParse(val) ?? 0;
+                                    final int balance = int.tryParse(
+                                            widget.pointsState.balance ??
+                                                '0') ??
+                                        0;
+                                    setState(() {
+                                      if (entered < 0) {
+                                        pointsError =
+                                            'Points cannot be negative';
+                                      } else if (entered > balance) {
+                                        pointsError = 'Insufficient points';
+                                      } else {
+                                        pointsError = null;
+                                      }
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              SizedBox(
+                                height: 52,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(0, 52),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    final int balance = int.tryParse(
+                                            widget.pointsState.balance ??
+                                                '0') ??
+                                        0;
+                                    pointsController.text = balance.toString();
+                                    setState(() {
+                                      pointsError = null;
+                                    });
+                                  },
+                                  child: const Text('Max'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
                           Text(
-                            '≈ Ksh ${((int.tryParse(pointsController.text) ?? 0) / 3).toStringAsFixed(2)}',
+                            '≈ Ksh ${(_pointsUsed / 3).toStringAsFixed(2)}',
                             style: const TextStyle(fontWeight: FontWeight.w500),
                           ),
                         ],
@@ -917,21 +1203,23 @@ class _ShopCartBottomSheetContentState
                       _summaryRow(
                           'Delivery',
                           _selectedTab == 0
-                              ? '$_currency ${deliveryFee.toStringAsFixed(2)}'
+                              ? '$_currency ${_deliveryFee.toStringAsFixed(2)}'
                               : '$_currency 0'),
+                      if (_promotionDiscount > 0)
+                        _summaryRow(
+                          'Promotion Discount',
+                          '- $_currency ${_promotionDiscount.toStringAsFixed(2)}',
+                        ),
+                      if (_pointsDiscount > 0)
+                        _summaryRow(
+                          'Points Discount',
+                          '- $_currency ${_pointsDiscount.toStringAsFixed(2)}',
+                        ),
                       const Divider(),
-                      ValueListenableBuilder(
-                        valueListenable: pointsController,
-                        builder: (context, usePoints, _) {
-                          int pointsUsed =
-                              int.tryParse(pointsController.text) ?? 0;
-                          final totalWithPoints =
-                              _subtotal + deliveryFee - pointsUsed / 3;
-
-                          return _summaryRow('Total',
-                              '$_currency ${totalWithPoints.toStringAsFixed(2)}',
-                              bold: true);
-                        },
+                      _summaryRow(
+                        'Total',
+                        '$_currency ${_previewTotal.toStringAsFixed(2)}',
+                        bold: true,
                       ),
 
                       const SizedBox(height: 20),
@@ -945,8 +1233,13 @@ class _ShopCartBottomSheetContentState
                     width: double.infinity,
                     height: 50,
                     child: GradientFilledButton(
-                        text: 'Checkout',
+                        text: widget.isProcessingCheckout
+                            ? 'Processing...'
+                            : 'Checkout',
                         onPressed: () {
+                          if (widget.isProcessingCheckout) {
+                            return;
+                          }
                           if (_selectedTab == 0 &&
                               _selectedAddressDropdown == null) {
                             SnackbarService.show(
@@ -965,10 +1258,15 @@ class _ShopCartBottomSheetContentState
                             return;
                           }
 
-                          context.pop();
+                          if (pointsError != null) {
+                            SnackbarService.show(
+                              pointsError!,
+                              backgroundColor: AppColors.dangerColor,
+                            );
+                            return;
+                          }
 
-                          final int usedPoints =
-                              int.tryParse(pointsController.text) ?? 0;
+                          final int usedPoints = _pointsUsed;
 
                           context.read<ProductBloc>().add(
                                 ProductEvent.buyBulkProducts(
@@ -986,6 +1284,8 @@ class _ShopCartBottomSheetContentState
                                       });
                                     }).toList(),
                                     "redeemablePoints": usedPoints,
+                                    if (_appliedPromotion != null)
+                                      "promotionCode": _appliedPromotion!.code,
                                   },
                                 ),
                               );

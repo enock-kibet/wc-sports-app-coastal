@@ -2,12 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmf;
 import 'package:geolocator/geolocator.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import 'package:sports_app/features/app/blocs/address/address_bloc.dart';
-import 'package:sports_app/features/dashboard/pages/shop/widgets/place_search_delegate.dart';
 import '../../../../../data/services/service.dart';
 import '../../../../../localization/app_prefs_manager.dart';
 import '../../../../../theme/app_colors.dart';
@@ -33,13 +30,6 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
   final _phoneController = TextEditingController();
   final _countryController = TextEditingController();
   final _cityController = TextEditingController();
-  final _addressController = TextEditingController();
-  bool _isSelectingAddress = false;
-
-  int _queryVersion = 0;
-
-  late FlutterGooglePlacesSdk _places;
-  List<AutocompletePrediction> _predictions = [];
   final _addressSearchController = TextEditingController();
   Map<String, dynamic>? _locationResult;
 
@@ -47,9 +37,17 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
   void initState() {
     super.initState();
     _nameController.text =
-        service<AppPreferencesManager>().currentUserValue!.name;
+        service<AppPreferencesManager>().currentUserValue?.name ?? '';
+  }
 
-    _places = FlutterGooglePlacesSdk(widget.apiKey);
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _countryController.dispose();
+    _cityController.dispose();
+    _addressSearchController.dispose();
+    super.dispose();
   }
 
   Future<gmf.LatLng?> getCurrentLatLng() async {
@@ -84,24 +82,8 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
     if (result != null) {
       setState(() {
         _locationResult = result;
-      });
-    }
-  }
-
-  void _pickLocadtion() async {
-    final places = FlutterGooglePlacesSdk(widget.apiKey);
-
-    final result = await showSearch(
-      context: context,
-      delegate: PlaceSearchDelegate(places),
-    );
-
-    if (result != null) {
-      setState(() {
-        _locationResult = {
-          "address": result["address"],
-          "latLng": gmf.LatLng(result["lat"], result["lng"]),
-        };
+        _addressSearchController.text =
+            (result["address"] ?? '').toString().trim();
       });
     }
   }
@@ -109,64 +91,65 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
   // default address checkbox functionality
   bool _isDefaultAddress = true;
 
-  void _submit() {
-    if (_locationResult != null &&
-        _nameController.text.isNotEmpty &&
-        _phoneController.text.isNotEmpty) {
-      // check if fields are filled
-      if (_nameController.text.isEmpty ||
-          _phoneController.text.isEmpty ||
-          _countryController.text.isEmpty ||
-          _cityController.text.isEmpty ||
-          _locationResult!["address"].isEmpty) {
-        AnimatedOverlaySnackbar.show(context, "Please fill all fields",
-            color: AppColors.defaultAppRed);
-        return;
-      }
+  Future<void> _submit() async {
+    final manualAddress = _addressSearchController.text.trim();
+    final latLng = _locationResult?["latLng"] as gmf.LatLng?;
 
-      // submit the address details
-      context.read<AddressBloc>().add(
-            AddressEvent.addAddress(request: {
-              "fullName": _nameController.text,
-              "line1": _locationResult!["address"],
-              "city": _cityController.text,
-              "country": _countryController.text,
-              "phone": _phoneController.text,
-              "latitude": _locationResult!["latLng"].latitude,
-              "longitude": _locationResult!["latLng"].longitude,
-              "isDefault": _isDefaultAddress,
-            }),
-          );
+    if (_nameController.text.isEmpty ||
+        _phoneController.text.isEmpty ||
+        _countryController.text.isEmpty ||
+        _cityController.text.isEmpty ||
+        manualAddress.isEmpty) {
+      AnimatedOverlaySnackbar.show(context, "Please fill all fields",
+          color: AppColors.defaultAppRed);
+      return;
+    }
 
-      // get address id from the state
-      final addressState = context.read<AddressBloc>().state;
-      if (addressState.status == AddressStatus.success) {
-        // final addressId = addressState.data.last.id; // Assuming the last added address is the one we just added
-        final addressId = addressState.addressId;
+    final bloc = context.read<AddressBloc>();
+    bloc.add(
+      AddressEvent.addAddress(request: {
+        "fullName": _nameController.text,
+        "line1": manualAddress,
+        "city": _cityController.text,
+        "country": _countryController.text,
+        "phone": _phoneController.text,
+        "latitude": latLng?.latitude,
+        "longitude": latLng?.longitude,
+        "isDefault": _isDefaultAddress,
+      }),
+    );
 
-        print("Address8 States: ${_locationResult!["address"]}");
-        widget.onAddressSelected({
-          "id": addressId,
-          "name": _nameController.text,
-          "phone": _phoneController.text,
-          "latLng": _locationResult!["latLng"],
-          "latitude": _locationResult!["latLng"].latitude,
-          "longitude": _locationResult!["latLng"].longitude,
-          "address": _locationResult!["address"],
-          "default": _isDefaultAddress,
-        });
+    final addressState = await bloc.stream.firstWhere(
+      (state) =>
+          state.status == AddressStatus.success ||
+          state.status == AddressStatus.failure,
+    );
 
-        print("Address8 States: ${_locationResult!["address"]}");
-        AnimatedOverlaySnackbar.show(context, "Address added successfully",
-            color: AppColors.darkColor);
-      } else {
-        AnimatedOverlaySnackbar.show(
-            context, "Failed to add address: ${addressState.failure?.error}",
-            color: AppColors.defaultAppRed);
-        return;
-      }
+    if (!mounted) return;
 
+    if (addressState.status == AddressStatus.success) {
+      final addressId = addressState.addressId;
+
+      widget.onAddressSelected({
+        "id": addressId,
+        "name": _nameController.text,
+        "phone": _phoneController.text,
+        "latLng": latLng,
+        "latitude": latLng?.latitude,
+        "longitude": latLng?.longitude,
+        "address": manualAddress,
+        "city": _cityController.text,
+        "country": _countryController.text,
+        "default": _isDefaultAddress,
+      });
+
+      AnimatedOverlaySnackbar.show(context, "Address added successfully",
+          color: AppColors.darkColor);
       Navigator.of(context).pop();
+    } else {
+      AnimatedOverlaySnackbar.show(
+          context, "Failed to add address: ${addressState.failure?.error}",
+          color: AppColors.defaultAppRed);
     }
   }
 
@@ -250,115 +233,29 @@ class _AddressFormBottomSheetState extends State<AddressFormBottomSheet> {
                 ),
               ),
               const SizedBox(height: 18),
-              GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).unfocus();
-                  setState(() {
-                    _predictions.clear();
-                  });
-                },
-                child: SizedBox(
-                  height: 150, // enough space for field + dropdown
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      // ✅ Address Input (Always on top)
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: TextField(
-                          controller: _addressSearchController,
-                          decoration: const InputDecoration(
-                            labelText: "Delivery Address",
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 12),
-                            border: InputBorder.none,
-                          ),
-                          onChanged: (value) async {
-                            if (_isSelectingAddress) return;
-                            if (value.isEmpty) {
-                              setState(() => _predictions.clear());
-                              return;
-                            }
-
-                            final currentVersion = ++_queryVersion;
-
-                            final res = await _places
-                                .findAutocompletePredictions(value);
-
-                            if (!_isSelectingAddress &&
-                                currentVersion == _queryVersion) {
-                              setState(() {
-                                _predictions =
-                                    List<AutocompletePrediction>.from(
-                                        res.predictions);
-                              });
-                            }
-                          },
-                        ),
-                      ),
-
-                      // ✅ AUTOCOMPLETE DROPDOWN (Z-INDEX ABOVE EVERYTHING)
-                      if (_predictions.isNotEmpty)
-                        Positioned(
-                          top: 55, // directly below the input
-                          left: 0,
-                          right: 0,
-                          child: Material(
-                            elevation: 6, // 👈 gives true Z depth
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: ListView.builder(
-                                padding: EdgeInsets.zero,
-                                itemCount: _predictions.length,
-                                itemBuilder: (context, index) {
-                                  final p = _predictions[index];
-
-                                  return ListTile(
-                                    title: Text(p.fullText),
-                                    onTap: () async {
-                                      _isSelectingAddress = true;
-                                      final details = await _places.fetchPlace(
-                                        p.placeId,
-                                        fields: [
-                                          PlaceField.Location,
-                                          PlaceField.Address,
-                                        ],
-                                      );
-
-                                      final place = details.place!;
-                                      final loc = place.latLng!;
-
-                                      setState(() {
-                                        _locationResult = {
-                                          "address": place.address,
-                                          "latLng":
-                                              gmf.LatLng(loc.lat, loc.lng),
-                                        };
-
-                                        _addressSearchController.text =
-                                            place.address ?? "";
-
-                                        _predictions.clear();
-                                      });
-                                      FocusScope.of(context).unfocus();
-
-                                      _isSelectingAddress = false;
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: TextField(
+                  controller: _addressSearchController,
+                  decoration: const InputDecoration(
+                    labelText: "Delivery Address",
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    border: InputBorder.none,
                   ),
+                  keyboardType: TextInputType.streetAddress,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: _pickLocation,
+                  icon: const Icon(Icons.map_outlined),
+                  label: const Text('Pick on map'),
                 ),
               ),
 

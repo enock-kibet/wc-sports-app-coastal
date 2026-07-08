@@ -61,8 +61,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
     on<_ProductRemoveCart>((event, emit) async {
       emit(state.copyWith(status: ProductStatus.loading));
-      final recordResponse =
-      await _productService.removeCart(event.request);
+      final recordResponse = await _productService.removeCart(event.request);
       recordResponse.when(onError: (error) {
         emit(state.copyWith(
           status: ProductStatus.failure,
@@ -79,8 +78,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
     on<_ProductClearCart>((event, emit) async {
       emit(state.copyWith(status: ProductStatus.loading));
-      final recordResponse =
-      await _productService.clearCart(event.request);
+      final recordResponse = await _productService.clearCart(event.request);
       recordResponse.when(onError: (error) {
         emit(state.copyWith(
           status: ProductStatus.failure,
@@ -95,11 +93,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       });
     });
 
-
     on<_ProductsBulkPurchase>((event, emit) async {
-      emit(state.copyWith(status: ProductStatus.processingPayment));
+      emit(state.copyWith(
+        status: ProductStatus.processingPayment,
+        authorizationUrl: null,
+        message: null,
+        failure: null,
+      ));
       final recordResponse =
-      await _productService.productsPayment(event.request);
+          await _productService.productsPayment(event.request);
       recordResponse.when(onError: (error) {
         emit(state.copyWith(
           status: ProductStatus.failure,
@@ -108,14 +110,20 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       }, onSuccess: (data) async {
         emit(state.copyWith(
           status: ProductStatus.successfulPayment,
-          authorizationUrl: data,
+          authorizationUrl: data.authorizationUrl,
+          message: data.orderNumber,
           failure: null,
         ));
       });
     });
 
     on<_ProductsPurchase>((event, emit) async {
-      emit(state.copyWith(status: ProductStatus.processingPayment));
+      emit(state.copyWith(
+        status: ProductStatus.processingPayment,
+        authorizationUrl: null,
+        message: null,
+        failure: null,
+      ));
       final recordResponse =
           await _productService.productPayment(event.request);
       recordResponse.when(onError: (error) {
@@ -126,7 +134,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       }, onSuccess: (data) async {
         emit(state.copyWith(
           status: ProductStatus.successfulPayment,
-          authorizationUrl: data,
+          authorizationUrl: data.authorizationUrl,
+          message: data.orderNumber,
           failure: null,
         ));
       });

@@ -4,6 +4,36 @@ class ScheduledTiles extends StatelessWidget {
   final MatchType match;
   const ScheduledTiles({required this.match, super.key});
 
+  void _openMatchDetails(BuildContext context) {
+    final isGuest = service<AppPreferencesManager>().currentUserValue == null;
+    if (isGuest) {
+      context.go('/signIn');
+      return;
+    }
+    context.pushNamed(AppRoute.matchDetails.name, extra: match);
+  }
+
+  Future<void> _handleBuyTicketTap(BuildContext context) async {
+    final isGuest = service<AppPreferencesManager>().currentUserValue == null;
+    if (isGuest) {
+      context.go('/signIn');
+      return;
+    }
+
+    final response =
+        await service<ProductService>().getPreferredTicketType(match.matchId);
+    if (!context.mounted) return;
+
+    response.when(
+      onError: (error) {
+        SnackbarService.showError(error.error);
+      },
+      onSuccess: (_) {
+        context.pushNamed(AppRoute.matchDetails.name, extra: match);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -20,15 +50,7 @@ class ScheduledTiles extends StatelessWidget {
     final secondaryTextColor = colorScheme.onSurface.withOpacity(0.7);
 
     return GestureDetector(
-      onTap: () {
-        final isGuest = service<AppPreferencesManager>().currentUserValue ==
-            null;
-        if (isGuest) {
-          context.go('/signIn');
-          return;
-        }
-        context.pushNamed(AppRoute.matchDetails.name, extra: match);
-      },
+      onTap: () => _openMatchDetails(context),
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(8),
@@ -115,7 +137,11 @@ class ScheduledTiles extends StatelessWidget {
                 _buildTeamsColumn(match, theme),
                 SizedBox(
                   width: 102,
-                  child: CustomisableFilledButton("Buy Ticket", true, 48, 12),
+                  child: GestureDetector(
+                    onTap: () => _handleBuyTicketTap(context),
+                    child:
+                        CustomisableFilledButton("Buy Ticket", true, 48, 12),
+                  ),
                 ),
               ],
             ),

@@ -246,12 +246,14 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
                                 await googleSignIn.signIn();
 
                             if (googleUser != null) {
+                              final auth = await googleUser.authentication;
+                              final accessToken = auth.accessToken;
+                              if (accessToken == null || accessToken.isEmpty) {
+                                throw Exception("Missing Google access token");
+                              }
+
                               authBloc.add(AuthEvent.googlelogin(request: {
-                                "name": googleUser.displayName,
-                                "email": googleUser.email,
-                                "googleId": googleUser.id,
-                                "picture": googleUser.photoUrl,
-                                "clubid": club.id,
+                                "access_token": accessToken,
                               }));
                             } else {
                               print("Google Sign-In canceled by user.");
@@ -419,11 +421,12 @@ class _LoginPageState extends State<LoginPage> with InputValidationMixin {
 
       authBloc.add(
         AuthEvent.appleLogin(request: {
-          "appleId": appleId,
           if (storedEmail != null) "email": storedEmail,
+          "first_name": credential.givenName,
+          "last_name": credential.familyName,
           if (storedName != null) "name": storedName,
           "identityToken": identityToken,
-          "clubid": club.id,
+          "authorizationCode": credential.authorizationCode,
         }),
       );
     } catch (e) {
