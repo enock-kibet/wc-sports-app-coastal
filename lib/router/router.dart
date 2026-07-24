@@ -9,10 +9,10 @@ import 'package:sports_app/data/models/match/match-recarp.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/models/products/product.dart';
 import 'package:sports_app/data/models/roaster/roaster.dart';
-
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/club/club_bloc.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
+import 'package:sports_app/features/app/blocs/products/product_bloc.dart';
 import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/features/auth/onboarding.dart';
 import 'package:sports_app/features/auth/otp_page.dart';
@@ -108,6 +108,120 @@ final RouteObserver<ModalRoute<void>> routeObserver =
 final RouteObserver<ModalRoute<void>> routeObserverB =
     RouteObserver<ModalRoute<void>>();
 
+Product? _productFromExtra(dynamic extra) {
+  if (extra is Product) {
+    return extra;
+  }
+
+  if (extra is Map<String, dynamic>) {
+    return Product.fromJson(Map<String, Object?>.from(extra));
+  }
+
+  if (extra is Map) {
+    return Product.fromJson(
+      Map<String, Object?>.from(extra.map(
+        (key, value) => MapEntry(key.toString(), value),
+      )),
+    );
+  }
+
+  return null;
+}
+
+Product? _productFromList(List<Product> products, String productId) {
+  final trimmedId = productId.trim();
+  if (trimmedId.isEmpty) {
+    return null;
+  }
+
+  for (final product in products) {
+    if (product.id == trimmedId) {
+      return product;
+    }
+  }
+
+  return null;
+}
+
+class _ShopDetailsRoutePage extends StatefulWidget {
+  const _ShopDetailsRoutePage({
+    required this.productId,
+    this.initialProduct,
+  });
+
+  final String productId;
+  final Product? initialProduct;
+
+  @override
+  State<_ShopDetailsRoutePage> createState() => _ShopDetailsRoutePageState();
+}
+
+class _ShopDetailsRoutePageState extends State<_ShopDetailsRoutePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+
+      final bloc = context.read<ProductBloc>();
+      final hasProductInState =
+          _productFromList(bloc.state.products, widget.productId) != null;
+      if (!hasProductInState && !bloc.state.status.isLoading) {
+        bloc.add(const ProductEvent.products());
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProductBloc, ProductState>(
+      builder: (context, state) {
+        final productFromState =
+            _productFromList(state.products, widget.productId);
+        final initialProduct = widget.initialProduct;
+        final product = productFromState ??
+            (initialProduct?.id == widget.productId ? initialProduct : null);
+
+        if (product != null) {
+          return ShopDetailsPage(
+            key: ValueKey(product.id),
+            product: product,
+          );
+        }
+
+        if (state.status.isInitial || state.status.isLoading) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final message = state.status.isFailure
+            ? (state.failure?.error.isNotEmpty == true
+                ? state.failure!.error
+                : 'Unable to load this product right now.')
+            : 'This product could not be found.';
+
+        return Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                message,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: "/splash",
@@ -192,8 +306,8 @@ final router = GoRouter(
       path: "/splash",
       name: AppRoute.splash.name,
       pageBuilder: (context, state) {
-        return MaterialPage(
-          child: const SplashScreen(),
+        return const MaterialPage(
+          child: SplashScreen(),
         );
       },
     ),
@@ -289,18 +403,23 @@ final router = GoRouter(
                 },
                 routes: [
                   GoRoute(
-                      path: "shopdetails",
+                      path: "shopdetails/:productId",
                       parentNavigatorKey: rootNavigatorKey,
                       name: AppRoute.shopDetails.name,
                       pageBuilder: (context, state) {
+                        final product = _productFromExtra(state.extra);
+                        final productId = state.pathParameters['productId'] ??
+                            product?.id ??
+                            '';
                         return MaterialPage(
-                          child: ShopDetailsPage(
-                            product: state.extra as Product,
-                            key: state.pageKey,
+                          key: state.pageKey,
+                          child: _ShopDetailsRoutePage(
+                            productId: productId,
+                            initialProduct: product,
                           ),
                         );
                       },
-                      routes: []),
+                      routes: const []),
                   GoRoute(
                     path: "paymentWebView",
                     name: AppRoute.paymentWebView.name,
@@ -386,7 +505,7 @@ final router = GoRouter(
                         key: state.pageKey,
                         child: BlocProvider(
                           create: (context) => PointsBloc(),
-                          child: PointsPage(),
+                          child: const PointsPage(),
                         ),
                       );
                     },

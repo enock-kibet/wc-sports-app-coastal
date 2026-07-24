@@ -101,7 +101,7 @@ class WCNotificationService {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://nomasana.local:8080/api/v1/frontend/notifications/devices'),
+            'https://coastal-kings.wencetechnologies.com/api/v1/frontend/notifications/devices'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',

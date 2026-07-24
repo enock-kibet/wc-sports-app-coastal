@@ -89,7 +89,7 @@ String? resolveClubLogoUrl(String? rawImageUrl) {
   final value = rawImageUrl.trim();
   if (value.isEmpty) return null;
 
-  const backendHost = 'http://nomasana.local:8080';
+  const backendHost = 'https://coastal-kings.wencetechnologies.com';
 
   if (value.startsWith('http://') || value.startsWith('https://')) {
     return value;

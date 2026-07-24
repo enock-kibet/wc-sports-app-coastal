@@ -121,7 +121,7 @@ class _BaseScreenState extends State<BaseScreen> {
                               context.pop();
                             },
                             child: RowIconButton(
-                                Icons.arrow_circle_up_outlined, "Standings"),
+                                Icons.arrow_circle_up_outlined, "Team"),
                           ),
                           const SizedBox(
                             height: kLarge,
@@ -134,7 +134,7 @@ class _BaseScreenState extends State<BaseScreen> {
                               context.pop();
                             },
                             child: RowIconButton(
-                                Icons.perm_media_outlined, "League Media"),
+                                Icons.perm_media_outlined, "Team Media"),
                           ),
                           const SizedBox(
                             height: kLarge,
@@ -242,7 +242,7 @@ class _BaseScreenState extends State<BaseScreen> {
                               .withOpacity(1)
                           : AppColors.greyColor,
                     ),
-                    label: 'League'),
+                    label: 'Team'),
                 BottomNavigationBarItem(
                   icon: SvgPicture.asset(
                     widget.navigationShell.currentIndex == 4

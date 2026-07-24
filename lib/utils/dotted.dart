@@ -61,7 +61,7 @@ extension StringCasingExtension on String {
 String replaceDomain(String url) {
   // Old and new domain
   const oldDomain = 'https://srv19716098.ultasrv.net';
-  const newDomain = 'http://nomasana.local:8080';
+  const newDomain = 'https://coastal-kings.wencetechnologies.com';
 
   // Check if the URL starts with the old domain
   if (url.startsWith(oldDomain)) {
@@ -76,7 +76,7 @@ String replaceDomain(String url) {
 String addDomain(String url) {
   // Old and new domain
   const oldDomain = 'https://srv19716098.ultasrv.net';
-  const newDomain = 'http://nomasana.local:8080';
+  const newDomain = 'https://coastal-kings.wencetechnologies.com';
   const uploadThingDomain = 'https://utfs';
 
   // Check if the URL starts with the old domain

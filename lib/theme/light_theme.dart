@@ -4,35 +4,43 @@ import 'package:sports_app/utils/utils.dart';
 
 import 'app_colors.dart';
 
-final ColorScheme _lightScheme = ColorScheme.fromSeed(
-  seedColor: AppColors.primaryColor,
-  brightness: Brightness.light,
-).copyWith(
-  primary: AppColors.primaryColor,
-  onPrimary: AppColors.darkColor,
-  onPrimaryContainer: AppColors.darkColor,
-  secondary: const Color(0xFF7D8AA3),
-  surface: const Color(0xFFFFFFFF),
-  onSurface: const Color(0xFF1B1F28),
-  error: AppColors.dangerColor,
-);
+ThemeData buildLightTheme() {
+  return _buildTheme(
+    _buildColorScheme(
+      brightness: Brightness.light,
+      primaryColor: AppColors.primaryColor,
+    ),
+  );
+}
 
-final ColorScheme _darkScheme = ColorScheme.fromSeed(
-  seedColor: AppColors.primaryColor,
-  brightness: Brightness.dark,
-).copyWith(
-  primary: AppColors.primaryColor,
-  onPrimary: AppColors.darkColor,
-  onPrimaryContainer: AppColors.darkColor,
-  secondary: const Color(0xFF9AA7BF),
-  surface: const Color(0xFF151824),
-  onSurface: const Color(0xFFF5F7FB),
-  error: AppColors.dangerColor,
-);
+ThemeData buildDarkTheme() {
+  return _buildTheme(
+    _buildColorScheme(
+      brightness: Brightness.dark,
+      primaryColor: AppColors.primaryColor,
+    ),
+  );
+}
 
-ThemeData lightMode = _buildTheme(_lightScheme);
+ColorScheme _buildColorScheme({
+  required Brightness brightness,
+  required Color primaryColor,
+}) {
+  final isDark = brightness == Brightness.dark;
 
-ThemeData darkMode = _buildTheme(_darkScheme);
+  return ColorScheme.fromSeed(
+    seedColor: primaryColor,
+    brightness: brightness,
+  ).copyWith(
+    primary: primaryColor,
+    onPrimary: AppColors.darkColor,
+    onPrimaryContainer: AppColors.darkColor,
+    secondary: isDark ? const Color(0xFF9AA7BF) : const Color(0xFF7D8AA3),
+    surface: isDark ? const Color(0xFF151824) : const Color(0xFFFFFFFF),
+    onSurface: isDark ? const Color(0xFFF5F7FB) : const Color(0xFF1B1F28),
+    error: AppColors.dangerColor,
+  );
+}
 
 ThemeData _buildTheme(ColorScheme colorScheme) {
   final isDark = colorScheme.brightness == Brightness.dark;
@@ -178,4 +186,4 @@ ThemeData _buildTheme(ColorScheme colorScheme) {
   );
 }
 
-ThemeData systemMode = lightMode;
+ThemeData buildSystemTheme() => buildLightTheme();

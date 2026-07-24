@@ -199,7 +199,7 @@ class CustomIconButton extends StatelessWidget {
 class GradientFilledButton extends StatelessWidget {
   final String text;
   final double radius;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   const GradientFilledButton({
     super.key,
@@ -210,13 +210,18 @@ class GradientFilledButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isEnabled = onPressed != null;
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.defaultAppRed, AppColors.defaultAppPurple],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: isEnabled
+            ? LinearGradient(
+                colors: [AppColors.defaultAppRed, AppColors.defaultAppPurple],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+        color: isEnabled ? null : AppColors.greyColor.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(radius),
       ),
       child: FilledButton(
@@ -228,14 +233,19 @@ class GradientFilledButton extends StatelessWidget {
           backgroundColor:
               Colors.transparent, // Needed for gradient to be visible
           minimumSize: const Size(double.infinity, 30),
-          overlayColor: Colors.white.withOpacity(1),
+          overlayColor: Colors.white.withValues(alpha: 1),
           splashFactory: InkSparkle.splashFactory,
           shadowColor: Colors.transparent, // Removes unwanted shadow
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         ),
         child: Text(
           text,
-          style: TextStyle(fontSize: 16, color: AppColors.darkColor),
+          style: TextStyle(
+            fontSize: 16,
+            color: isEnabled
+                ? AppColors.whiteColor
+                : AppColors.whiteColor.withValues(alpha: 0.8),
+          ),
         ),
       ),
     );

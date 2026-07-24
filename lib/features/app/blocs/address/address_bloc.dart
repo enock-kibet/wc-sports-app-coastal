@@ -3,6 +3,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sports_app/data/error/failure.dart';
 import 'package:sports_app/data/models/addresses/address.dart';
 import 'package:sports_app/data/models/addresses/pickupaddress.dart';
+import 'package:sports_app/data/models/multiple_results/multiple_result.dart'
+    as result_model;
 
 import 'package:sports_app/data/services/service.dart';
 
@@ -25,7 +27,7 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
           status: AddressStatus.failure,
           failure: error,
         ));
-      }, onSuccess: (data) async {
+      }, onSuccess: (data) {
         emit(state.copyWith(
           status: AddressStatus.success,
           data: data,
@@ -37,18 +39,35 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
     on<_AddressAdd>((event, emit) async {
       emit(state.copyWith(status: AddressStatus.loading));
       final recordResponse = await _addressService.addNewAddress(event.request);
-      recordResponse.when(onError: (error) {
+      if (recordResponse is result_model.Error<String>) {
         emit(state.copyWith(
           status: AddressStatus.failure,
-          failure: error,
+          failure: recordResponse.error,
         ));
-      }, onSuccess: (data) async {
+        return;
+      }
+
+      final addressId = (recordResponse as result_model.Success<String>).data;
+      final addressesResponse = await _addressService.getAddresses();
+      if (emit.isDone) {
+        return;
+      }
+
+      if (addressesResponse is result_model.Success<List<Address>>) {
         emit(state.copyWith(
           status: AddressStatus.success,
-          addressId: data,
+          addressId: addressId,
+          data: addressesResponse.data,
           failure: null,
         ));
-      });
+        return;
+      }
+
+      emit(state.copyWith(
+        status: AddressStatus.success,
+        addressId: addressId,
+        failure: null,
+      ));
     });
 
     on<_PickupAddressFetch>((event, emit) async {
@@ -59,7 +78,7 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
           status: AddressStatus.failure,
           failure: error,
         ));
-      }, onSuccess: (data) async {
+      }, onSuccess: (data) {
         emit(state.copyWith(
           status: AddressStatus.success,
           pickupAddresses: data,

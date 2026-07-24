@@ -22,6 +22,7 @@ class AppPreferencesManager {
   AppPreferencesManager._internal();
 
   final _controller = StreamController<AuthenticationStatus>.broadcast();
+  final _contextController = StreamController<FrontendContextData?>.broadcast();
 
   late AppPreferences _prefs;
 
@@ -40,6 +41,7 @@ class AppPreferencesManager {
     // Load and cache data from SharedPreferences
     _currentUser = await _prefs.getUserData();
     _currentContext = await _prefs.getFrontendContext();
+    _contextController.add(_currentContext);
 
     _status = firstTimerun
         ? AuthenticationStatus.firstTime
@@ -67,6 +69,10 @@ class AppPreferencesManager {
   FrontendContextData? get currentContextValue => _currentContext;
   AuthenticationStatus get currentAuthStateValue => _status;
   bool get hasSkippedLogin => _hasSkippedLogin;
+  Stream<FrontendContextData?> get contextStream async* {
+    yield _currentContext;
+    yield* _contextController.stream;
+  }
 
   // Save a value and update the cache
   Future<void> saveValue(User user) async {
@@ -101,6 +107,7 @@ class AppPreferencesManager {
   Future<void> saveFrontendContext(FrontendContextData context) async {
     await _prefs.storeFrontendContext(context);
     _currentContext = await _prefs.getFrontendContext();
+    _contextController.add(_currentContext);
     _controller.add(_status);
   }
 
@@ -183,6 +190,7 @@ class AppPreferencesManager {
     await removeTokenExpiry();
     _currentUser = await _prefs.getUserData();
     _currentContext = await _prefs.getFrontendContext();
+    _contextController.add(_currentContext);
     _status = _verificationStatus(_currentUser);
     _controller.add(_status);
   }

@@ -1,6 +1,6 @@
 {
-    "name": "sports_app",
-    "short_name": "sports_app",
+    "name": "Coastal Kings",
+    "short_name": "Coastal Kings",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

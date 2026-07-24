@@ -16,27 +16,150 @@ class TeamPage extends StatefulWidget {
 
 class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
   late TabController tabController;
+  ClubRoasterData? _resolvedSelectedClub;
+  bool _isResolvingDefaultClub = false;
   int _statsRefreshTick = 0;
+
+  ClubRoasterData? get _effectiveSelectedClub =>
+      widget.selectedClub ?? _resolvedSelectedClub;
 
   @override
   void initState() {
-    tabController = TabController(initialIndex: 2, length: 3, vsync: this);
     super.initState();
+    tabController = TabController(
+      initialIndex: widget.selectedClub == null ? 2 : 0,
+      length: 3,
+      vsync: this,
+    );
     tabController.addListener(_handleTabChange);
+    final selectedClub = _effectiveSelectedClub;
     context.read<MatchBloc>().add(
-          MatchEvent.matchstats(clubId: widget.selectedClub?.id),
+          MatchEvent.matchstats(clubId: selectedClub?.id),
         );
+    if (widget.selectedClub == null) {
+      _resolveDefaultClub();
+    }
   }
 
   void _handleTabChange() {
     if (tabController.indexIsChanging || tabController.index != 1) return;
 
+    final selectedClub = _effectiveSelectedClub;
     context.read<MatchBloc>().add(
-          MatchEvent.matchstats(clubId: widget.selectedClub?.id),
+          MatchEvent.matchstats(clubId: selectedClub?.id),
         );
     setState(() {
       _statsRefreshTick++;
     });
+  }
+
+  Future<void> _resolveDefaultClub() async {
+    final contextData = service<AppPreferencesManager>().currentContextValue;
+    final normalizedBrandName = _normalizeSearchKey(
+      contextData?.brandingName ?? contextData?.resolvedBrandName,
+    );
+    final normalizedLeagueId = _normalizeValue(contextData?.activeLeagueId);
+
+    if (normalizedBrandName == null && normalizedLeagueId == null) {
+      return;
+    }
+
+    setState(() {
+      _isResolvingDefaultClub = true;
+    });
+
+    ClubRoasterData? resolvedClub;
+    final result = await service<RoasterService>().getLeagueRoasters();
+    await result.when(
+      onError: (_) async {},
+      onSuccess: (clubs) async {
+        resolvedClub = _findDefaultClub(
+          clubs: clubs,
+          normalizedBrandName: normalizedBrandName,
+          normalizedLeagueId: normalizedLeagueId,
+        );
+      },
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _resolvedSelectedClub = resolvedClub;
+      _isResolvingDefaultClub = false;
+    });
+
+    if (resolvedClub != null) {
+      context.read<MatchBloc>().add(
+            MatchEvent.matchstats(clubId: resolvedClub!.id),
+          );
+      if (tabController.index != 0) {
+        tabController.animateTo(0);
+      }
+    }
+  }
+
+  ClubRoasterData? _findDefaultClub({
+    required List<ClubRoasterData> clubs,
+    required String? normalizedBrandName,
+    required String? normalizedLeagueId,
+  }) {
+    if (clubs.isEmpty) {
+      return null;
+    }
+
+    var prioritizedClubs = clubs;
+    if (normalizedLeagueId != null) {
+      final sameLeague = clubs
+          .where(
+            (club) => _normalizeValue(club.leagueId) == normalizedLeagueId,
+          )
+          .toList();
+      if (sameLeague.isNotEmpty) {
+        prioritizedClubs = sameLeague;
+      }
+    }
+
+    if (normalizedBrandName != null) {
+      for (final club in prioritizedClubs) {
+        if (_normalizeSearchKey(club.name) == normalizedBrandName) {
+          return club;
+        }
+      }
+
+      for (final club in prioritizedClubs) {
+        final normalizedClubName = _normalizeSearchKey(club.name);
+        if (normalizedClubName == null) {
+          continue;
+        }
+        if (normalizedClubName.contains(normalizedBrandName) ||
+            normalizedBrandName.contains(normalizedClubName)) {
+          return club;
+        }
+      }
+    }
+
+    return prioritizedClubs.length == 1 ? prioritizedClubs.first : null;
+  }
+
+  String? _normalizeValue(String? value) {
+    if (value == null) {
+      return null;
+    }
+
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed.toLowerCase();
+  }
+
+  String? _normalizeSearchKey(String? value) {
+    final normalizedValue = _normalizeValue(value);
+    if (normalizedValue == null) {
+      return null;
+    }
+
+    final compact = normalizedValue.replaceAll(RegExp(r'[^a-z0-9]'), '');
+    return compact.isEmpty ? null : compact;
   }
 
   @override
@@ -48,6 +171,20 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final selectedClub = _effectiveSelectedClub;
+
+    if (_isResolvingDefaultClub && selectedClub == null) {
+      return const Scaffold(
+        body: AppBackground(
+          childWidget: SafeArea(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       body: AppBackground(
         childWidget: SafeArea(
@@ -67,7 +204,7 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
                       height: 39,
                     ),
                     Text(
-                      widget.selectedClub?.name ?? "League",
+                      selectedClub?.name ?? "Team",
                       style: context.textTheme.headlineLarge
                           ?.copyWith(fontSize: 16),
                     ),
@@ -98,9 +235,7 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
                         controller: tabController,
                         tabs: [
                           Tab(
-                            text: widget.selectedClub == null
-                                ? 'TEAMS'
-                                : 'ROSTER',
+                            text: selectedClub == null ? 'TEAMS' : 'ROSTER',
                           ),
                           Tab(
                             text: 'STATS',
@@ -111,7 +246,7 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
                       child: TabBarView(
                         controller: tabController,
                         children: [
-                          widget.selectedClub == null
+                          selectedClub == null
                               ? MultiBlocProvider(
                                   providers: [
                                     BlocProvider(
@@ -126,17 +261,17 @@ class _TeamPageState extends State<TeamPage> with TickerProviderStateMixin {
                               : BlocProvider(
                                   create: (_) => RoasterBloc()
                                     ..add(RoasterEvent.roasters(
-                                      widget.selectedClub!.id,
+                                      selectedClub.id,
                                     )),
                                   child: TeamRoster(
-                                    clubId: widget.selectedClub!.id,
+                                    clubId: selectedClub.id,
                                   ),
                                 ),
                           TeamStats(
                             key: ValueKey(
-                              '${widget.selectedClub?.id ?? "league"}-$_statsRefreshTick',
+                              '${selectedClub?.id ?? "league"}-$_statsRefreshTick',
                             ),
-                            selectedClubId: widget.selectedClub?.id,
+                            selectedClubId: selectedClub?.id,
                           ),
                           BlocProvider(
                             create: (_) => TeamStatsBloc()

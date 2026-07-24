@@ -180,7 +180,7 @@ class _MediaPageState extends State<MediaPage> {
         Column(
           children: [
             Text(
-              'League Media',
+              'Team Media',
               style: TextStyle(
                 color: titleColor,
                 fontSize: 18,

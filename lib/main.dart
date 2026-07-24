@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sports_app/core/snackbar_service.dart';
+import 'package:sports_app/data/models/session/frontend_context.dart';
 import 'package:sports_app/features/app/blocs/address/address_bloc.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:sports_app/features/app/blocs/matches/match_schedule/schedule_bloc.dart';
@@ -27,6 +28,7 @@ import 'data/services/upgrade_service.dart';
 import 'features/app/blocs/matches/match_bloc.dart';
 import 'features/app/blocs/products/product_bloc.dart';
 import 'router/router.dart';
+import 'theme/app_colors.dart';
 import 'theme/light_theme.dart';
 import 'dart:io' show Platform;
 
@@ -79,6 +81,7 @@ void main() {
 
     setUpService();
     await service<AppPreferencesManager>().init();
+    await _bootstrapFrontendBranding();
 
     final runnableApp = _buildRunnableApp(
       isWeb: kIsWeb,
@@ -94,6 +97,34 @@ void main() {
       fatal: true,
     );
   });
+}
+
+Future<void> _bootstrapFrontendBranding() async {
+  final prefsManager = service<AppPreferencesManager>();
+  final cachedContext = prefsManager.currentContextValue;
+
+  AppColors.applyBranding(
+    primaryColorHex: cachedContext?.brandingPrimaryColor,
+    secondaryColorHex: cachedContext?.brandingSecondaryColor,
+    accentColorHex: cachedContext?.brandingAccentColor,
+  );
+
+  if (cachedContext?.hasBranding ?? false) {
+    return;
+  }
+
+  final result = await service<ContextService>().getContext();
+  await result.when(
+    onError: (_) async {},
+    onSuccess: (context) async {
+      await prefsManager.saveFrontendContext(context);
+      AppColors.applyBranding(
+        primaryColorHex: context.brandingPrimaryColor,
+        secondaryColorHex: context.brandingSecondaryColor,
+        accentColorHex: context.brandingAccentColor,
+      );
+    },
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -122,6 +153,12 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
             create: (_) =>
                 UserBloc(service<AppPreferencesManager>().currentUserValue)),
+        BlocProvider(
+          create: (_) => BrandingCubit(
+            service<AppPreferencesManager>(),
+            service<ContextService>(),
+          )..refreshBranding(),
+        ),
         BlocProvider(create: (_) => SideMenuCubit()),
         BlocProvider(create: (_) => HideCubit()),
         BlocProvider(create: (_) => ScheduleBloc()),
@@ -179,28 +216,32 @@ class _MyAppState extends State<MyApp> {
           create: (_) => PointsBloc(),
         ),
       ],
-      child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, themeMode) {
-          return MaterialApp.router(
-            scaffoldMessengerKey: SnackbarService.messengerKey,
-            title: 'DB Savio',
-            debugShowCheckedModeBanner: false,
-            theme: lightMode,
-            darkTheme: darkMode,
-            themeMode: themeMode,
-            routerConfig: router,
-            builder: (context, child) {
-              return UpgradeAlert(
-                navigatorKey: router.routerDelegate.navigatorKey,
-                showIgnore: false,
-                showLater: false,
-                barrierDismissible: false,
-                shouldPopScope: () => false,
-                upgrader: Upgrader(
-                  debugLogging: true,
-                  durationUntilAlertAgain: Duration.zero,
-                ),
-                child: child ?? const SizedBox.shrink(),
+      child: BlocBuilder<BrandingCubit, FrontendContextData>(
+        builder: (context, brandingState) {
+          return BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              return MaterialApp.router(
+                scaffoldMessengerKey: SnackbarService.messengerKey,
+                title: brandingState.resolvedBrandName,
+                debugShowCheckedModeBanner: false,
+                theme: buildLightTheme(),
+                darkTheme: buildDarkTheme(),
+                themeMode: themeMode,
+                routerConfig: router,
+                builder: (context, child) {
+                  return UpgradeAlert(
+                    navigatorKey: router.routerDelegate.navigatorKey,
+                    showIgnore: false,
+                    showLater: false,
+                    barrierDismissible: false,
+                    shouldPopScope: () => false,
+                    upgrader: Upgrader(
+                      debugLogging: true,
+                      durationUntilAlertAgain: Duration.zero,
+                    ),
+                    child: child ?? const SizedBox.shrink(),
+                  );
+                },
               );
             },
           );
@@ -267,5 +308,45 @@ class ThemeCubit extends Cubit<ThemeMode> {
   void setSystemTheme() async {
     emit(ThemeMode.system);
     await _prefs.saveThemeMode(ThemeMode.system);
+  }
+}
+
+class BrandingCubit extends Cubit<FrontendContextData> {
+  BrandingCubit(this._prefsManager, this._contextService)
+      : super(_prefsManager.currentContextValue ?? const FrontendContextData()) {
+    _applyBranding(state);
+    _subscription = _prefsManager.contextStream.listen((context) {
+      final next = context ?? const FrontendContextData();
+      _applyBranding(next);
+      emit(next);
+    });
+  }
+
+  final AppPreferencesManager _prefsManager;
+  final ContextService _contextService;
+  StreamSubscription<FrontendContextData?>? _subscription;
+
+  Future<void> refreshBranding() async {
+    final result = await _contextService.getContext();
+    await result.when(
+      onError: (_) async {},
+      onSuccess: (context) async {
+        await _prefsManager.saveFrontendContext(context);
+      },
+    );
+  }
+
+  void _applyBranding(FrontendContextData context) {
+    AppColors.applyBranding(
+      primaryColorHex: context.brandingPrimaryColor,
+      secondaryColorHex: context.brandingSecondaryColor,
+      accentColorHex: context.brandingAccentColor,
+    );
+  }
+
+  @override
+  Future<void> close() async {
+    await _subscription?.cancel();
+    return super.close();
   }
 }

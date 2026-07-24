@@ -221,6 +221,7 @@ class _TicketsPageState extends State<TicketsPage> {
         if (ticketId.isNotEmpty) {
           context.pushNamed(
             AppRoute.profileTicketDetails.name,
+            pathParameters: {'ticketId': ticketId},
             extra: ticketId,
           );
         }
@@ -324,6 +325,7 @@ class _TicketsPageState extends State<TicketsPage> {
         if (orderId.isNotEmpty) {
           context.pushNamed(
             AppRoute.profileOrderDetails.name,
+            pathParameters: {'orderId': orderId},
             extra: orderId,
           );
         }

@@ -11,7 +11,11 @@ class SeasonHighlightsList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Season Highlights", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text("Season Highlights",
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface)),
         const SizedBox(height: 8),
         ListView.separated(
           physics: const NeverScrollableScrollPhysics(),

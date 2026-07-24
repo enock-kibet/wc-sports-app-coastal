@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static Color defaultAppRed = const Color(0xFFF9D96B);
-  static Color defaultAppPurple = const Color(0xFFF9D96B);
-  static Color primaryColor = const Color(0xFFF9D96B);
-  static Color purpleColor = const Color(0xFFF9D96B);
-  static Color pinkColor = const Color(0xFFF9D96B);
-  static Color pink2Color = const Color(0xFFF9D96B);
+  static const Color _defaultBrandColor = Color(0xFF010060);
+
+  static Color defaultAppRed = _defaultBrandColor;
+  static Color defaultAppPurple = _defaultBrandColor;
+  static Color primaryColor = _defaultBrandColor;
+  static Color purpleColor = _defaultBrandColor;
+  static Color pinkColor = _defaultBrandColor;
+  static Color pink2Color = _defaultBrandColor;
   static Color inputFillColor = whiteColor;
   static Color greyColor = const Color(0xFFC7C7C7);
   static Color scaffoldBackground = const Color(0xFFF7F6F9);
@@ -17,4 +19,44 @@ class AppColors {
   static Color warningColor = Colors.orange;
   static Color hintTextColor = const Color(0xFF4D4D4D);
   static Color blackColor = const Color(0xFF000000);
+
+  static void applyBranding({
+    String? primaryColorHex,
+    String? secondaryColorHex,
+    String? accentColorHex,
+  }) {
+    final primary = fromHex(primaryColorHex) ?? _defaultBrandColor;
+    final secondary = fromHex(secondaryColorHex) ?? primary;
+    final accent = fromHex(accentColorHex) ?? primary;
+
+    defaultAppRed = primary;
+    defaultAppPurple = primary;
+    primaryColor = primary;
+    purpleColor = secondary;
+    pinkColor = accent;
+    pink2Color = accent;
+  }
+
+  static Color? fromHex(String? value) {
+    if (value == null) {
+      return null;
+    }
+
+    final normalized = value.trim();
+    if (normalized.isEmpty) {
+      return null;
+    }
+
+    var hex = normalized.replaceFirst('#', '');
+    if (hex.length == 6) {
+      hex = 'FF$hex';
+    }
+
+    if (hex.length != 8) {
+      return null;
+    }
+
+    final parsed = int.tryParse(hex, radix: 16);
+    return parsed == null ? null : Color(parsed);
+  }
 }

@@ -3,19 +3,19 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>555382788437-fn3kqfq2d0d5ofdmhlfv6v3ip7bvs5e9.apps.googleusercontent.com</string>
+	<string>555382788437-mjlc3mu4ubibcnkl8eiutcjrjhr4dik2.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.555382788437-fn3kqfq2d0d5ofdmhlfv6v3ip7bvs5e9</string>
+	<string>com.googleusercontent.apps.555382788437-mjlc3mu4ubibcnkl8eiutcjrjhr4dik2</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>555382788437-p4m2jf1qcjm568e7ga0d0qit9ujudabk.apps.googleusercontent.com</string>
+	<string>555382788437-44mo9hsfqo5gmo8706mb0tp1d88665q6.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDcMxcCE5KbtQobQbRF7CJ9avyJRYO2V18</string>
+	<string>AIzaSyCu5BBjztYJgKAfnhFj4wLKfpINu17Qif8</string>
 	<key>GCM_SENDER_ID</key>
 	<string>555382788437</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.wtl.siel</string>
+	<string>com.wtl.coastalkings</string>
 	<key>PROJECT_ID</key>
 	<string>wence-sports-d6c49</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:555382788437:ios:18e7f38f5427306a5fdfdc</string>
+	<string>1:555382788437:ios:9ff0efc338b067645fdfdc</string>
 </dict>
 </plist>

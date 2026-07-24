@@ -99,7 +99,9 @@ class PreviousTiles extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Ksh ${match.matchPrice}",
+                  match.hasTicket
+                      ? "Ksh ${match.matchPrice.toStringAsFixed(0)}"
+                      : "Tickets unavailable",
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     fontSize: 9,
@@ -289,7 +291,8 @@ class PreviousTiles extends StatelessWidget {
   Widget _abbrText(String team) {
     return Text(
       _getInitials(team),
-      style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w600),
+      style: const TextStyle(
+          fontSize: 8, fontWeight: FontWeight.w600, color: Colors.white),
     );
   }
 }

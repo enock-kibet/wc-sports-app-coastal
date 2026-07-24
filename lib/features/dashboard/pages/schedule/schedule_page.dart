@@ -9,13 +9,11 @@ import 'package:sports_app/router/router.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
-import 'package:sports_app/common/extension/buildcontext.dart';
 import 'package:sports_app/common/utils/pull_to_refresh.dart';
 import 'package:sports_app/data/services/service.dart';
 import 'package:sports_app/features/app/blocs/matches/match_bloc.dart';
+import 'package:sports_app/features/dashboard/widgets/upcoming_match_tile.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
-import 'package:sports_app/theme/app_colors.dart';
-import 'package:sports_app/theme/theme.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:sports_app/features/app/side_menu_cubit.dart';
@@ -88,6 +86,19 @@ class _SchedulePageState extends State<SchedulePage> {
       context.go('/signIn');
       return;
     }
+    context.pushNamed(
+      AppRoute.matchDetails.name,
+      extra: match,
+    );
+  }
+
+  void _openMatchDetails(MatchType match) {
+    final isGuest = service<AppPreferencesManager>().currentUserValue == null;
+    if (isGuest) {
+      context.go('/signIn');
+      return;
+    }
+
     context.pushNamed(
       AppRoute.matchDetails.name,
       extra: match,
@@ -563,116 +574,13 @@ class _SchedulePageState extends State<SchedulePage> {
       );
     }
 
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final mutedTextColor =
-        isDark ? Colors.white70 : colorScheme.onSurface.withValues(alpha: 0.68);
-    final todayForegroundColor =
-        isDark ? colorScheme.onSurface : const Color(0xFF5F4A00);
-
-    return Container(
+    return UpcomingMatchTile(
+      match: match,
+      onTap: () => _openMatchDetails(match),
+      onBuyTicketTap: () => _handleBuyTicketTap(match),
       margin: useOuterMargin
           ? const EdgeInsets.symmetric(horizontal: kSmall, vertical: kSmall)
           : EdgeInsets.zero,
-      padding: const EdgeInsets.all(kMedium),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(kMedium),
-        color: colorScheme.surface,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            match.matchName,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: kSmall),
-          Row(
-            children: [
-              const Icon(Icons.location_on, size: kSMedium),
-              const SizedBox(width: kXSmall),
-              Text(
-                match.matchVenue,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w300,
-                  color: mutedTextColor,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: kMedium),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(kSmall),
-                decoration: BoxDecoration(
-                  color: AppColors.greyColor.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(kMedium),
-                ),
-                child: Text(
-                  getStringDate(match.matchDate),
-                  style: context.textTheme.bodySmall
-                      ?.copyWith(fontWeight: FontWeight.w700),
-                ),
-              ),
-              Text(
-                "Ksh ${match.matchPrice}",
-                style: context.textTheme.titleLarge
-                    ?.copyWith(fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-          const SizedBox(height: kLarge),
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {},
-                icon: Icon(
-                  LucideIcons.bookmark,
-                  color: AppColors.purpleColor,
-                ),
-              ),
-              const SizedBox(width: kLarge * 3),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _handleBuyTicketTap(match),
-                  child: Container(
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    height: 50,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: kMedium,
-                      vertical: kXSmall,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.pinkColor,
-                          AppColors.purpleColor,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(kMedium),
-                    ),
-                    child: Text(
-                      "Buy Ticket",
-                      style: TextStyle(
-                        color: todayForegroundColor,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 

@@ -185,7 +185,7 @@ class _TeamMediaPageState extends State<TeamMediaPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("League Media!",
+              Text("Team Media!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: titleColor,

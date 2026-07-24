@@ -9,7 +9,6 @@ import 'package:sports_app/common/app_background.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/common/extension/buildcontext.dart';
 import 'package:sports_app/common/utils/pull_to_refresh.dart';
-import 'package:sports_app/constants/constants.dart';
 import 'package:sports_app/core/snackbar_service.dart';
 import 'package:sports_app/data/models/match/match.dart';
 import 'package:sports_app/data/models/products/frontend_checkout.dart';
@@ -20,10 +19,10 @@ import 'package:sports_app/features/app/blocs/media/media_bloc.dart';
 import 'package:sports_app/features/app/blocs/points/points_bloc.dart';
 import 'package:sports_app/features/app/blocs/stripe/stripe_bloc.dart';
 import 'package:sports_app/features/app/side_menu_cubit.dart';
-import 'package:sports_app/features/auth/login_page.dart';
 import 'package:sports_app/features/dashboard/pages/home/widget/home_media.dart';
 import 'package:sports_app/features/dashboard/pages/home/widget/previous_tiles.dart';
 import 'package:sports_app/features/dashboard/pages/pages.dart';
+import 'package:sports_app/features/dashboard/widgets/upcoming_match_tile.dart';
 import 'package:sports_app/localization/app_prefs_manager.dart';
 import 'package:sports_app/router/router.dart';
 import 'package:sports_app/theme/app_colors.dart';
@@ -493,36 +492,51 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(fontSize: 10)),
                             Text(match.matchVenue,
                                 style: const TextStyle(fontSize: 10)),
-                            Text("Amount -ksh ${match.matchPrice}",
+                            Text(
+                                match.hasTicket
+                                    ? "Amount - Ksh ${match.matchPrice.toStringAsFixed(0)}"
+                                    : "Tickets unavailable",
                                 style: TextStyle(fontSize: 10)),
                             const SizedBox(
                               height: kSmall,
                             ),
                             GestureDetector(
-                              onTap: () {
-                                final isGuest = service<AppPreferencesManager>()
-                                        .currentUserValue ==
-                                    null;
-                                if (isGuest) {
-                                  context.go('/signIn');
-                                  return;
-                                }
-                                _stripeBloc.add(const StripeEvent.stripe(
-                                    email: "john@gmail.com", price: 500));
-                              },
+                              onTap: match.hasTicket
+                                  ? () {
+                                      final isGuest =
+                                          service<AppPreferencesManager>()
+                                                  .currentUserValue ==
+                                              null;
+                                      if (isGuest) {
+                                        context.go('/signIn');
+                                        return;
+                                      }
+                                      _stripeBloc.add(const StripeEvent.stripe(
+                                          email: "john@gmail.com", price: 500));
+                                    }
+                                  : null,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: kMedium, vertical: kXSmall),
                                 decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        AppColors.pinkColor,
-                                        AppColors.purpleColor
-                                      ],
-                                    ),
+                                    color: match.hasTicket
+                                        ? null
+                                        : AppColors.greyColor
+                                            .withValues(alpha: 0.2),
+                                    gradient: match.hasTicket
+                                        ? LinearGradient(
+                                            colors: [
+                                              AppColors.pinkColor,
+                                              AppColors.purpleColor
+                                            ],
+                                          )
+                                        : null,
                                     borderRadius:
                                         BorderRadius.circular(kMedium)),
-                                child: Text("Buy Ticket",
+                                child: Text(
+                                    match.hasTicket
+                                        ? "Buy Ticket"
+                                        : "Ticket Unavailable",
                                     style:
                                         TextStyle(color: AppColors.whiteColor)),
                               ),

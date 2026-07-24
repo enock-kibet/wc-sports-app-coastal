@@ -20,21 +20,14 @@ class MatchType with _$MatchType {
     required double matchPrice,
     String? teamOneScore,
     String? teamTwoScore,
-    MatchModel? recap, 
+    MatchModel? recap,
   }) = _MatchType;
   factory MatchType.fromJson(Map<String, Object?> json) =>
       _$MatchTypeFromJson(json);
 }
 
-int getRandomMultipleOf50() {
-  Random random = Random();
-  int min = 400;
-  int max = 1000;
-
-  // Generate a random index from 8 to 20 (because (400/50) = 8, (1000/50) = 20)
-  int randomIndex = random.nextInt((max ~/ 50) - (min ~/ 50) + 1) + (min ~/ 50);
-
-  return randomIndex * 50; // Convert back to a multiple of 50
+extension MatchTypeX on MatchType {
+  bool get hasTicket => matchPrice > 0;
 }
 
 String getStringDate(DateTime date, {bool withoutWeekday = false}) {

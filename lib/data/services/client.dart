@@ -227,6 +227,7 @@ class ProductService {
         final payload = _extractDataMap(responseData);
         final order = _mapOrEmpty(payload['order']);
         final checkout = _mapOrEmpty(payload['checkout']);
+        final payment = _mapOrEmpty(payload['payment']);
         final appliedPromotion = _mapOrEmpty(order['applied_promotion']);
         final pointsRedemption = _mapOrEmpty(order['points_redemption']);
         final rawAuthorizationUrl =
@@ -234,6 +235,29 @@ class ProductService {
         final rawRequiresPayment = checkout['requires_payment'];
         final authorizationUrl =
             rawAuthorizationUrl.isEmpty ? null : rawAuthorizationUrl;
+        final paymentStatus =
+            _pickText(payment, ['status'], fallback: '').toLowerCase();
+        final orderPaymentStatus =
+            _pickText(order, ['payment_status'], fallback: '').toLowerCase();
+        final orderStatus =
+            _pickText(order, ['status'], fallback: '').toLowerCase();
+        final checkoutStatus = _pickText(
+          checkout,
+          ['status'],
+          fallback: _pickText(
+            payment,
+            ['status'],
+            fallback: _pickText(order, ['status']),
+          ),
+        );
+        final requiresPayment = rawRequiresPayment == true ||
+            rawRequiresPayment.toString().toLowerCase() == 'true' ||
+            rawRequiresPayment.toString() == '1' ||
+            (authorizationUrl != null &&
+                paymentStatus != 'paid' &&
+                orderPaymentStatus != 'paid' &&
+                orderStatus != 'paid' &&
+                orderStatus != 'completed');
 
         final result = FrontendCheckoutResult(
           orderId: _pickText(order, ['id', 'uuid']),
@@ -248,10 +272,8 @@ class ProductService {
           ),
           reference: _pickText(checkout, ['reference']),
           provider: _pickText(checkout, ['provider'], fallback: 'paystack'),
-          status: _pickText(checkout, ['status']),
-          requiresPayment: rawRequiresPayment == true ||
-              rawRequiresPayment.toString().toLowerCase() == 'true' ||
-              rawRequiresPayment.toString() == '1',
+          status: checkoutStatus,
+          requiresPayment: requiresPayment,
           appliedPromotion: appliedPromotion.isEmpty
               ? null
               : FrontendAppliedPromotion(
@@ -630,8 +652,10 @@ class MatchService {
   }
 }
 
-const _frontendAuthBase = "http://nomasana.local:8080/api/v1/frontend-auth";
-const _frontendShopBase = "http://nomasana.local:8080/api/v1/frontend/shop";
+const _frontendAuthBase =
+    "https://coastal-kings.wencetechnologies.com/api/v1/frontend-auth";
+const _frontendShopBase =
+    "https://coastal-kings.wencetechnologies.com/api/v1/frontend/shop";
 const _frontendShopProductsBase = "$_frontendShopBase/products";
 const _frontendShopTicketTypesBase = "$_frontendShopBase/ticket-types";
 const _frontendShopOrdersBase = "$_frontendShopBase/orders";
@@ -647,19 +671,22 @@ const _frontendShopCheckoutInitializeBase =
 const _frontendShopCheckoutVerifyBase =
     "$_frontendShopCartBase/checkout/verify";
 const _frontendShopPickupStationsBase = "$_frontendShopBase/pickup-stations";
-const _frontendPointsBase = "http://nomasana.local:8080/api/v1/points";
+const _frontendPointsBase =
+    "https://coastal-kings.wencetechnologies.com/api/v1/points";
 const _frontendPointsWalletBase = "$_frontendPointsBase/wallet";
 const _frontendPointsEarnBase = "$_frontendPointsBase/actions/earn";
 const _frontendPointsHistoryBase = "$_frontendPointsBase/history";
 const _frontendPointsTransferBase = "$_frontendPointsBase/transfer";
 const _frontendNotificationsBase =
-    "http://nomasana.local:8080/api/v1/frontend/notifications";
+    "https://coastal-kings.wencetechnologies.com/api/v1/frontend/notifications";
 const _frontendCheckoutCallbackUrl = String.fromEnvironment(
   'SPORTS_APP_CHECKOUT_CALLBACK_URL',
   defaultValue:
       'https://wencesportswebapplication.vercel.app/checkout/complete',
 );
-const _mobileBase = "http://nomasana.local:8080/api/v1/mobile";
+const _domainContextBase =
+    "https://coastal-kings.wencetechnologies.com/api/v1/domains/context";
+const _mobileBase = "https://coastal-kings.wencetechnologies.com/api/v1/mobile";
 const _mobileContextBase = "$_mobileBase/context";
 const _mobileClubsBase = "$_mobileBase/clubs";
 const _mobileTeamsBase = "$_mobileBase/teams";
@@ -1451,11 +1478,36 @@ MatchType _mapMobileMatchRecordToMatchType(
     matchDate: resolvedRecap.matchDate.date,
     matchVenue: resolvedRecap.venue.name,
     matchLocation: resolvedRecap.venue.location,
-    matchPrice: getRandomMultipleOf50().toDouble(),
+    matchPrice: _resolveMobileMatchPrice(record),
     teamOneScore: resolvedRecap.clubOneScore,
     teamTwoScore: resolvedRecap.clubTwoScore,
     recap: resolvedRecap,
   );
+}
+
+double _resolveMobileMatchPrice(Map<String, dynamic> record) {
+  const matchPriceKeys = [
+    'match_price',
+    'ticket_price',
+    'price',
+    'matchPrice',
+    'ticketPrice',
+  ];
+
+  for (final key in matchPriceKeys) {
+    final price = _toDoubleValue(record[key]);
+    if (price > 0) {
+      return price;
+    }
+  }
+
+  final ticketType = _mapOrEmpty(record['ticket_type']);
+  final ticketTypePrice = _toDoubleValue(ticketType['price']);
+  if (ticketTypePrice > 0) {
+    return ticketTypePrice;
+  }
+
+  return 0;
 }
 
 Stats _mapStatisticLeader(
@@ -1787,13 +1839,65 @@ FrontendContextData? _extractFrontendContext(dynamic responseData) {
 
   final activeLeague = context['active_league'] as Map<String, dynamic>?;
   final activeSeason = context['active_season'] as Map<String, dynamic>?;
+  final dataMap =
+      data is Map<String, dynamic> ? data : const <String, dynamic>{};
+  final domain = dataMap['domain'] as Map<String, dynamic>?;
+  final branding = _extractBrandingMap(dataMap, context, domain);
+  final activeClub = dataMap['active_club'] as Map<String, dynamic>?;
+  final activeClubLogo = activeClub?['logo'] as Map<String, dynamic>?;
+  final brandingLogo = branding?['logo'] as Map<String, dynamic>?;
 
   return FrontendContextData(
     activeLeagueId: _stringOrNull(activeLeague?['id'] ?? activeLeague?['uuid']),
     activeLeagueName: _stringOrNull(activeLeague?['name']),
+    activeLeagueSport: _stringOrNull(activeLeague?['sport']),
+    activeLeagueCountry: _stringOrNull(activeLeague?['country']),
     activeSeasonId: _stringOrNull(activeSeason?['id'] ?? activeSeason?['uuid']),
     activeSeasonName: _stringOrNull(activeSeason?['name']),
+    activeClubId: _stringOrNull(activeClub?['id'] ?? activeClub?['uuid']),
+    activeClubName: _stringOrNull(activeClub?['name']),
+    activeClubLocation: _stringOrNull(activeClub?['location']),
+    activeClubWebsite: _stringOrNull(activeClub?['website']),
+    activeClubDescription: _stringOrNull(activeClub?['description']),
+    activeClubContactNumber: _stringOrNull(activeClub?['contact_number']),
+    activeClubEmail: _stringOrNull(activeClub?['email']),
+    activeClubHeadCoachName: _stringOrNull(activeClub?['head_coach_name']),
+    activeClubLogoUrl: _assetUrl(activeClubLogo),
+    brandingName: _stringOrNull(
+      branding?['name'] ?? activeClub?['name'] ?? activeLeague?['name'],
+    ),
+    brandingPrimaryColor: _stringOrNull(branding?['primary_color']),
+    brandingSecondaryColor: _stringOrNull(branding?['secondary_color']),
+    brandingAccentColor: _stringOrNull(branding?['accent_color']),
+    brandingLogoUrl: _assetUrl(brandingLogo) ?? _assetUrl(activeClubLogo),
   );
+}
+
+Map<String, dynamic>? _extractBrandingMap(
+  Map<String, dynamic> data,
+  Map<String, dynamic> context,
+  Map<String, dynamic>? domain,
+) {
+  final candidates = <Map<String, dynamic>>[
+    if (data['branding'] is Map<String, dynamic>)
+      data['branding'] as Map<String, dynamic>,
+    if (context['branding'] is Map<String, dynamic>)
+      context['branding'] as Map<String, dynamic>,
+    if (domain?['branding'] is Map<String, dynamic>)
+      domain!['branding'] as Map<String, dynamic>,
+    if (domain?['branding_overrides'] is Map<String, dynamic>)
+      domain!['branding_overrides'] as Map<String, dynamic>,
+    if (context['branding_overrides'] is Map<String, dynamic>)
+      context['branding_overrides'] as Map<String, dynamic>,
+  ];
+
+  for (final candidate in candidates) {
+    if (candidate.isNotEmpty) {
+      return candidate;
+    }
+  }
+
+  return null;
 }
 
 User _mapFrontendUserFromResponse(
@@ -1913,7 +2017,7 @@ class ContextService {
     String? seasonId,
   }) async {
     return Http.get(
-      _mobileContextBase,
+      _domainContextBase,
       useAuthToken: false,
       headers: _buildContextHeaders(
         leagueId: leagueId,
@@ -1922,7 +2026,7 @@ class ContextService {
       deserializer: (data) {
         final context = _extractFrontendContext(data);
         if (context == null) {
-          throw const FormatException("Unable to load mobile context");
+          throw const FormatException("Unable to load domain context");
         }
         return context;
       },

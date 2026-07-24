@@ -8,7 +8,7 @@ class AppConfig {
   // different value is supplied by auth context or build-time configuration.
   static const String _defaultLeagueId = String.fromEnvironment(
     'SPORTS_APP_DEFAULT_LEAGUE_ID',
-    defaultValue: '9118399e-3371-4957-854d-fdb4c7fb31d5',
+    defaultValue: '',
   );
 
   static const String _defaultSeasonId = String.fromEnvironment(

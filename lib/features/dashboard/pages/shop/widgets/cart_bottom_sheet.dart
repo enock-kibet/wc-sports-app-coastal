@@ -146,19 +146,16 @@ class _ShopCartBottomSheetContent extends StatefulWidget {
   final List<CartItem> cartItems;
   final List<Address> addresses;
   final List<PickupAddress> pickupAddresses;
-  final Map<String, double>? priceByProduct;
   final PointsState pointsState;
   final bool isProcessingCheckout;
 
   const _ShopCartBottomSheetContent({
-    super.key,
     required this.isLoading,
     required this.cartItems,
     required this.addresses,
     required this.pickupAddresses,
     required this.pointsState,
     required this.isProcessingCheckout,
-    this.priceByProduct,
   });
 
   @override
@@ -182,10 +179,7 @@ class _ShopCartBottomSheetContentState
 
   PickupAddress? _selectedPickupAddressDropdown;
 
-  String? _selectedAddress;
-
   // Constants
-  static const double _defaultPrice = 720.0;
   static const double _maxQty = 999;
   static const double _initialSheetSize = 0.82;
   static const double _minSheetSize = 0.45;
@@ -205,10 +199,6 @@ class _ShopCartBottomSheetContentState
     pointsController.dispose();
     promoCodeController.dispose();
     super.dispose();
-  }
-
-  double _priceForItem(CartItem item) {
-    return widget.priceByProduct?[item.id] ?? _defaultPrice;
   }
 
   double get _subtotal {
@@ -355,7 +345,6 @@ class _ShopCartBottomSheetContentState
         apiKey: kGoogleApiKey,
         onAddressSelected: (result) {
           setState(() {
-            _selectedAddress = result["address"];
             _selectedAddressDropdown = Address(
               id: result["id"] ?? "",
               name: result["name"] ?? "",
@@ -427,7 +416,6 @@ class _ShopCartBottomSheetContentState
         // convert to absolute value
         final differenceInt = difference.abs();
         // check if difference is greater than 0
-        print(difference);
         if (difference > 0) {
           context.read<ProductBloc>().add(
                 ProductEvent.removeCart(
@@ -599,14 +587,16 @@ class _ShopCartBottomSheetContentState
 
   @override
   Widget build(BuildContext context) {
-    final points = int.tryParse(widget.pointsState.balance) ?? 0;
     final addresses = widget.addresses;
     final pickupAddresses = widget.pickupAddresses;
-    final selectedAddress = addresses.any(
-      (address) => address.id == _selectedAddressDropdown?.id,
-    )
-        ? _selectedAddressDropdown
-        : null;
+    Address? selectedAddress;
+    for (final address in addresses) {
+      if (address.id == _selectedAddressDropdown?.id) {
+        selectedAddress = address;
+        break;
+      }
+    }
+    selectedAddress ??= _selectedAddressDropdown;
     final selectedPickupAddress = pickupAddresses.any(
       (address) => address.id == _selectedPickupAddressDropdown?.id,
     )
@@ -726,32 +716,128 @@ class _ShopCartBottomSheetContentState
                             color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Container(
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 64,
-                                  height: 64,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: Colors.grey[300],
-                                    image: const DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: NetworkImage(
-                                          'https://placehold.co/150x150?font=roboto&text=Map+Preview'),
-                                    ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 64,
+                                height: 64,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey[300],
+                                  image: const DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: NetworkImage(
+                                        'https://placehold.co/150x150?font=roboto&text=Map+Preview'),
                                   ),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      if (addresses.isEmpty)
-                                        _emptySelectorState(
-                                          message: 'No delivery addresses yet.',
-                                          action: GestureDetector(
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (addresses.isEmpty)
+                                      _emptySelectorState(
+                                        message: 'No delivery addresses yet.',
+                                        action: GestureDetector(
+                                          onTap: _handlePressButton,
+                                          child: const SizedBox(
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.add,
+                                                  color: Colors.purple,
+                                                  size: 15,
+                                                ),
+                                                SizedBox(width: 5),
+                                                Text(
+                                                  'New delivery address',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    else
+                                      Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 56,
+                                            child: DropdownSearch<Address>(
+                                              items: (filter,
+                                                      infiniteScrollProps) =>
+                                                  addresses,
+                                              itemAsString: (address) =>
+                                                  address.locality,
+                                              selectedItem: selectedAddress,
+                                              compareFn: (a, b) => a.id == b.id,
+                                              decoratorProps:
+                                                  DropDownDecoratorProps(
+                                                decoration: InputDecoration(
+                                                  fillColor: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface,
+                                                  labelText: "Select Address",
+                                                  prefixIcon: const Icon(
+                                                    Icons.location_on,
+                                                    size: 18,
+                                                    color: Colors.purple,
+                                                  ),
+                                                  suffixIcon: const Icon(
+                                                    Icons.arrow_drop_down,
+                                                    size: 28,
+                                                    color: Colors.purple,
+                                                  ),
+                                                  border:
+                                                      const OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(12),
+                                                    ),
+                                                  ),
+                                                  contentPadding:
+                                                      const EdgeInsets
+                                                          .symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 8,
+                                                  ),
+                                                ),
+                                              ),
+                                              popupProps:
+                                                  const PopupProps.menu(
+                                                showSearchBox: false,
+                                                menuProps: MenuProps(
+                                                  shape:
+                                                      RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(12),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              onChanged: (selectedAddress) {
+                                                debugPrint(
+                                                  "Selected Address ID: ${selectedAddress?.id}",
+                                                );
+                                                debugPrint(
+                                                  "Selected Address Name: ${selectedAddress?.name}",
+                                                );
+                                                setState(() {
+                                                  _selectedAddressDropdown =
+                                                      selectedAddress;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          GestureDetector(
                                             onTap: _handlePressButton,
                                             child: const SizedBox(
                                               child: Row(
@@ -776,113 +862,12 @@ class _ShopCartBottomSheetContentState
                                               ),
                                             ),
                                           ),
-                                        )
-                                      else
-                                        Column(
-                                          children: [
-                                            SizedBox(
-                                              height: 56,
-                                              child: DropdownSearch<Address>(
-                                                items: (filter,
-                                                        infiniteScrollProps) =>
-                                                    addresses,
-                                                itemAsString: (address) =>
-                                                    address.locality,
-                                                selectedItem: selectedAddress,
-                                                compareFn: (a, b) =>
-                                                    a.id == b.id,
-                                                decoratorProps:
-                                                    DropDownDecoratorProps(
-                                                  decoration: InputDecoration(
-                                                    fillColor: Theme.of(context)
-                                                        .colorScheme
-                                                        .surface,
-                                                    labelText: "Select Address",
-                                                    prefixIcon: const Icon(
-                                                      Icons.location_on,
-                                                      size: 18,
-                                                      color: Colors.purple,
-                                                    ),
-                                                    suffixIcon: const Icon(
-                                                      Icons.arrow_drop_down,
-                                                      size: 28,
-                                                      color: Colors.purple,
-                                                    ),
-                                                    border:
-                                                        const OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(12),
-                                                      ),
-                                                    ),
-                                                    contentPadding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 8,
-                                                    ),
-                                                  ),
-                                                ),
-                                                popupProps:
-                                                    const PopupProps.menu(
-                                                  showSearchBox: false,
-                                                  menuProps: MenuProps(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(12),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                onChanged: (selectedAddress) {
-                                                  debugPrint(
-                                                    "Selected Address ID: ${selectedAddress?.id}",
-                                                  );
-                                                  debugPrint(
-                                                    "Selected Address Name: ${selectedAddress?.name}",
-                                                  );
-                                                  setState(() {
-                                                    _selectedAddressDropdown =
-                                                        selectedAddress;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            GestureDetector(
-                                              onTap: _handlePressButton,
-                                              child: const SizedBox(
-                                                child: Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.add,
-                                                      color: Colors.purple,
-                                                      size: 15,
-                                                    ),
-                                                    SizedBox(width: 5),
-                                                    Text(
-                                                      'New delivery address',
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                              )
+                            ],
                           ),
                         ),
 
@@ -893,117 +878,114 @@ class _ShopCartBottomSheetContentState
                             color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Container(
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 64,
-                                  height: 64,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: Colors.grey[300],
-                                    image: const DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: NetworkImage(
-                                          'https://placehold.co/150x150?font=roboto&text=Map+Preview'),
-                                    ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 64,
+                                height: 64,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey[300],
+                                  image: const DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: NetworkImage(
+                                        'https://placehold.co/150x150?font=roboto&text=Map+Preview'),
                                   ),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      if (pickupAddresses.isEmpty)
-                                        _emptySelectorState(
-                                          message:
-                                              'No pickup locations available right now.',
-                                        )
-                                      else
-                                        Column(
-                                          children: [
-                                            SizedBox(
-                                              height: 56,
-                                              child:
-                                                  DropdownSearch<PickupAddress>(
-                                                items: (filter,
-                                                        infiniteScrollProps) =>
-                                                    pickupAddresses,
-                                                itemAsString: (address) =>
-                                                    address.locality,
-                                                selectedItem:
-                                                    selectedPickupAddress,
-                                                compareFn: (a, b) =>
-                                                    a.id == b.id,
-                                                decoratorProps:
-                                                    DropDownDecoratorProps(
-                                                  decoration: InputDecoration(
-                                                    fillColor: Theme.of(context)
-                                                        .colorScheme
-                                                        .surface,
-                                                    labelText:
-                                                        "Select Pickup Location",
-                                                    prefixIcon: const Icon(
-                                                      Icons.location_on,
-                                                      size: 18,
-                                                      color: Colors.purple,
-                                                    ),
-                                                    suffixIcon: const Icon(
-                                                      Icons.arrow_drop_down,
-                                                      size: 28,
-                                                      color: Colors.purple,
-                                                    ),
-                                                    border:
-                                                        const OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(12),
-                                                      ),
-                                                    ),
-                                                    contentPadding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 8,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (pickupAddresses.isEmpty)
+                                      _emptySelectorState(
+                                        message:
+                                            'No pickup locations available right now.',
+                                      )
+                                    else
+                                      Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 56,
+                                            child:
+                                                DropdownSearch<PickupAddress>(
+                                              items: (filter,
+                                                      infiniteScrollProps) =>
+                                                  pickupAddresses,
+                                              itemAsString: (address) =>
+                                                  address.locality,
+                                              selectedItem:
+                                                  selectedPickupAddress,
+                                              compareFn: (a, b) =>
+                                                  a.id == b.id,
+                                              decoratorProps:
+                                                  DropDownDecoratorProps(
+                                                decoration: InputDecoration(
+                                                  fillColor: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface,
+                                                  labelText:
+                                                      "Select Pickup Location",
+                                                  prefixIcon: const Icon(
+                                                    Icons.location_on,
+                                                    size: 18,
+                                                    color: Colors.purple,
+                                                  ),
+                                                  suffixIcon: const Icon(
+                                                    Icons.arrow_drop_down,
+                                                    size: 28,
+                                                    color: Colors.purple,
+                                                  ),
+                                                  border:
+                                                      const OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(12),
                                                     ),
                                                   ),
-                                                ),
-                                                popupProps:
-                                                    const PopupProps.menu(
-                                                  showSearchBox: false,
-                                                  menuProps: MenuProps(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(12),
-                                                      ),
-                                                    ),
+                                                  contentPadding:
+                                                      const EdgeInsets
+                                                          .symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 8,
                                                   ),
                                                 ),
-                                                onChanged: (selectedAddress) {
-                                                  debugPrint(
-                                                    "Selected Address ID: ${_selectedPickupAddressDropdown?.id}",
-                                                  );
-                                                  debugPrint(
-                                                    "Selected Address Name: ${selectedAddress?.name}",
-                                                  );
-                                                  setState(() {
-                                                    _selectedPickupAddressDropdown =
-                                                        selectedAddress;
-                                                  });
-                                                },
                                               ),
+                                              popupProps:
+                                                  const PopupProps.menu(
+                                                showSearchBox: false,
+                                                menuProps: MenuProps(
+                                                  shape:
+                                                      RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(12),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              onChanged: (selectedAddress) {
+                                                debugPrint(
+                                                  "Selected Address ID: ${_selectedPickupAddressDropdown?.id}",
+                                                );
+                                                debugPrint(
+                                                  "Selected Address Name: ${selectedAddress?.name}",
+                                                );
+                                                setState(() {
+                                                  _selectedPickupAddressDropdown =
+                                                      selectedAddress;
+                                                });
+                                              },
                                             ),
-                                            const SizedBox(height: 8),
-                                          ],
-                                        ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                              )
+                            ],
                           ),
                         ),
 
@@ -1148,8 +1130,7 @@ class _ShopCartBottomSheetContentState
                                   onChanged: (val) {
                                     final int entered = int.tryParse(val) ?? 0;
                                     final int balance = int.tryParse(
-                                            widget.pointsState.balance ??
-                                                '0') ??
+                                            widget.pointsState.balance) ??
                                         0;
                                     setState(() {
                                       if (entered < 0) {
@@ -1176,8 +1157,7 @@ class _ShopCartBottomSheetContentState
                                   ),
                                   onPressed: () {
                                     final int balance = int.tryParse(
-                                            widget.pointsState.balance ??
-                                                '0') ??
+                                            widget.pointsState.balance) ??
                                         0;
                                     pointsController.text = balance.toString();
                                     setState(() {

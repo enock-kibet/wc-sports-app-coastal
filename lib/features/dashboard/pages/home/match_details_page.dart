@@ -50,6 +50,11 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
       _pointsBloc = PointsBloc();
       _ownsPointsBloc = true;
     }
+    if (!widget.match.hasTicket) {
+      _ticketTypesLoading = false;
+      _ticketTypesError = 'Tickets are not available for this match yet.';
+      return;
+    }
     _loadTicketTypes();
   }
 
@@ -185,6 +190,13 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
     final selectedTicketPrice = _ticketTypePrice(selectedTicketType);
     final selectedTicketName =
         selectedTicketType == null ? null : _ticketTypeName(selectedTicketType);
+    final canBuyTicket = widget.match.hasTicket &&
+        !_ticketTypesLoading &&
+        selectedTicketType != null &&
+        selectedTicketPrice > 0;
+    final shareTicketPriceText = widget.match.hasTicket
+        ? 'Ksh ${widget.match.matchPrice.toStringAsFixed(0)}'
+        : 'Tickets unavailable';
 
     return BlocConsumer<ProductBloc, ProductState>(
       bloc: context.read<ProductBloc>(),
@@ -244,10 +256,10 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                       final shareText = '''
           🎟️ ${match.matchName}
           📅 ${getStringDate(match.matchDate)} at ${formatTime(match.matchDate)}
-          💸 Ticket Price: ${match.matchPrice}
+          💸 Ticket Price: $shareTicketPriceText
           📍 Location: ${match.matchVenue}
-          Get your tickets now from the Wence Sports app!
-          https://play.google.com/store/apps/details?id=com.wtl.siel''';
+          Get your tickets now from the Coastal Kings app!
+          https://play.google.com/store/apps/details?id=com.wtl.coastalkings''';
 
                       SharePlus.instance.share(
                         ShareParams(
@@ -262,100 +274,110 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                   Expanded(
                     child: GradientFilledButton(
                       radius: 16,
-                      onPressed: () async {
-                        final currentUser =
-                            service<AppPreferencesManager>().currentUserValue;
-                        final userEmail = currentUser?.email;
-                        if (userEmail == null || userEmail.isEmpty) {
-                          if (context.mounted) {
-                            context.go('/signIn');
-                          }
-                          return;
-                        }
+                      onPressed: canBuyTicket
+                          ? () async {
+                              final currentUser =
+                                  service<AppPreferencesManager>()
+                                      .currentUserValue;
+                              final userEmail = currentUser?.email;
+                              if (userEmail == null || userEmail.isEmpty) {
+                                if (context.mounted) {
+                                  context.go('/signIn');
+                                }
+                                return;
+                              }
 
-                        if (_ticketTypesLoading) {
-                          SnackbarService.show(
-                            'Loading ticket options...',
-                            backgroundColor: AppColors.blackColor,
-                          );
-                          return;
-                        }
-
-                        final ticketType = _selectedTicketType;
-                        if (ticketType == null) {
-                          SnackbarService.showError(
-                            _ticketTypesError ??
-                                'No tickets are available for this match yet.',
-                          );
-                          return;
-                        }
-
-                        final bloc = _pointsBloc;
-                        final ticketTypeId =
-                            (ticketType['id'] ?? '').toString().trim();
-                        final ticketPrice = _ticketTypePrice(ticketType);
-                        final maxPerOrder = _ticketTypeMaxPerOrder(ticketType);
-                        final checkoutQuantity = maxPerOrder > 0
-                            ? numberOfTickets.value.clamp(1, maxPerOrder)
-                            : numberOfTickets.value;
-
-                        if (maxPerOrder > 0 &&
-                            checkoutQuantity != numberOfTickets.value) {
-                          numberOfTickets.value = checkoutQuantity;
-                          SnackbarService.show(
-                            'You can only buy up to $maxPerOrder tickets per order for this match.',
-                            backgroundColor: AppColors.blackColor,
-                          );
-                        }
-
-                        // Step 1: Trigger loading of points
-                        bloc.add(const PointsEvent.points());
-
-                        // Step 2: Wait for points to load (listen for success)
-                        await Future.doWhile(() async {
-                          await Future.delayed(
-                              const Duration(milliseconds: 100));
-                          final state = bloc.state;
-                          return state.status == PointsStatus.loading;
-                        });
-                        if (!context.mounted) return;
-
-                        final pointsState = bloc.state;
-
-                        showTicketBottomSheet(
-                          context,
-                          (
-                            TotalAmount: ticketPrice * checkoutQuantity,
-                            quantity: checkoutQuantity,
-                          ),
-                          buyMerch: (usedPoints, promotionCode) {
-                            final int redeemablePoints = usedPoints;
-
-                            context.read<ProductBloc>().add(
-                                  ProductEvent.buyProducts(request: {
-                                    "amount": ticketPrice * checkoutQuantity,
-                                    "email": userEmail,
-                                    "matchId": widget.match.matchId,
-                                    "ticketTypeId": ticketTypeId,
-                                    "reference_type": "ticket_type",
-                                    "quantity": checkoutQuantity,
-                                    "productID":
-                                        "20d802f0-1557-49a5-9fcf-7de02e570c57",
-                                    "category": "",
-                                    if (redeemablePoints > 0)
-                                      "redeemablePoints": redeemablePoints,
-                                    if (promotionCode != null &&
-                                        promotionCode.trim().isNotEmpty)
-                                      "promotionCode": promotionCode,
-                                  }),
+                              if (_ticketTypesLoading) {
+                                SnackbarService.show(
+                                  'Loading ticket options...',
+                                  backgroundColor: AppColors.blackColor,
                                 );
-                          },
-                          match: widget.match,
-                          pointsState: pointsState,
-                          ticketLabel: selectedTicketName,
-                        );
-                      },
-                      text: "Buy Ticket",
+                                return;
+                              }
+
+                              final ticketType = _selectedTicketType;
+                              if (ticketType == null) {
+                                SnackbarService.showError(
+                                  _ticketTypesError ??
+                                      'No tickets are available for this match yet.',
+                                );
+                                return;
+                              }
+
+                              final bloc = _pointsBloc;
+                              final ticketTypeId =
+                                  (ticketType['id'] ?? '').toString().trim();
+                              final ticketPrice = _ticketTypePrice(ticketType);
+                              final maxPerOrder =
+                                  _ticketTypeMaxPerOrder(ticketType);
+                              final checkoutQuantity = maxPerOrder > 0
+                                  ? numberOfTickets.value.clamp(1, maxPerOrder)
+                                  : numberOfTickets.value;
+
+                              if (maxPerOrder > 0 &&
+                                  checkoutQuantity != numberOfTickets.value) {
+                                numberOfTickets.value = checkoutQuantity;
+                                SnackbarService.show(
+                                  'You can only buy up to $maxPerOrder tickets per order for this match.',
+                                  backgroundColor: AppColors.blackColor,
+                                );
+                              }
+
+                              // Step 1: Trigger loading of points
+                              bloc.add(const PointsEvent.points());
+
+                              // Step 2: Wait for points to load (listen for success)
+                              await Future.doWhile(() async {
+                                await Future.delayed(
+                                    const Duration(milliseconds: 100));
+                                final state = bloc.state;
+                                return state.status == PointsStatus.loading;
+                              });
+                              if (!context.mounted) return;
+
+                              final pointsState = bloc.state;
+
+                              showTicketBottomSheet(
+                                context,
+                                (
+                                  TotalAmount: ticketPrice * checkoutQuantity,
+                                  quantity: checkoutQuantity,
+                                ),
+                                buyMerch: (usedPoints, promotionCode) {
+                                  final int redeemablePoints = usedPoints;
+
+                                  context.read<ProductBloc>().add(
+                                        ProductEvent.buyProducts(request: {
+                                          "amount":
+                                              ticketPrice * checkoutQuantity,
+                                          "email": userEmail,
+                                          "matchId": widget.match.matchId,
+                                          "ticketTypeId": ticketTypeId,
+                                          "reference_type": "ticket_type",
+                                          "quantity": checkoutQuantity,
+                                          "productID":
+                                              "20d802f0-1557-49a5-9fcf-7de02e570c57",
+                                          "category": "",
+                                          if (redeemablePoints > 0)
+                                            "redeemablePoints":
+                                                redeemablePoints,
+                                          if (promotionCode != null &&
+                                              promotionCode.trim().isNotEmpty)
+                                            "promotionCode": promotionCode,
+                                        }),
+                                      );
+                                },
+                                match: widget.match,
+                                pointsState: pointsState,
+                                ticketLabel: selectedTicketName,
+                              );
+                            }
+                          : null,
+                      text: canBuyTicket
+                          ? "Buy Ticket"
+                          : (_ticketTypesLoading
+                              ? "Loading Tickets..."
+                              : "Tickets Unavailable"),
                     ),
                   ),
                 ],
@@ -659,7 +681,8 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                                     TileLayer(
                                       urlTemplate:
                                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                      userAgentPackageName: 'com.wtl.siel',
+                                      userAgentPackageName:
+                                          'com.wtl.coastalkings',
                                     ),
                                     MarkerLayer(
                                       markers: [

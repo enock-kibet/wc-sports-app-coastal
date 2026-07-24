@@ -42,15 +42,15 @@ class _SideMenuState extends State<SideMenu> {
         children: [
           const ProfileCard(),
           SideMenuIconTile(
-            title: "Standings",
+            title: "Team",
             icon: Icons.list_alt_outlined,
             press: () {
               context.read<SideMenuCubit>().closeDrawer();
-              context.pushNamed(AppRoute.standings.name);
+              context.pushNamed(AppRoute.team.name);
             },
           ),
           SideMenuIconTile(
-            title: "League Media",
+            title: "Team Media",
             icon: LucideIcons.tv,
             press: () {
               context.read<SideMenuCubit>().closeDrawer();

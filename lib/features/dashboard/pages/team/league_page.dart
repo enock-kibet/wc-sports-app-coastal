@@ -45,7 +45,7 @@ class _LeaguePageState extends State<LeaguePage> with TickerProviderStateMixin {
                       height: 39,
                     ),
                     Text(
-                      "League",
+                      "Team",
                       style: context.textTheme.headlineLarge
                           ?.copyWith(fontSize: 16),
                     ),

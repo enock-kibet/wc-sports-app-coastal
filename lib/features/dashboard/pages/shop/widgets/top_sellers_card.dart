@@ -23,6 +23,7 @@ class TopSellersCard extends StatelessWidget {
           onTap: () {
             context.pushNamed(
               AppRoute.shopDetails.name,
+              pathParameters: {'productId': product.id},
               extra: product,
             );
           },
