@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sports_app/common/app_back_button.dart';
 import 'package:sports_app/common/dimens.dart';
 import 'package:sports_app/data/error/failure.dart';
@@ -78,6 +79,109 @@ class _TicketDetailPageState extends State<TicketDetailPage> {
     }
 
     return DateFormat('MMM dd, yyyy • hh:mm a').format(parsed.toLocal());
+  }
+
+  String? _qrData(Map<String, dynamic> ticket) {
+    final payload = _read(ticket['qr_payload'], fallback: '');
+    if (payload.isNotEmpty) {
+      return payload;
+    }
+
+    final publicUrl = _read(ticket['public_ticket_url'], fallback: '');
+    if (publicUrl.isNotEmpty) {
+      return publicUrl;
+    }
+
+    final token = _read(ticket['qr_token'], fallback: '');
+    if (token.isNotEmpty) {
+      return token;
+    }
+
+    return null;
+  }
+
+  Widget _qrCard(BuildContext context, Map<String, dynamic> ticket) {
+    final qrData = _qrData(ticket);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(kLarge),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(kMedium),
+        border: Border.all(
+          color: colorScheme.onSurface.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Scan At Entry',
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w800,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: kXSmall),
+          Text(
+            'Present this QR code at the gate for validation.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
+          ),
+          const SizedBox(height: kLarge),
+          Container(
+            padding: const EdgeInsets.all(kMedium),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(kMedium),
+            ),
+            child: qrData == null
+                ? Icon(
+                    Icons.qr_code_2_rounded,
+                    size: 164,
+                    color: colorScheme.onSurface.withValues(alpha: 0.3),
+                  )
+                : QrImageView(
+                    data: qrData,
+                    version: QrVersions.auto,
+                    size: 164,
+                    backgroundColor: Colors.white,
+                    eyeStyle: const QrEyeStyle(
+                      eyeShape: QrEyeShape.square,
+                      color: Colors.black,
+                    ),
+                    dataModuleStyle: const QrDataModuleStyle(
+                      dataModuleShape: QrDataModuleShape.square,
+                      color: Colors.black,
+                    ),
+                  ),
+          ),
+          const SizedBox(height: kMedium),
+          Text(
+            _read(ticket['ticket_number']),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (qrData == null) ...[
+            const SizedBox(height: kSmall),
+            Text(
+              'QR code is not available for this ticket yet.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 
   Widget _infoTile(BuildContext context, String label, String value) {
@@ -161,6 +265,8 @@ class _TicketDetailPageState extends State<TicketDetailPage> {
               else if (_failure != null)
                 Center(child: Text(_failure!.error))
               else ...[
+                _qrCard(context, ticket),
+                const SizedBox(height: kMedium),
                 _infoTile(
                     context, 'Ticket Number', _read(ticket['ticket_number'])),
                 _infoTile(
@@ -175,6 +281,11 @@ class _TicketDetailPageState extends State<TicketDetailPage> {
                   'Issued At',
                   _formatDate(ticket['issued_at']),
                 ),
+                // _infoTile(
+                //   context,
+                //   'Public Ticket URL',
+                //   _read(ticket['public_ticket_url']),
+                // ),
                 _infoTile(context, 'QR Token', _read(ticket['qr_token'])),
                 _infoTile(
                   context,

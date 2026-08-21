@@ -598,16 +598,49 @@ class PickupAddressService {
 
 class MatchService {
   HttpResult<List<MatchType>> getMatches({String? clubId}) async {
+    final currentContext = service<AppPreferencesManager>().currentContextValue;
+    final endpoint = _mobileScheduleEndpoint(clubId);
+
     return Http.get(
-      _mobileScheduleEndpoint(clubId),
+      endpoint,
       queryParams: {
         'status': 'scheduled',
         'per_page': 50,
       },
       deserializer: (data) {
-        return _extractDataList(data)
-            .map(_mapMobileMatchRecordToMatchType)
-            .toList();
+        final records = _extractDataList(data);
+        final matches = records.map(_mapMobileMatchRecordToMatchType).toList();
+
+        if (kDebugMode) {
+          service<Talker>().info(
+            'Scheduled matches request => '
+            'endpoint=$endpoint, '
+            'clubId=$clubId, '
+            'leagueId=${currentContext?.activeLeagueId ?? AppConfig.defaultLeagueId}, '
+            'seasonId=${currentContext?.activeSeasonId ?? AppConfig.defaultSeasonId}, '
+            'rawCount=${records.length}, '
+            'rawIds=${records.map((record) => _pickText(record, ['id'])).toList()}',
+          );
+
+          for (var i = 0; i < records.length && i < matches.length; i++) {
+            final record = records[i];
+            final match = matches[i];
+            final ticketing = _mapOrEmpty(record['ticketing']);
+
+            service<Talker>().info(
+              'Scheduled match ticketing => '
+              'id=${match.matchId}, '
+              'name=${match.matchName}, '
+              'matchPrice=${match.matchPrice}, '
+              'hasTicket=${match.hasTicket}, '
+              'ticketing.has_tickets=${ticketing['has_tickets']}, '
+              'ticketing.starting_price=${ticketing['starting_price']}, '
+              'ticketing=${jsonEncode(ticketing)}',
+            );
+          }
+        }
+
+        return matches;
       },
     );
   }
@@ -1486,6 +1519,19 @@ MatchType _mapMobileMatchRecordToMatchType(
 }
 
 double _resolveMobileMatchPrice(Map<String, dynamic> record) {
+  final ticketing = _mapOrEmpty(record['ticketing']);
+  if (ticketing.isNotEmpty) {
+    final hasTickets = ticketing['has_tickets'] == true;
+    if (!hasTickets) {
+      return 0;
+    }
+
+    final startingPrice = _toDoubleValue(ticketing['starting_price']);
+    if (startingPrice > 0) {
+      return startingPrice;
+    }
+  }
+
   const matchPriceKeys = [
     'match_price',
     'ticket_price',

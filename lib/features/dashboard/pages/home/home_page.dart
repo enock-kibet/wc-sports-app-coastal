@@ -67,6 +67,7 @@ class _HomePageState extends State<HomePage> {
 
     super.initState();
     _focusNode.addListener(_handleFocusChange);
+    context.read<MatchBloc>().add(const MatchEvent.matches());
     context.read<MatchBloc>().add(const MatchEvent.matchstats());
     _registerForNotifications();
   }
@@ -143,7 +144,7 @@ class _HomePageState extends State<HomePage> {
         categorized[_HomeScheduleCategory.today]!.add(match);
       } else if (matchDate == tomorrow) {
         categorized[_HomeScheduleCategory.tomorrow]!.add(match);
-      } else if (matchDate.isAfter(tomorrow) && matchDate.isBefore(endOfWeek)) {
+      } else if (matchDate.isAfter(tomorrow) && !matchDate.isAfter(endOfWeek)) {
         categorized[_HomeScheduleCategory.thisWeek]!.add(match);
       } else if (matchDate.isAfter(endOfWeek)) {
         categorized[_HomeScheduleCategory.future]!.add(match);
@@ -216,8 +217,11 @@ class _HomePageState extends State<HomePage> {
                             ),
                           );
                         case MatchStatus.success:
-                          final visibleMatches =
-                              reveal ? state.searchedMatches : state.matches;
+                          final hasActiveSearch =
+                              reveal && searchText.text.trim().isNotEmpty;
+                          final visibleMatches = hasActiveSearch
+                              ? state.searchedMatches
+                              : state.matches;
                           final categorized =
                               _categorizeSchedules(visibleMatches);
                           final statsMatches = state.statsMatches;
